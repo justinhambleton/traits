@@ -1,0 +1,9 @@
+{
+  "name": "traits-dev",
+  "private": true,
+  "version": "0.0.0",
+  "packageManager": "pnpm@10.29.1",
+  "scripts": {
+    "test": "pnpm --filter @traits-dev/core test && pnpm --filter @traits-dev/cli test"
+  }
+}

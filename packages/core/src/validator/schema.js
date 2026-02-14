@@ -1,0 +1,525 @@
+const LEVELS = ["very-low", "low", "medium", "high", "very-high"];
+const HUMOR_STYLES = ["none", "dry", "subtle-wit", "playful"];
+const DIMENSIONS = [
+  "formality",
+  "warmth",
+  "verbosity",
+  "directness",
+  "empathy",
+  "humor"
+];
+
+const TOP_LEVEL_KEYS = new Set([
+  "schema",
+  "meta",
+  "identity",
+  "voice",
+  "vocabulary",
+  "behavioral_rules",
+  "context_adaptations",
+  "localization",
+  "channel_adaptations",
+  "extends",
+  "behavioral_rules_remove",
+  "context_adaptations_remove"
+]);
+
+const VOCABULARY_KEYS = new Set([
+  "preferred_terms",
+  "forbidden_terms",
+  "preferred_terms_remove",
+  "forbidden_terms_remove"
+]);
+
+const DIMENSION_INDEX = new Map(LEVELS.map((level, index) => [level, index]));
+
+function isObject(value) {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function isString(value) {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
+function isStringArray(value) {
+  return Array.isArray(value) && value.every((item) => typeof item === "string");
+}
+
+function pushDiagnostic(target, code, message, location) {
+  target.push({
+    code,
+    severity: "error",
+    message: location ? `${message} (${location})` : message,
+    location
+  });
+}
+
+function summarizeDiagnostics(diagnostics) {
+  return {
+    status: diagnostics.length > 0 ? "error" : "pass",
+    errors: diagnostics.length,
+    warnings: 0
+  };
+}
+
+function validateScalarField(parent, key, location, diagnostics) {
+  if (!isString(parent?.[key])) {
+    pushDiagnostic(
+      diagnostics,
+      "V001",
+      `Expected non-empty string for "${key}"`,
+      `${location}.${key}`
+    );
+  }
+}
+
+function validateDimensionValue(value, dimension, location, dimensionsDiagnostics, rangeDiagnostics) {
+  if (typeof value === "string") {
+    if (!DIMENSION_INDEX.has(value)) {
+      pushDiagnostic(
+        dimensionsDiagnostics,
+        "V002",
+        `Invalid level "${value}" for ${dimension}`,
+        location
+      );
+    }
+    return;
+  }
+
+  if (!isObject(value)) {
+    pushDiagnostic(
+      dimensionsDiagnostics,
+      "V002",
+      `Expected "${dimension}" to be a level string or object`,
+      location
+    );
+    return;
+  }
+
+  const allowedObjectKeys =
+    dimension === "humor"
+      ? new Set(["target", "adapt", "floor", "ceiling", "style"])
+      : new Set(["target", "adapt", "floor", "ceiling"]);
+
+  for (const key of Object.keys(value)) {
+    if (!allowedObjectKeys.has(key)) {
+      pushDiagnostic(
+        dimensionsDiagnostics,
+        "V002",
+        `Unknown dimension property "${key}" for ${dimension}`,
+        `${location}.${key}`
+      );
+    }
+  }
+
+  if (!DIMENSION_INDEX.has(value.target)) {
+    pushDiagnostic(
+      dimensionsDiagnostics,
+      "V002",
+      `Invalid target level "${value.target}" for ${dimension}`,
+      `${location}.target`
+    );
+  }
+
+  if (value.adapt != null && typeof value.adapt !== "boolean") {
+    pushDiagnostic(
+      dimensionsDiagnostics,
+      "V002",
+      `Expected boolean for ${dimension}.adapt`,
+      `${location}.adapt`
+    );
+  }
+
+  if (value.floor != null && !DIMENSION_INDEX.has(value.floor)) {
+    pushDiagnostic(
+      dimensionsDiagnostics,
+      "V002",
+      `Invalid floor level "${value.floor}" for ${dimension}`,
+      `${location}.floor`
+    );
+  }
+
+  if (value.ceiling != null && !DIMENSION_INDEX.has(value.ceiling)) {
+    pushDiagnostic(
+      dimensionsDiagnostics,
+      "V002",
+      `Invalid ceiling level "${value.ceiling}" for ${dimension}`,
+      `${location}.ceiling`
+    );
+  }
+
+  if (dimension === "humor") {
+    if (value.style != null && !HUMOR_STYLES.includes(value.style)) {
+      pushDiagnostic(
+        dimensionsDiagnostics,
+        "V002",
+        `Invalid humor style "${value.style}"`,
+        `${location}.style`
+      );
+    }
+  } else if (value.style != null) {
+    pushDiagnostic(
+      dimensionsDiagnostics,
+      "V002",
+      `Style is only allowed on the humor dimension`,
+      `${location}.style`
+    );
+  }
+
+  if (value.adapt === true) {
+    if (value.floor == null || value.ceiling == null) {
+      pushDiagnostic(
+        rangeDiagnostics,
+        "V003",
+        `Adaptive dimension "${dimension}" requires both floor and ceiling`,
+        location
+      );
+      return;
+    }
+
+    if (!DIMENSION_INDEX.has(value.target) || !DIMENSION_INDEX.has(value.floor) || !DIMENSION_INDEX.has(value.ceiling)) {
+      return;
+    }
+
+    const floorIndex = DIMENSION_INDEX.get(value.floor);
+    const targetIndex = DIMENSION_INDEX.get(value.target);
+    const ceilingIndex = DIMENSION_INDEX.get(value.ceiling);
+    if (floorIndex > targetIndex || targetIndex > ceilingIndex) {
+      pushDiagnostic(
+        rangeDiagnostics,
+        "V003",
+        `Adaptive range must satisfy floor <= target <= ceiling for "${dimension}"`,
+        location
+      );
+    }
+  }
+}
+
+export function validateSchema(profile) {
+  const structureDiagnostics = [];
+  const dimensionDiagnostics = [];
+  const rangeDiagnostics = [];
+
+  if (!isObject(profile)) {
+    pushDiagnostic(structureDiagnostics, "V001", "Profile must be a YAML object", "root");
+    return {
+      diagnostics: [...structureDiagnostics],
+      checks: {
+        schema_structure: summarizeDiagnostics(structureDiagnostics),
+        dimension_values: summarizeDiagnostics(dimensionDiagnostics),
+        adaptation_ranges: summarizeDiagnostics(rangeDiagnostics)
+      }
+    };
+  }
+
+  for (const key of Object.keys(profile)) {
+    if (!TOP_LEVEL_KEYS.has(key)) {
+      pushDiagnostic(
+        structureDiagnostics,
+        "V001",
+        `Unknown top-level section "${key}"`,
+        key
+      );
+    }
+  }
+
+  if (!isString(profile.schema)) {
+    pushDiagnostic(
+      structureDiagnostics,
+      "V001",
+      `Missing required "schema" field`,
+      "schema"
+    );
+  } else if (profile.schema !== "v1.4") {
+    pushDiagnostic(
+      structureDiagnostics,
+      "V001",
+      `Unsupported schema version "${profile.schema}"`,
+      "schema"
+    );
+  }
+
+  if (profile.extends != null && !isString(profile.extends)) {
+    pushDiagnostic(
+      structureDiagnostics,
+      "V001",
+      `Expected "extends" to be a non-empty string`,
+      "extends"
+    );
+  }
+
+  if (!isObject(profile.meta)) {
+    pushDiagnostic(structureDiagnostics, "V001", `Missing required "meta" section`, "meta");
+  } else {
+    validateScalarField(profile.meta, "name", "meta", structureDiagnostics);
+    validateScalarField(profile.meta, "version", "meta", structureDiagnostics);
+    validateScalarField(profile.meta, "description", "meta", structureDiagnostics);
+
+    if (profile.meta.tags != null && !isStringArray(profile.meta.tags)) {
+      pushDiagnostic(
+        structureDiagnostics,
+        "V001",
+        `Expected "meta.tags" to be an array of strings`,
+        "meta.tags"
+      );
+    }
+    if (profile.meta.target_audience != null && !isString(profile.meta.target_audience)) {
+      pushDiagnostic(
+        structureDiagnostics,
+        "V001",
+        `Expected "meta.target_audience" to be a non-empty string`,
+        "meta.target_audience"
+      );
+    }
+  }
+
+  if (!isObject(profile.identity)) {
+    pushDiagnostic(
+      structureDiagnostics,
+      "V001",
+      `Missing required "identity" section`,
+      "identity"
+    );
+  } else {
+    validateScalarField(profile.identity, "role", "identity", structureDiagnostics);
+    if (profile.identity.backstory != null && !isString(profile.identity.backstory)) {
+      pushDiagnostic(
+        structureDiagnostics,
+        "V001",
+        `Expected "identity.backstory" to be a non-empty string`,
+        "identity.backstory"
+      );
+    }
+    if (
+      profile.identity.expertise_domains != null &&
+      !isStringArray(profile.identity.expertise_domains)
+    ) {
+      pushDiagnostic(
+        structureDiagnostics,
+        "V001",
+        `Expected "identity.expertise_domains" to be an array of strings`,
+        "identity.expertise_domains"
+      );
+    }
+  }
+
+  if (!isObject(profile.voice)) {
+    pushDiagnostic(structureDiagnostics, "V001", `Missing required "voice" section`, "voice");
+  } else {
+    for (const dimension of DIMENSIONS) {
+      if (profile.voice[dimension] == null) {
+        pushDiagnostic(
+          dimensionDiagnostics,
+          "V002",
+          `Missing required voice dimension "${dimension}"`,
+          `voice.${dimension}`
+        );
+        continue;
+      }
+      validateDimensionValue(
+        profile.voice[dimension],
+        dimension,
+        `voice.${dimension}`,
+        dimensionDiagnostics,
+        rangeDiagnostics
+      );
+    }
+  }
+
+  if (profile.vocabulary != null) {
+    if (!isObject(profile.vocabulary)) {
+      pushDiagnostic(
+        structureDiagnostics,
+        "V001",
+        `Expected "vocabulary" to be an object`,
+        "vocabulary"
+      );
+    } else {
+      for (const key of Object.keys(profile.vocabulary)) {
+        if (!VOCABULARY_KEYS.has(key)) {
+          pushDiagnostic(
+            structureDiagnostics,
+            "V001",
+            `Unknown vocabulary key "${key}"`,
+            `vocabulary.${key}`
+          );
+        }
+      }
+      if (
+        profile.vocabulary.preferred_terms != null &&
+        !isStringArray(profile.vocabulary.preferred_terms)
+      ) {
+        pushDiagnostic(
+          structureDiagnostics,
+          "V001",
+          `Expected "vocabulary.preferred_terms" to be an array of strings`,
+          "vocabulary.preferred_terms"
+        );
+      }
+      if (
+        profile.vocabulary.forbidden_terms != null &&
+        !isStringArray(profile.vocabulary.forbidden_terms)
+      ) {
+        pushDiagnostic(
+          structureDiagnostics,
+          "V001",
+          `Expected "vocabulary.forbidden_terms" to be an array of strings`,
+          "vocabulary.forbidden_terms"
+        );
+      }
+      if (
+        profile.vocabulary.preferred_terms_remove != null &&
+        !isStringArray(profile.vocabulary.preferred_terms_remove)
+      ) {
+        pushDiagnostic(
+          structureDiagnostics,
+          "V001",
+          `Expected "vocabulary.preferred_terms_remove" to be an array of strings`,
+          "vocabulary.preferred_terms_remove"
+        );
+      }
+      if (
+        profile.vocabulary.forbidden_terms_remove != null &&
+        !isStringArray(profile.vocabulary.forbidden_terms_remove)
+      ) {
+        pushDiagnostic(
+          structureDiagnostics,
+          "V001",
+          `Expected "vocabulary.forbidden_terms_remove" to be an array of strings`,
+          "vocabulary.forbidden_terms_remove"
+        );
+      }
+    }
+  }
+
+  if (profile.behavioral_rules != null && !isStringArray(profile.behavioral_rules)) {
+    pushDiagnostic(
+      structureDiagnostics,
+      "V001",
+      `Expected "behavioral_rules" to be an array of strings`,
+      "behavioral_rules"
+    );
+  }
+
+  if (
+    profile.behavioral_rules_remove != null &&
+    !isStringArray(profile.behavioral_rules_remove)
+  ) {
+    pushDiagnostic(
+      structureDiagnostics,
+      "V001",
+      `Expected "behavioral_rules_remove" to be an array of strings`,
+      "behavioral_rules_remove"
+    );
+  }
+
+  if (
+    profile.context_adaptations_remove != null &&
+    !isStringArray(profile.context_adaptations_remove)
+  ) {
+    pushDiagnostic(
+      structureDiagnostics,
+      "V001",
+      `Expected "context_adaptations_remove" to be an array of strings`,
+      "context_adaptations_remove"
+    );
+  }
+
+  if (profile.context_adaptations != null) {
+    if (!Array.isArray(profile.context_adaptations)) {
+      pushDiagnostic(
+        structureDiagnostics,
+        "V001",
+        `Expected "context_adaptations" to be an array`,
+        "context_adaptations"
+      );
+    } else {
+      profile.context_adaptations.forEach((adaptation, idx) => {
+        const location = `context_adaptations[${idx}]`;
+        if (!isObject(adaptation)) {
+          pushDiagnostic(
+            structureDiagnostics,
+            "V001",
+            `Expected context adaptation to be an object`,
+            location
+          );
+          return;
+        }
+
+        if (!isString(adaptation.when)) {
+          pushDiagnostic(
+            structureDiagnostics,
+            "V001",
+            `Context adaptation requires "when"`,
+            `${location}.when`
+          );
+        }
+
+        if (adaptation.priority != null) {
+          if (typeof adaptation.priority !== "number" || !Number.isFinite(adaptation.priority)) {
+            pushDiagnostic(
+              structureDiagnostics,
+              "V001",
+              `Expected "priority" to be a finite number`,
+              `${location}.priority`
+            );
+          }
+        }
+
+        if (adaptation.inject != null && !isStringArray(adaptation.inject)) {
+          pushDiagnostic(
+            structureDiagnostics,
+            "V001",
+            `Expected "inject" to be an array of strings`,
+            `${location}.inject`
+          );
+        }
+
+        if (adaptation.adjustments != null) {
+          if (!isObject(adaptation.adjustments)) {
+            pushDiagnostic(
+              structureDiagnostics,
+              "V001",
+              `Expected "adjustments" to be an object`,
+              `${location}.adjustments`
+            );
+          } else {
+            for (const [dimension, value] of Object.entries(adaptation.adjustments)) {
+              if (!DIMENSIONS.includes(dimension)) {
+                pushDiagnostic(
+                  dimensionDiagnostics,
+                  "V002",
+                  `Unknown adaptation dimension "${dimension}"`,
+                  `${location}.adjustments.${dimension}`
+                );
+                continue;
+              }
+              validateDimensionValue(
+                value,
+                dimension,
+                `${location}.adjustments.${dimension}`,
+                dimensionDiagnostics,
+                rangeDiagnostics
+              );
+            }
+          }
+        }
+      });
+    }
+  }
+
+  const diagnostics = [
+    ...structureDiagnostics,
+    ...dimensionDiagnostics,
+    ...rangeDiagnostics
+  ];
+
+  return {
+    diagnostics,
+    checks: {
+      schema_structure: summarizeDiagnostics(structureDiagnostics),
+      dimension_values: summarizeDiagnostics(dimensionDiagnostics),
+      adaptation_ranges: summarizeDiagnostics(rangeDiagnostics)
+    }
+  };
+}

@@ -1,0 +1,185 @@
+{
+  "version": "claude-baseline-v1",
+  "model": "claude",
+  "dimensions": {
+    "formality": {
+      "very-low": {
+        "pattern": "Claude pattern: keep formality at very-low with explicit framing and concise guidance.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "low": {
+        "pattern": "Claude pattern: keep formality at low with explicit framing and concise guidance.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "medium": {
+        "pattern": "Claude pattern: keep formality at medium with explicit framing and concise guidance.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "high": {
+        "pattern": "Claude pattern: keep formality at high with explicit framing and concise guidance.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "very-high": {
+        "pattern": "Claude pattern: keep formality at very-high with explicit framing and concise guidance.",
+        "adherence": 0.7,
+        "calibrated": false
+      }
+    },
+    "warmth": {
+      "very-low": {
+        "pattern": "Claude pattern: keep warmth at very-low with explicit framing and concise guidance.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "low": {
+        "pattern": "Claude pattern: keep warmth at low with explicit framing and concise guidance.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "medium": {
+        "pattern": "Claude pattern: keep warmth at medium with explicit framing and concise guidance.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "high": {
+        "pattern": "Claude pattern: keep warmth at high with explicit framing and concise guidance.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "very-high": {
+        "pattern": "Claude pattern: keep warmth at very-high with explicit framing and concise guidance.",
+        "adherence": 0.7,
+        "calibrated": false
+      }
+    },
+    "verbosity": {
+      "very-low": {
+        "pattern": "Claude pattern: keep verbosity at very-low with explicit framing and concise guidance.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "low": {
+        "pattern": "Claude pattern: keep verbosity at low with explicit framing and concise guidance.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "medium": {
+        "pattern": "Claude pattern: keep verbosity at medium with explicit framing and concise guidance.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "high": {
+        "pattern": "Claude pattern: keep verbosity at high with explicit framing and concise guidance.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "very-high": {
+        "pattern": "Claude pattern: keep verbosity at very-high with explicit framing and concise guidance.",
+        "adherence": 0.7,
+        "calibrated": false
+      }
+    },
+    "directness": {
+      "very-low": {
+        "pattern": "Claude pattern: keep directness at very-low with explicit framing and concise guidance.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "low": {
+        "pattern": "Claude pattern: keep directness at low with explicit framing and concise guidance.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "medium": {
+        "pattern": "Claude pattern: keep directness at medium with explicit framing and concise guidance.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "high": {
+        "pattern": "Claude pattern: keep directness at high with explicit framing and concise guidance.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "very-high": {
+        "pattern": "Claude pattern: keep directness at very-high with explicit framing and concise guidance.",
+        "adherence": 0.7,
+        "calibrated": false
+      }
+    },
+    "empathy": {
+      "very-low": {
+        "pattern": "Claude pattern: keep empathy at very-low with explicit framing and concise guidance.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "low": {
+        "pattern": "Claude pattern: keep empathy at low with explicit framing and concise guidance.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "medium": {
+        "pattern": "Claude pattern: keep empathy at medium with explicit framing and concise guidance.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "high": {
+        "pattern": "Claude pattern: keep empathy at high with explicit framing and concise guidance.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "very-high": {
+        "pattern": "Claude pattern: keep empathy at very-high with explicit framing and concise guidance.",
+        "adherence": 0.7,
+        "calibrated": false
+      }
+    },
+    "humor": {
+      "very-low": {
+        "pattern": "Claude pattern: keep humor at very-low with explicit framing and concise guidance.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "low": {
+        "pattern": "Claude pattern: keep humor at low with explicit framing and concise guidance.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "medium": {
+        "pattern": "Claude pattern: keep humor at medium with explicit framing and concise guidance.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "high": {
+        "pattern": "Claude pattern: keep humor at high with explicit framing and concise guidance.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "very-high": {
+        "pattern": "Claude pattern: keep humor at very-high with explicit framing and concise guidance.",
+        "adherence": 0.7,
+        "calibrated": false
+      }
+    }
+  },
+  "interactions": {
+    "warmth-high_directness-high": {
+      "pattern": "Claude interaction: acknowledge first and pivot immediately to action.",
+      "adherence": 0.74,
+      "calibrated": false
+    },
+    "empathy-very-high_directness-low": {
+      "pattern": "Interaction guardrail: keep empathy high while preserving explicit boundaries and refusal clarity.",
+      "adherence": 0.68,
+      "calibrated": false
+    },
+    "formality-high_humor-medium-plus": {
+      "pattern": "Interaction guardrail: keep humor subtle and professional under high formality.",
+      "adherence": 0.66,
+      "calibrated": false
+    }
+  }
+}

@@ -1,0 +1,46 @@
+# Test fixture: Overspecified profile for S004 warning path
+#
+# Expected:
+# - validate exit code = 1
+# - WARNING [S004] with constraint count above 15 and below/equal 30
+
+schema: "v1.4"
+
+meta:
+  name: "_overspec-s004-warning-test"
+  version: "1.0.0"
+  description: "Fixture profile that intentionally triggers S004 warning"
+  tags:
+    - "test-fixture"
+    - "s004"
+
+identity:
+  role: "Overspec fixture role"
+
+voice:
+  formality: "medium"
+  warmth: "medium"
+  verbosity: "medium"
+  directness: "medium"
+  empathy: "medium"
+  humor:
+    target: "very-low"
+    style: "none"
+
+behavioral_rules:
+  - "Rule 01"
+  - "Rule 02"
+  - "Rule 03"
+  - "Rule 04"
+  - "Rule 05"
+  - "Rule 06"
+  - "Rule 07"
+  - "Rule 08"
+  - "Rule 09"
+  - "Rule 10"
+  - "Rule 11"
+  - "Rule 12"
+  - "Rule 13"
+  - "Rule 14"
+  - "Rule 15"
+  - "Rule 16"

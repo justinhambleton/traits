@@ -1,0 +1,9 @@
+{
+  "version": "0.1.0",
+  "updated_at": "2026-02-14T02:01:59.860Z",
+  "models": [
+    "claude",
+    "gpt"
+  ],
+  "notes": "Baseline placeholder patterns for MVP compile scaffolding."
+}

@@ -1,0 +1,185 @@
+{
+  "version": "gpt-baseline-v1",
+  "model": "gpt",
+  "dimensions": {
+    "formality": {
+      "very-low": {
+        "pattern": "GPT pattern: enforce formality=very-low with clear directives and stable tone.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "low": {
+        "pattern": "GPT pattern: enforce formality=low with clear directives and stable tone.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "medium": {
+        "pattern": "GPT pattern: enforce formality=medium with clear directives and stable tone.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "high": {
+        "pattern": "GPT pattern: enforce formality=high with clear directives and stable tone.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "very-high": {
+        "pattern": "GPT pattern: enforce formality=very-high with clear directives and stable tone.",
+        "adherence": 0.7,
+        "calibrated": false
+      }
+    },
+    "warmth": {
+      "very-low": {
+        "pattern": "GPT pattern: enforce warmth=very-low with clear directives and stable tone.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "low": {
+        "pattern": "GPT pattern: enforce warmth=low with clear directives and stable tone.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "medium": {
+        "pattern": "GPT pattern: enforce warmth=medium with clear directives and stable tone.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "high": {
+        "pattern": "GPT pattern: enforce warmth=high with clear directives and stable tone.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "very-high": {
+        "pattern": "GPT pattern: enforce warmth=very-high with clear directives and stable tone.",
+        "adherence": 0.7,
+        "calibrated": false
+      }
+    },
+    "verbosity": {
+      "very-low": {
+        "pattern": "GPT pattern: enforce verbosity=very-low with clear directives and stable tone.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "low": {
+        "pattern": "GPT pattern: enforce verbosity=low with clear directives and stable tone.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "medium": {
+        "pattern": "GPT pattern: enforce verbosity=medium with clear directives and stable tone.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "high": {
+        "pattern": "GPT pattern: enforce verbosity=high with clear directives and stable tone.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "very-high": {
+        "pattern": "GPT pattern: enforce verbosity=very-high with clear directives and stable tone.",
+        "adherence": 0.7,
+        "calibrated": false
+      }
+    },
+    "directness": {
+      "very-low": {
+        "pattern": "GPT pattern: enforce directness=very-low with clear directives and stable tone.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "low": {
+        "pattern": "GPT pattern: enforce directness=low with clear directives and stable tone.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "medium": {
+        "pattern": "GPT pattern: enforce directness=medium with clear directives and stable tone.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "high": {
+        "pattern": "GPT pattern: enforce directness=high with clear directives and stable tone.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "very-high": {
+        "pattern": "GPT pattern: enforce directness=very-high with clear directives and stable tone.",
+        "adherence": 0.7,
+        "calibrated": false
+      }
+    },
+    "empathy": {
+      "very-low": {
+        "pattern": "GPT pattern: enforce empathy=very-low with clear directives and stable tone.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "low": {
+        "pattern": "GPT pattern: enforce empathy=low with clear directives and stable tone.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "medium": {
+        "pattern": "GPT pattern: enforce empathy=medium with clear directives and stable tone.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "high": {
+        "pattern": "GPT pattern: enforce empathy=high with clear directives and stable tone.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "very-high": {
+        "pattern": "GPT pattern: enforce empathy=very-high with clear directives and stable tone.",
+        "adherence": 0.7,
+        "calibrated": false
+      }
+    },
+    "humor": {
+      "very-low": {
+        "pattern": "GPT pattern: enforce humor=very-low with clear directives and stable tone.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "low": {
+        "pattern": "GPT pattern: enforce humor=low with clear directives and stable tone.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "medium": {
+        "pattern": "GPT pattern: enforce humor=medium with clear directives and stable tone.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "high": {
+        "pattern": "GPT pattern: enforce humor=high with clear directives and stable tone.",
+        "adherence": 0.7,
+        "calibrated": false
+      },
+      "very-high": {
+        "pattern": "GPT pattern: enforce humor=very-high with clear directives and stable tone.",
+        "adherence": 0.7,
+        "calibrated": false
+      }
+    }
+  },
+  "interactions": {
+    "warmth-high_directness-high": {
+      "pattern": "GPT interaction: acknowledge concern, then move directly to concrete actions.",
+      "adherence": 0.74,
+      "calibrated": false
+    },
+    "empathy-very-high_directness-low": {
+      "pattern": "Interaction guardrail: keep empathy high while preserving explicit boundaries and refusal clarity.",
+      "adherence": 0.68,
+      "calibrated": false
+    },
+    "formality-high_humor-medium-plus": {
+      "pattern": "Interaction guardrail: keep humor subtle and professional under high formality.",
+      "adherence": 0.66,
+      "calibrated": false
+    }
+  }
+}

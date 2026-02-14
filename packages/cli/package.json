@@ -1,0 +1,15 @@
+{
+  "name": "@traits-dev/cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "traits": "./src/bin/traits.js"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@traits-dev/core": "workspace:*"
+  }
+}

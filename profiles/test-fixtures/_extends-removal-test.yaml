@@ -1,0 +1,57 @@
+# Test fixture: Explicit removal with S006 warning + error path
+#
+# Extends: resolve
+# Purpose: Validate that behavioral_rules_remove and forbidden_terms_remove
+#          trigger S006 warnings, and that reduced merged safety arrays trigger
+#          the S006 regression error.
+#
+# Expected S006 output:
+#   WARNING [S006] _extends-removal-test removes behavioral rule from parent
+#           resolve. Behavioral rules are safety-relevant.
+#   WARNING [S006] _extends-removal-test removes forbidden term "our policy
+#           states" from parent resolve.
+#   ERROR [S006] merged profile has fewer safety constraints than parent
+#         (behavioral_rules: 2 < 3, forbidden_terms: 2 < 3)
+#
+# Expected merged behavioral_rules (2 total — parent had 3, removed 1):
+#   1. "Acknowledge the customer's problem before offering a solution" (parent)
+#   2. "Ask one diagnostic question at a time — never dump a list..." (parent)
+#   [removed: "Own errors directly: 'I made an error there — let me correct that'"]
+#
+# Expected merged forbidden_terms (2 total — parent had 3, removed 1):
+#   1. "unfortunately" (parent)
+#   2. "calm down" (parent)
+#   [removed: "our policy states"]
+#
+# Note: This fixture intentionally has fewer rules/terms than parent to test
+#       the S006 regression error path after explicit removals.
+
+schema: "v1.4"
+extends: "resolve"
+
+meta:
+  name: "_extends-removal-test"
+  version: "1.0.0"
+  description: "Test fixture — validates S006 warning and regression error on explicit removal"
+  tags:
+    - "test-fixture"
+    - "extends"
+    - "s006"
+
+voice:
+  formality: "low"
+  humor:
+    target: "low"
+    style: "subtle-wit"
+
+vocabulary:
+  forbidden_terms_remove:
+    - "our policy states"
+  # MERGED forbidden_terms: ["unfortunately", "calm down"]
+
+behavioral_rules_remove:
+  - "Own errors directly: 'I made an error there — let me correct that'"
+  # MERGED behavioral_rules: [
+  #   "Acknowledge the customer's problem before offering a solution",
+  #   "Ask one diagnostic question at a time — never dump a list of troubleshooting steps"
+  # ]
