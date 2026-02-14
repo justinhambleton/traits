@@ -5,7 +5,7 @@ import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
-const CLI_ENTRY = path.join(ROOT, "packages/cli/src/bin/traits.js");
+const CLI_ENTRY = path.join(ROOT, "packages/cli/dist/traits.js");
 
 function runCLI(args) {
   return spawnSync(process.execPath, [CLI_ENTRY, ...args], {

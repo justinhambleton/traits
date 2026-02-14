@@ -5,8 +5,37 @@ import {
   formatValidationResult,
   toValidationResultObject
 } from "@traits-dev/core";
+import type { CommandIO, OutputWriter } from "../types.js";
 
-function printCompileUsage(out = process.stderr) {
+type ContextValue = boolean | string;
+
+type CompileArgs = {
+  profilePath: string | null;
+  model: string | null;
+  strict: boolean;
+  json: boolean;
+  explain: boolean;
+  verbose: boolean;
+  noColor: boolean;
+  knowledgeBaseDir: string | null;
+  bundledProfilesDir: string | null;
+  context: Record<string, ContextValue>;
+};
+
+type ParsedCompileArgs =
+  | { error: string }
+  | {
+      value: CompileArgs;
+    };
+
+type ParsedContextArg =
+  | { error: string }
+  | {
+      key: string;
+      value: ContextValue;
+    };
+
+function printCompileUsage(out: OutputWriter = process.stderr): void {
   out.write(
     [
       "Usage:",
@@ -27,7 +56,7 @@ function printCompileUsage(out = process.stderr) {
   );
 }
 
-function parseContextArg(value) {
+function parseContextArg(value: string): ParsedContextArg {
   const [key, rawValue] = String(value).split("=", 2);
   const normalizedKey = String(key).trim();
   if (!normalizedKey) return { error: `Invalid context value "${value}"` };
@@ -43,8 +72,8 @@ function parseContextArg(value) {
   return { key: normalizedKey, value: rawValue };
 }
 
-function parseCompileArgs(args) {
-  const result = {
+function parseCompileArgs(args: string[]): ParsedCompileArgs {
+  const result: CompileArgs = {
     profilePath: null,
     model: null,
     strict: false,
@@ -57,7 +86,7 @@ function parseCompileArgs(args) {
     context: {}
   };
 
-  const positionals = [];
+  const positionals: string[] = [];
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
     if (arg === "--strict") {
@@ -96,7 +125,7 @@ function parseCompileArgs(args) {
         result.knowledgeBaseDir = value;
       } else {
         const parsedContext = parseContextArg(value);
-        if (parsedContext.error) return { error: parsedContext.error };
+        if ("error" in parsedContext) return { error: parsedContext.error };
         result.context[parsedContext.key] = parsedContext.value;
       }
       index += 1;
@@ -120,15 +149,21 @@ function parseCompileArgs(args) {
   return { value: result };
 }
 
-export function runCompile(args, io = process) {
+export function runCompile(args: string[], io: CommandIO = process): number {
   const parsed = parseCompileArgs(args);
-  if (parsed.error) {
+  if ("error" in parsed) {
     io.stderr.write(`Error: ${parsed.error}\n\n`);
     printCompileUsage(io.stderr);
     return 1;
   }
 
   const options = parsed.value;
+  if (!options.profilePath || !options.model) {
+    io.stderr.write("Error: Missing required arguments\n\n");
+    printCompileUsage(io.stderr);
+    return 1;
+  }
+
   const profilePath = path.resolve(io.cwd(), options.profilePath);
   const bundledProfilesDir = options.bundledProfilesDir
     ? path.resolve(io.cwd(), options.bundledProfilesDir)
@@ -169,23 +204,31 @@ export function runCompile(args, io = process) {
     }
     return 0;
   } catch (error) {
-    if (error?.code === "E_COMPILE_VALIDATION" && error.validation) {
+    const typedError = error as {
+      code?: string;
+      message?: string;
+      validation?: {
+        exitCode?: number;
+      };
+    };
+
+    if (typedError.code === "E_COMPILE_VALIDATION" && typedError.validation) {
       if (options.json) {
         io.stdout.write(
           `${JSON.stringify(
             {
-              error: error.message,
-              code: error.code,
-              validation: toValidationResultObject(error.validation)
+              error: typedError.message,
+              code: typedError.code,
+              validation: toValidationResultObject(typedError.validation)
             },
             null,
             2
           )}\n`
         );
       } else {
-        io.stderr.write(`${formatValidationResult(error.validation)}\n`);
+        io.stderr.write(`${formatValidationResult(typedError.validation)}\n`);
       }
-      return error.validation.exitCode ?? 2;
+      return typedError.validation.exitCode ?? 2;
     }
 
     io.stderr.write(
@@ -195,6 +238,6 @@ export function runCompile(args, io = process) {
   }
 }
 
-export function compileHelp(out = process.stdout) {
+export function compileHelp(out: OutputWriter = process.stdout): void {
   printCompileUsage(out);
 }

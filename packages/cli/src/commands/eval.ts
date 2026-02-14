@@ -11,8 +11,56 @@ import {
   runTier3EvaluationForProfile,
   toValidationResultObject
 } from "@traits-dev/core";
+import type { CommandIO, OutputWriter } from "../types.js";
 
-function printEvalUsage(out = process.stderr) {
+type EvalProvider = "auto" | "openai" | "anthropic";
+
+type EvalSample = {
+  id?: string;
+  prompt?: string;
+  response?: string;
+};
+
+type EvalArgs = {
+  profilePath: string | null;
+  model: string | null;
+  tier: number | null;
+  provider: EvalProvider;
+  embeddingModel: string | null;
+  judgeModel: string | null;
+  openaiBaseUrl: string | null;
+  anthropicBaseUrl: string | null;
+  timeoutMs: number | null;
+  maxRetries: number | null;
+  retryBaseMs: number | null;
+  json: boolean;
+  strict: boolean;
+  verbose: boolean;
+  noColor: boolean;
+  responses: string[];
+  samplesPath: string | null;
+  noBaselines: boolean;
+  noHelpfulness: boolean;
+  constraintImpact: boolean;
+};
+
+type ParsedEvalArgs =
+  | { error: string }
+  | {
+      value: EvalArgs;
+    };
+
+type Tier1Report = ReturnType<typeof runTier1EvaluationForProfile>["report"];
+type Tier2Report = Awaited<ReturnType<typeof runTier2EvaluationForProfile>>["report"];
+type Tier3Report = Awaited<ReturnType<typeof runTier3EvaluationForProfile>>["report"];
+
+type TierReports = {
+  tier1?: Tier1Report;
+  tier2?: Tier2Report;
+  tier3?: Tier3Report;
+};
+
+function printEvalUsage(out: OutputWriter = process.stderr): void {
   out.write(
     [
       "Usage:",
@@ -44,8 +92,8 @@ function printEvalUsage(out = process.stderr) {
   );
 }
 
-function parseEvalArgs(args) {
-  const result = {
+function parseEvalArgs(args: string[]): ParsedEvalArgs {
+  const result: EvalArgs = {
     profilePath: null,
     model: null,
     tier: null,
@@ -68,7 +116,7 @@ function parseEvalArgs(args) {
     constraintImpact: false
   };
 
-  const positionals = [];
+  const positionals: string[] = [];
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
     if (arg === "--json") {
@@ -119,7 +167,9 @@ function parseEvalArgs(args) {
       if (!value) return { error: `Missing value for "${arg}"` };
       if (arg === "--model") result.model = value;
       if (arg === "--tier") result.tier = Number(value);
-      if (arg === "--provider") result.provider = value;
+      if (arg === "--provider") {
+        result.provider = String(value).toLowerCase() as EvalProvider;
+      }
       if (arg === "--embedding-model") result.embeddingModel = value;
       if (arg === "--judge-model") result.judgeModel = value;
       if (arg === "--openai-base-url") result.openaiBaseUrl = value;
@@ -150,7 +200,7 @@ function parseEvalArgs(args) {
   if (result.tier != null && ![1, 2, 3].includes(result.tier)) {
     return { error: 'Invalid "--tier" value. Expected 1, 2, or 3.' };
   }
-  if (!["auto", "openai", "anthropic"].includes(String(result.provider).toLowerCase())) {
+  if (!(["auto", "openai", "anthropic"] as const).includes(result.provider)) {
     return { error: 'Invalid "--provider" value. Expected auto, openai, or anthropic.' };
   }
   if (result.timeoutMs != null && (!Number.isInteger(result.timeoutMs) || result.timeoutMs < 0)) {
@@ -172,10 +222,10 @@ function parseEvalArgs(args) {
   return { value: result };
 }
 
-function loadSamples(options, cwd) {
+function loadSamples(options: EvalArgs, cwd: string): EvalSample[] {
   if (options.samplesPath) {
     const sampleFile = path.resolve(cwd, options.samplesPath);
-    const parsed = JSON.parse(fs.readFileSync(sampleFile, "utf8"));
+    const parsed = JSON.parse(fs.readFileSync(sampleFile, "utf8")) as unknown;
     if (!Array.isArray(parsed)) {
       throw new Error("Sample file must be a JSON array");
     }
@@ -183,10 +233,15 @@ function loadSamples(options, cwd) {
       if (typeof item === "string") {
         return { id: `sample-${index + 1}`, response: item };
       }
+      if (!item || typeof item !== "object") {
+        return { id: `sample-${index + 1}`, response: "" };
+      }
+
+      const sample = item as Record<string, unknown>;
       return {
-        id: item?.id ?? `sample-${index + 1}`,
-        response: String(item?.response ?? ""),
-        prompt: item?.prompt != null ? String(item.prompt) : undefined
+        id: sample.id != null ? String(sample.id) : `sample-${index + 1}`,
+        response: String(sample.response ?? ""),
+        prompt: sample.prompt != null ? String(sample.prompt) : undefined
       };
     });
   }
@@ -197,24 +252,36 @@ function loadSamples(options, cwd) {
   }));
 }
 
-function writeProgress(io, options, message) {
+function writeProgress(io: CommandIO, options: EvalArgs, message: string): void {
   if (options.json) return;
   io.stderr.write(`${message}\n`);
 }
 
-export async function runEval(args, io = process) {
+type CommandError = {
+  code?: string;
+  message?: string;
+  validation?: unknown;
+};
+
+export async function runEval(args: string[], io: CommandIO = process): Promise<number> {
   const parsed = parseEvalArgs(args);
-  if (parsed.error) {
+  if ("error" in parsed) {
     io.stderr.write(`Error: ${parsed.error}\n\n`);
     printEvalUsage(io.stderr);
     return 1;
   }
 
   const options = parsed.value;
+  if (!options.profilePath || !options.model) {
+    io.stderr.write("Error: Missing required arguments\n\n");
+    printEvalUsage(io.stderr);
+    return 1;
+  }
+
   const profilePath = path.resolve(io.cwd(), options.profilePath);
   const bundledProfilesDir = path.resolve(io.cwd(), "profiles");
 
-  let samples;
+  let samples: EvalSample[];
   try {
     samples = loadSamples(options, io.cwd());
   } catch (error) {
@@ -246,9 +313,10 @@ export async function runEval(args, io = process) {
   const availability = detectEvalTierAvailability(process.env, {
     provider: options.provider
   });
-  const autoRequestedTier = [3, 2, 1].find(
-    (tier) => availability?.[tier]?.available && availability?.[tier]?.implemented
-  ) ?? 1;
+  const autoRequestedTier =
+    [3, 2, 1].find(
+      (tier) => availability?.[tier]?.available && availability?.[tier]?.implemented
+    ) ?? 1;
   const requestedTier = options.tier ?? autoRequestedTier;
   const tierResolution = resolveTierExecution(requestedTier, availability);
   if (tierResolution.blocked.length > 0 && !options.json) {
@@ -258,10 +326,10 @@ export async function runEval(args, io = process) {
   }
 
   try {
-    const tierReports = {};
-    let baselineReport = null;
+    const tierReports: TierReports = {};
+    let baselineReport: ReturnType<typeof runOfflineBaselineScaffold> | null = null;
 
-    let evaluation = null;
+    let evaluation: ReturnType<typeof runTier1EvaluationForProfile> | null = null;
     if (tierResolution.tiers_run.includes(1)) {
       writeProgress(io, options, "Running Tier 1 checks...");
       evaluation = runTier1EvaluationForProfile(profilePath, samples, {
@@ -279,12 +347,12 @@ export async function runEval(args, io = process) {
         strict: options.strict,
         bundledProfilesDir,
         openaiApiKey: process.env.TRAITS_OPENAI_API_KEY,
-        embeddingModel: options.embeddingModel,
-        openaiBaseUrl: options.openaiBaseUrl,
+        embeddingModel: options.embeddingModel ?? undefined,
+        openaiBaseUrl: options.openaiBaseUrl ?? undefined,
         includeHelpfulness: !options.noHelpfulness,
-        fetchTimeoutMs: options.timeoutMs,
-        fetchMaxRetries: options.maxRetries,
-        fetchRetryBaseMs: options.retryBaseMs
+        fetchTimeoutMs: options.timeoutMs ?? undefined,
+        fetchMaxRetries: options.maxRetries ?? undefined,
+        fetchRetryBaseMs: options.retryBaseMs ?? undefined
       });
       tierReports.tier2 = tier2.report;
       writeProgress(io, options, "Tier 2 complete.");
@@ -296,15 +364,15 @@ export async function runEval(args, io = process) {
         strict: options.strict,
         bundledProfilesDir,
         provider: options.provider,
-        judgeModel: options.judgeModel,
+        judgeModel: options.judgeModel ?? undefined,
         openaiApiKey: process.env.TRAITS_OPENAI_API_KEY,
         anthropicApiKey: process.env.TRAITS_ANTHROPIC_API_KEY,
-        openaiBaseUrl: options.openaiBaseUrl,
-        anthropicBaseUrl: options.anthropicBaseUrl,
+        openaiBaseUrl: options.openaiBaseUrl ?? undefined,
+        anthropicBaseUrl: options.anthropicBaseUrl ?? undefined,
         includeHelpfulness: !options.noHelpfulness,
-        fetchTimeoutMs: options.timeoutMs,
-        fetchMaxRetries: options.maxRetries,
-        fetchRetryBaseMs: options.retryBaseMs
+        fetchTimeoutMs: options.timeoutMs ?? undefined,
+        fetchMaxRetries: options.maxRetries ?? undefined,
+        fetchRetryBaseMs: options.retryBaseMs ?? undefined
       });
       tierReports.tier3 = tier3.report;
       writeProgress(io, options, "Tier 3 complete.");
@@ -319,16 +387,18 @@ export async function runEval(args, io = process) {
       writeProgress(io, options, "Offline baseline scaffold complete.");
     }
 
-    const allScores = Object.values(tierReports)
-      .map((report) => Number(report?.average_score))
-      .filter((score) => Number.isFinite(score));
+    const allScores = [
+      tierReports.tier1?.average_score,
+      tierReports.tier2?.average_score,
+      tierReports.tier3?.average_score
+    ].filter((score): score is number => Number.isFinite(score));
+
     const overallScore =
       allScores.length > 0
         ? allScores.reduce((sum, value) => sum + value, 0) / allScores.length
         : 0;
 
-    const validationForPayload = evaluation?.validation;
-    const payload = {
+    const payload: Record<string, unknown> = {
       profile: profilePath,
       model: options.model,
       tier_requested: requestedTier,
@@ -341,10 +411,11 @@ export async function runEval(args, io = process) {
         ...(baselineReport ? { baselines: baselineReport } : {})
       }
     };
-    if (validationForPayload) {
+
+    if (evaluation?.validation) {
       payload.validation = {
-        warnings: validationForPayload.warnings.length,
-        errors: validationForPayload.errors.length
+        warnings: evaluation.validation.warnings.length,
+        errors: evaluation.validation.errors.length
       };
     }
 
@@ -373,35 +444,39 @@ export async function runEval(args, io = process) {
         `Baseline (basic) Tier 1 avg: ${baselineReport.tier1.basic.average_score.toFixed(3)}\n`
       );
       const deltas = baselineReport.tier1.deltas ?? {};
-      if (Number.isFinite(deltas.compiled_vs_none)) {
-        io.stdout.write(`Delta vs none baseline: ${deltas.compiled_vs_none.toFixed(3)}\n`);
+      const compiledVsNone = deltas.compiled_vs_none;
+      if (typeof compiledVsNone === "number" && Number.isFinite(compiledVsNone)) {
+        io.stdout.write(`Delta vs none baseline: ${compiledVsNone.toFixed(3)}\n`);
       }
-      if (Number.isFinite(deltas.compiled_vs_basic)) {
-        io.stdout.write(`Delta vs basic baseline: ${deltas.compiled_vs_basic.toFixed(3)}\n`);
+      const compiledVsBasic = deltas.compiled_vs_basic;
+      if (typeof compiledVsBasic === "number" && Number.isFinite(compiledVsBasic)) {
+        io.stdout.write(`Delta vs basic baseline: ${compiledVsBasic.toFixed(3)}\n`);
       }
     }
     io.stdout.write(`Overall eval score: ${overallScore.toFixed(3)}\n`);
     return 0;
   } catch (error) {
+    const typedError = error as CommandError;
+
     if (
-      (error?.code === "E_EVAL_TIER2_UNAVAILABLE" ||
-        error?.code === "E_EVAL_TIER3_UNAVAILABLE") &&
+      (typedError.code === "E_EVAL_TIER2_UNAVAILABLE" ||
+        typedError.code === "E_EVAL_TIER3_UNAVAILABLE") &&
       !options.json
     ) {
-      io.stderr.write(`Error: ${error.message}\n`);
+      io.stderr.write(`Error: ${typedError.message ?? "Evaluation tier unavailable."}\n`);
       return 2;
     }
 
     if (
-      (error?.code === "E_EVAL_TIER2_UNAVAILABLE" ||
-        error?.code === "E_EVAL_TIER3_UNAVAILABLE") &&
+      (typedError.code === "E_EVAL_TIER2_UNAVAILABLE" ||
+        typedError.code === "E_EVAL_TIER3_UNAVAILABLE") &&
       options.json
     ) {
       io.stdout.write(
         `${JSON.stringify(
           {
-            error: error.message,
-            code: error.code
+            error: typedError.message,
+            code: typedError.code
           },
           null,
           2
@@ -410,23 +485,31 @@ export async function runEval(args, io = process) {
       return 2;
     }
 
-    if (error?.code === "E_EVAL_VALIDATION" && error.validation) {
+    const validation = typedError.validation as
+      | Parameters<typeof formatValidationResult>[0]
+      | undefined;
+
+    if (typedError.code === "E_EVAL_VALIDATION" && validation) {
       if (options.json) {
         io.stdout.write(
           `${JSON.stringify(
             {
-              error: error.message,
-              code: error.code,
-              validation: toValidationResultObject(error.validation)
+              error: typedError.message,
+              code: typedError.code,
+              validation: toValidationResultObject(validation)
             },
             null,
             2
           )}\n`
         );
       } else {
-        io.stderr.write(`${formatValidationResult(error.validation)}\n`);
+        io.stderr.write(`${formatValidationResult(validation)}\n`);
       }
-      return error.validation.exitCode ?? 2;
+      return (
+        (validation as {
+          exitCode?: number;
+        }).exitCode ?? 2
+      );
     }
 
     io.stderr.write(`Error: ${error instanceof Error ? error.message : String(error)}\n`);
@@ -434,6 +517,6 @@ export async function runEval(args, io = process) {
   }
 }
 
-export function evalHelp(out = process.stdout) {
+export function evalHelp(out: OutputWriter = process.stdout): void {
   printEvalUsage(out);
 }

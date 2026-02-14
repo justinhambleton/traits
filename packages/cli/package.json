@@ -4,12 +4,19 @@
   "private": true,
   "type": "module",
   "bin": {
-    "traits": "./src/bin/traits.js"
+    "traits": "./dist/traits.js"
   },
   "scripts": {
-    "test": "pnpm --filter @traits-dev/core build && node --test"
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "pnpm --filter @traits-dev/core build && tsup && node --test"
   },
   "dependencies": {
     "@traits-dev/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^25.2.3",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
   }
 }

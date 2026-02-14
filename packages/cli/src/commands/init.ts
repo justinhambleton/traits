@@ -4,8 +4,28 @@ import path from "node:path";
 import readline from "node:readline/promises";
 
 import { validateProfile } from "@traits-dev/core";
+import type { CommandIO, OutputWriter } from "../types.js";
 
-const TONE_PRESETS = {
+type DimensionSpec = {
+  target: string;
+  adapt?: boolean;
+  floor?: string;
+  ceiling?: string;
+  style?: string;
+};
+
+type TonePreset = {
+  formality: string | DimensionSpec;
+  warmth: string | DimensionSpec;
+  verbosity: string | DimensionSpec;
+  directness: string | DimensionSpec;
+  empathy: string | DimensionSpec;
+  humor: string | DimensionSpec;
+};
+
+type ToneName = "balanced" | "warm" | "direct" | "formal";
+
+const TONE_PRESETS: Record<ToneName, TonePreset> = {
   balanced: {
     formality: { target: "medium", adapt: true, floor: "low", ceiling: "high" },
     warmth: { target: "medium", adapt: true, floor: "low", ceiling: "high" },
@@ -40,7 +60,25 @@ const TONE_PRESETS = {
   }
 };
 
-function printInitUsage(out = process.stderr) {
+type InitArgs = {
+  outputPath: string | null;
+  name: string | null;
+  domain: string | null;
+  model: string | null;
+  tone: string | null;
+  template: string | null;
+  verbose: boolean;
+  noColor: boolean;
+  force: boolean;
+};
+
+type ParsedInitArgs =
+  | { error: string }
+  | {
+      value: InitArgs;
+    };
+
+function printInitUsage(out: OutputWriter = process.stderr): void {
   out.write(
     [
       "Usage:",
@@ -60,7 +98,7 @@ function printInitUsage(out = process.stderr) {
   );
 }
 
-function slugify(value) {
+function slugify(value: string): string {
   return String(value)
     .trim()
     .toLowerCase()
@@ -68,7 +106,7 @@ function slugify(value) {
     .replace(/^-+|-+$/g, "");
 }
 
-function toTitleWords(value) {
+function toTitleWords(value: string): string {
   return String(value)
     .split(/[-_\s]+/g)
     .filter(Boolean)
@@ -76,7 +114,7 @@ function toTitleWords(value) {
     .join(" ");
 }
 
-function renderDimensionBlock(key, value) {
+function renderDimensionBlock(key: string, value: string | DimensionSpec): string[] {
   if (typeof value === "string") {
     return [`  ${key}: "${value}"`];
   }
@@ -89,15 +127,25 @@ function renderDimensionBlock(key, value) {
   return lines;
 }
 
-function renderScaffold({ name, domain, model, tone }) {
+function renderScaffold({
+  name,
+  domain,
+  model,
+  tone
+}: {
+  name: string;
+  domain: string;
+  model: string;
+  tone: string;
+}): string {
   const domainLabel = String(domain).trim();
-  const preset = TONE_PRESETS[tone] ?? TONE_PRESETS.balanced;
+  const preset = (TONE_PRESETS[tone as ToneName] ?? TONE_PRESETS.balanced) as TonePreset;
   const role = `${toTitleWords(domainLabel)} assistant`;
   const expertise = `${toTitleWords(domainLabel)} workflows and support`;
 
   return [
-    '# traits.dev personality scaffold',
-    '# Edit fields to match your product and voice requirements.',
+    "# traits.dev personality scaffold",
+    "# Edit fields to match your product and voice requirements.",
     'schema: "v1.4"',
     "",
     "meta:",
@@ -152,8 +200,8 @@ function renderScaffold({ name, domain, model, tone }) {
   ].join("\n");
 }
 
-function parseInitArgs(args) {
-  const result = {
+function parseInitArgs(args: string[]): ParsedInitArgs {
+  const result: InitArgs = {
     outputPath: null,
     name: null,
     domain: null,
@@ -165,7 +213,7 @@ function parseInitArgs(args) {
     force: false
   };
 
-  const positionals = [];
+  const positionals: string[] = [];
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
     if (arg === "--force") {
@@ -180,11 +228,20 @@ function parseInitArgs(args) {
       result.noColor = true;
       continue;
     }
-    if (arg === "--name" || arg === "--domain" || arg === "--model" || arg === "--tone" || arg === "--template") {
+    if (
+      arg === "--name" ||
+      arg === "--domain" ||
+      arg === "--model" ||
+      arg === "--tone" ||
+      arg === "--template"
+    ) {
       const value = args[index + 1];
       if (!value) return { error: `Missing value for "${arg}"` };
-      const key = arg.slice(2);
-      result[key] = value;
+      if (arg === "--name") result.name = value;
+      if (arg === "--domain") result.domain = value;
+      if (arg === "--model") result.model = value;
+      if (arg === "--tone") result.tone = value;
+      if (arg === "--template") result.template = value;
       index += 1;
       continue;
     }
@@ -208,7 +265,7 @@ function parseInitArgs(args) {
   return { value: result };
 }
 
-function resolveTemplatePath(template, cwd) {
+function resolveTemplatePath(template: string, cwd: string): string | null {
   const candidateValues = [template];
   if (!template.endsWith(".yaml")) {
     candidateValues.push(`${template}.yaml`);
@@ -225,9 +282,10 @@ function resolveTemplatePath(template, cwd) {
   return null;
 }
 
-async function promptIfMissing(config, io) {
+async function promptIfMissing(config: InitArgs, io: CommandIO): Promise<InitArgs> {
   const out = { ...config };
-  if (!io.stdin.isTTY || !io.stdout.isTTY) {
+  const stdout = io.stdout as NodeJS.WriteStream;
+  if (!io.stdin.isTTY || !stdout.isTTY) {
     out.name = out.name ?? "my-profile";
     out.domain = out.domain ?? "general-assistant";
     out.model = out.model ?? "claude-sonnet";
@@ -235,7 +293,7 @@ async function promptIfMissing(config, io) {
     return out;
   }
 
-  const rl = readline.createInterface({ input: io.stdin, output: io.stdout });
+  const rl = readline.createInterface({ input: io.stdin, output: stdout });
   try {
     const nameInput = out.name ?? (await rl.question("Profile name (my-profile): "));
     out.name = nameInput.trim() || "my-profile";
@@ -260,16 +318,19 @@ async function promptIfMissing(config, io) {
   return out;
 }
 
-function resolveOutputPath(cwd, options) {
+function resolveOutputPath(cwd: string, options: InitArgs): string {
   if (options.outputPath) return path.resolve(cwd, options.outputPath);
   if (options.template) {
     const base = slugify(path.basename(options.template, path.extname(options.template)));
     return path.resolve(cwd, `${base || "profile"}-custom.yaml`);
   }
-  return path.resolve(cwd, `${slugify(options.name) || "profile"}.yaml`);
+  return path.resolve(cwd, `${slugify(options.name ?? "") || "profile"}.yaml`);
 }
 
-function ensureWritableTarget(filePath, force) {
+function ensureWritableTarget(
+  filePath: string,
+  force: boolean
+): { ok: boolean; message?: string } {
   if (!fs.existsSync(filePath)) return { ok: true };
   if (force) return { ok: true };
   return {
@@ -278,7 +339,7 @@ function ensureWritableTarget(filePath, force) {
   };
 }
 
-function writeFileAtomic(filePath, contents) {
+function writeFileAtomic(filePath: string, contents: string): void {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
   const tempFile = path.join(
     path.dirname(filePath),
@@ -288,9 +349,9 @@ function writeFileAtomic(filePath, contents) {
   fs.renameSync(tempFile, filePath);
 }
 
-export async function runInit(args, io = process) {
+export async function runInit(args: string[], io: CommandIO = process): Promise<number> {
   const parsed = parseInitArgs(args);
-  if (parsed.error) {
+  if ("error" in parsed) {
     io.stderr.write(`Error: ${parsed.error}\n\n`);
     printInitUsage(io.stderr);
     return 1;
@@ -362,10 +423,10 @@ export async function runInit(args, io = process) {
   return 0;
 }
 
-export function initHelp(out = process.stdout) {
+export function initHelp(out: OutputWriter = process.stdout): void {
   printInitUsage(out);
 }
 
-export function defaultInitOutputDir() {
+export function defaultInitOutputDir(): string {
   return path.join(os.tmpdir(), "traits-init");
 }

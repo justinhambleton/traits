@@ -5,8 +5,24 @@ import {
   toValidationResultObject,
   validateProfile
 } from "@traits-dev/core";
+import type { CommandIO, OutputWriter } from "../types.js";
 
-function printValidateUsage(out = process.stderr) {
+type ValidateArgs = {
+  profilePath: string | null;
+  strict: boolean;
+  json: boolean;
+  verbose: boolean;
+  noColor: boolean;
+  bundledProfilesDir: string | null;
+};
+
+type ParsedValidateArgs =
+  | { error: string }
+  | {
+      value: ValidateArgs;
+    };
+
+function printValidateUsage(out: OutputWriter = process.stderr): void {
   out.write(
     [
       "Usage:",
@@ -23,8 +39,8 @@ function printValidateUsage(out = process.stderr) {
   );
 }
 
-function parseValidateArgs(args) {
-  const result = {
+function parseValidateArgs(args: string[]): ParsedValidateArgs {
+  const result: ValidateArgs = {
     profilePath: null,
     strict: false,
     json: false,
@@ -33,7 +49,7 @@ function parseValidateArgs(args) {
     bundledProfilesDir: null
   };
 
-  const positionals = [];
+  const positionals: string[] = [];
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
     if (arg === "--strict") {
@@ -75,15 +91,21 @@ function parseValidateArgs(args) {
   return { value: result };
 }
 
-export function runValidate(args, io = process) {
+export function runValidate(args: string[], io: CommandIO = process): number {
   const parsed = parseValidateArgs(args);
-  if (parsed.error) {
+  if ("error" in parsed) {
     io.stderr.write(`Error: ${parsed.error}\n\n`);
     printValidateUsage(io.stderr);
     return 1;
   }
 
   const options = parsed.value;
+  if (!options.profilePath) {
+    io.stderr.write("Error: Missing profile path\n\n");
+    printValidateUsage(io.stderr);
+    return 1;
+  }
+
   const bundledProfilesDir = options.bundledProfilesDir
     ? path.resolve(io.cwd(), options.bundledProfilesDir)
     : path.resolve(io.cwd(), "profiles");
@@ -107,6 +129,6 @@ export function runValidate(args, io = process) {
   return result.exitCode;
 }
 
-export function validateHelp(out = process.stdout) {
+export function validateHelp(out: OutputWriter = process.stdout): void {
   printValidateUsage(out);
 }

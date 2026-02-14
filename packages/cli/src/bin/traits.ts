@@ -8,13 +8,38 @@ import { evalHelp, runEval } from "../commands/eval.js";
 import { initHelp, runInit } from "../commands/init.js";
 import { importHelp, runImport } from "../commands/import.js";
 import { runValidate, validateHelp } from "../commands/validate.js";
+import type { CommandIO, OutputWriter } from "../types.js";
 
-const PACKAGE_JSON_PATH = path.resolve(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "../../package.json"
-);
+const CLI_DIR = path.dirname(fileURLToPath(import.meta.url));
+const PACKAGE_JSON_CANDIDATES = [
+  path.resolve(CLI_DIR, "../package.json"),
+  path.resolve(CLI_DIR, "../../package.json")
+];
 
-function printRootUsage(out = process.stdout) {
+function resolvePackageJsonPath(): string {
+  for (const candidate of PACKAGE_JSON_CANDIDATES) {
+    if (fs.existsSync(candidate)) return candidate;
+  }
+  return PACKAGE_JSON_CANDIDATES[0];
+}
+
+const PACKAGE_JSON_PATH = resolvePackageJsonPath();
+
+type GlobalFlags = {
+  json: boolean;
+  verbose: boolean;
+  noColor: boolean;
+};
+
+type ParsedGlobalFlags =
+  | { error: string }
+  | {
+      flags: GlobalFlags;
+      command: string | null;
+      commandArgs: string[];
+    };
+
+function printRootUsage(out: OutputWriter = process.stdout): void {
   out.write(
     [
       "traits.dev CLI",
@@ -45,18 +70,20 @@ function printRootUsage(out = process.stdout) {
   );
 }
 
-function readCliVersion() {
+function readCliVersion(): string {
   try {
     const raw = fs.readFileSync(PACKAGE_JSON_PATH, "utf8");
-    const pkg = JSON.parse(raw);
+    const pkg = JSON.parse(raw) as {
+      version?: string;
+    };
     return String(pkg.version ?? "0.0.0");
   } catch {
     return "0.0.0";
   }
 }
 
-function parseGlobalFlags(args) {
-  const flags = { json: false, verbose: false, noColor: false };
+function parseGlobalFlags(args: string[]): ParsedGlobalFlags {
+  const flags: GlobalFlags = { json: false, verbose: false, noColor: false };
   let index = 0;
   while (index < args.length) {
     const arg = args[index];
@@ -88,7 +115,7 @@ function parseGlobalFlags(args) {
   };
 }
 
-function withGlobalFlags(command, commandArgs, flags) {
+function withGlobalFlags(command: string, commandArgs: string[], flags: GlobalFlags): string[] {
   const args = [...commandArgs];
   if (flags.verbose && !args.includes("--verbose")) {
     args.push("--verbose");
@@ -109,7 +136,7 @@ function withGlobalFlags(command, commandArgs, flags) {
   return args;
 }
 
-async function run(argv, io = process) {
+async function run(argv: string[], io: CommandIO = process): Promise<number> {
   const args = [...argv];
 
   if (args.length === 0 || args[0] === "--help" || args[0] === "-h") {
@@ -122,7 +149,7 @@ async function run(argv, io = process) {
   }
 
   const parsed = parseGlobalFlags(args);
-  if (parsed.error) {
+  if ("error" in parsed) {
     io.stderr.write(`Error: ${parsed.error}\n\n`);
     printRootUsage(io.stderr);
     return 1;

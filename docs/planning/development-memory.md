@@ -197,3 +197,9 @@ Decision log for implementation-critical choices. Keep entries brief and factual
 - Why: Make calibration outcomes auditable and enforceable so future changes cannot silently regress into placeholder or uncalibrated knowledge-base state.
 - Files: `knowledge-base/calibration-notes.md`, `package.json`, `docs/planning/development-memory.md`
 - Follow-up: Run a provider-backed (`--embedding-mode openai`) calibration refinement pass to improve score differentiation and raise base-dimension adherence above initial threshold targets.
+
+- Date: 2026-02-14
+- Decision: Complete `@traits-dev/cli` TypeScript migration, move CLI tests to built-output execution (`dist/traits.js`), and add CLI to root build/typecheck gates.
+- Why: Keep the workspace on a single typed source model, ensure command tests validate shipped artifacts instead of source internals, and prevent future JS/TS drift in the user-facing CLI surface.
+- Files: `packages/cli/src/bin/traits.ts`, `packages/cli/src/commands/compile.ts`, `packages/cli/src/commands/eval.ts`, `packages/cli/src/commands/import.ts`, `packages/cli/src/commands/init.ts`, `packages/cli/src/commands/validate.ts`, `packages/cli/src/types.ts`, `packages/cli/tsconfig.json`, `packages/cli/tsup.config.ts`, `packages/cli/package.json`, `packages/cli/test/compile.test.js`, `packages/cli/test/eval.test.js`, `packages/cli/test/import.test.js`, `packages/cli/test/init.test.js`, `packages/cli/test/validate.test.js`, `packages/cli/test/workflow.test.js`, `package.json`, `pnpm-lock.yaml`, `docs/planning/development-memory.md`
+- Follow-up: Consider adding CLI declaration output if third-party programmatic CLI integration becomes a requirement; otherwise proceed with compile output quality audit as the next product-priority task.

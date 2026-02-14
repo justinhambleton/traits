@@ -7,8 +7,44 @@ import {
   toValidationResultObject,
   validateResolvedProfile
 } from "@traits-dev/core";
+import type { CommandIO, OutputWriter } from "../types.js";
 
-function printImportUsage(out = process.stderr) {
+type ImportProvider = "auto" | "openai" | "anthropic";
+
+type ImportArgs = {
+  promptPath: string | null;
+  provider: ImportProvider;
+  model: string | null;
+  profileName: string | null;
+  outputPath: string | null;
+  openaiBaseUrl: string | null;
+  anthropicBaseUrl: string | null;
+  timeoutMs: number | null;
+  maxRetries: number | null;
+  retryBaseMs: number | null;
+  strict: boolean;
+  json: boolean;
+  verbose: boolean;
+  noColor: boolean;
+};
+
+type ParsedImportArgs =
+  | { error: string }
+  | {
+      value: ImportArgs;
+    };
+
+type PromptSource = {
+  source: string;
+  text: string;
+};
+
+type CommandError = {
+  code?: string;
+  message?: string;
+};
+
+function printImportUsage(out: OutputWriter = process.stderr): void {
   out.write(
     [
       "Usage:",
@@ -37,8 +73,8 @@ function printImportUsage(out = process.stderr) {
   );
 }
 
-function parseImportArgs(args) {
-  const result = {
+function parseImportArgs(args: string[]): ParsedImportArgs {
+  const result: ImportArgs = {
     promptPath: null,
     provider: "auto",
     model: null,
@@ -55,7 +91,7 @@ function parseImportArgs(args) {
     noColor: false
   };
 
-  const positionals = [];
+  const positionals: string[] = [];
   for (let index = 0; index < args.length; index += 1) {
     const arg = args[index];
 
@@ -89,7 +125,7 @@ function parseImportArgs(args) {
     ) {
       const value = args[index + 1];
       if (!value) return { error: `Missing value for "${arg}"` };
-      if (arg === "--provider") result.provider = value;
+      if (arg === "--provider") result.provider = String(value).toLowerCase() as ImportProvider;
       if (arg === "--model") result.model = value;
       if (arg === "--name") result.profileName = value;
       if (arg === "--output") result.outputPath = value;
@@ -114,7 +150,7 @@ function parseImportArgs(args) {
   }
   result.promptPath = positionals[0] ?? null;
 
-  if (!["auto", "openai", "anthropic"].includes(String(result.provider).toLowerCase())) {
+  if (!(["auto", "openai", "anthropic"] as const).includes(result.provider)) {
     return { error: 'Invalid "--provider" value. Expected auto, openai, or anthropic.' };
   }
   if (result.timeoutMs != null && (!Number.isInteger(result.timeoutMs) || result.timeoutMs < 0)) {
@@ -136,15 +172,15 @@ function parseImportArgs(args) {
   return { value: result };
 }
 
-async function readStream(stream) {
-  const chunks = [];
+async function readStream(stream: AsyncIterable<unknown>): Promise<string> {
+  const chunks: string[] = [];
   for await (const chunk of stream) {
-    chunks.push(typeof chunk === "string" ? chunk : chunk.toString("utf8"));
+    chunks.push(typeof chunk === "string" ? chunk : Buffer.from(chunk as Uint8Array).toString("utf8"));
   }
   return chunks.join("");
 }
 
-async function loadPromptSource(options, io) {
+async function loadPromptSource(options: ImportArgs, io: CommandIO): Promise<PromptSource> {
   if (options.promptPath) {
     const promptPath = path.resolve(io.cwd(), options.promptPath);
     return {
@@ -164,22 +200,20 @@ async function loadPromptSource(options, io) {
   };
 }
 
-export async function runImport(args, io = process) {
+export async function runImport(args: string[], io: CommandIO = process): Promise<number> {
   const parsed = parseImportArgs(args);
-  if (parsed.error) {
+  if ("error" in parsed) {
     io.stderr.write(`Error: ${parsed.error}\n\n`);
     printImportUsage(io.stderr);
     return 1;
   }
 
   const options = parsed.value;
-  let promptSource;
+  let promptSource: PromptSource;
   try {
     promptSource = await loadPromptSource(options, io);
   } catch (error) {
-    io.stderr.write(
-      `Error: ${error instanceof Error ? error.message : String(error)}\n`
-    );
+    io.stderr.write(`Error: ${error instanceof Error ? error.message : String(error)}\n`);
     return 1;
   }
 
@@ -200,15 +234,15 @@ export async function runImport(args, io = process) {
   try {
     const imported = await runImportAnalysis(promptText, {
       provider: options.provider,
-      model: options.model,
-      profileName: options.profileName,
+      model: options.model ?? undefined,
+      profileName: options.profileName ?? undefined,
       openaiApiKey: process.env.TRAITS_OPENAI_API_KEY,
       anthropicApiKey: process.env.TRAITS_ANTHROPIC_API_KEY,
-      openaiBaseUrl: options.openaiBaseUrl,
-      anthropicBaseUrl: options.anthropicBaseUrl,
-      fetchTimeoutMs: options.timeoutMs,
-      fetchMaxRetries: options.maxRetries,
-      fetchRetryBaseMs: options.retryBaseMs
+      openaiBaseUrl: options.openaiBaseUrl ?? undefined,
+      anthropicBaseUrl: options.anthropicBaseUrl ?? undefined,
+      fetchTimeoutMs: options.timeoutMs ?? undefined,
+      fetchMaxRetries: options.maxRetries ?? undefined,
+      fetchRetryBaseMs: options.retryBaseMs ?? undefined
     });
 
     const validation = validateResolvedProfile(imported.profile, {
@@ -251,20 +285,21 @@ export async function runImport(args, io = process) {
     io.stderr.write("\nNext: run `traits eval <profile-path> --model <model>` to verify fit.\n");
     return validation.exitCode ?? 0;
   } catch (error) {
-    if (error?.code === "E_IMPORT_PROVIDER_UNAVAILABLE") {
+    const typedError = error as CommandError;
+    if (typedError.code === "E_IMPORT_PROVIDER_UNAVAILABLE") {
       if (options.json) {
         io.stdout.write(
           `${JSON.stringify(
             {
-              error: error.message,
-              code: error.code
+              error: typedError.message,
+              code: typedError.code
             },
             null,
             2
           )}\n`
         );
       } else {
-        io.stderr.write(`Error: ${error.message}\n`);
+        io.stderr.write(`Error: ${typedError.message ?? "Import provider unavailable."}\n`);
       }
       return 2;
     }
@@ -274,6 +309,6 @@ export async function runImport(args, io = process) {
   }
 }
 
-export function importHelp(out = process.stdout) {
+export function importHelp(out: OutputWriter = process.stdout): void {
   printImportUsage(out);
 }
