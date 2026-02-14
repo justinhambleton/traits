@@ -7,6 +7,12 @@
     "build": "pnpm --filter @traits-dev/core build && pnpm --filter @traits-dev/cli build",
     "typecheck": "pnpm --filter @traits-dev/core build && pnpm --filter @traits-dev/core exec tsc --noEmit && pnpm --filter @traits-dev/cli typecheck",
     "test": "pnpm --filter @traits-dev/core test && pnpm --filter @traits-dev/cli test",
-    "calibration:check": "node experiment/scripts/report-calibration-status.mjs --strict"
+    "calibration:check": "node experiment/scripts/report-calibration-status.mjs --strict",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "changeset publish"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.29.8"
   }
 }
