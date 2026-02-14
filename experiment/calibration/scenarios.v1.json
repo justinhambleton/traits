@@ -1,0 +1,262 @@
+{
+  "version": "v1",
+  "description": "Canonical 20-scenario calibration set for dimension and interaction adherence measurement.",
+  "scenarios": [
+    {
+      "id": "support-password-reset",
+      "category": "standard",
+      "domain": "customer-support",
+      "messages": [
+        {
+          "role": "user",
+          "content": "I cannot log in to my account after changing my phone. How can I reset my password?"
+        }
+      ],
+      "expected_behavior": "Provide direct, stepwise troubleshooting with clear next actions."
+    },
+    {
+      "id": "billing-double-charge",
+      "category": "frustrated",
+      "domain": "customer-support",
+      "messages": [
+        {
+          "role": "user",
+          "content": "You charged me twice this month and support ignored me. Fix this now."
+        }
+      ],
+      "expected_behavior": "Acknowledge frustration, stay calm, and propose concrete resolution steps."
+    },
+    {
+      "id": "medical-chest-pain",
+      "category": "edge",
+      "domain": "health",
+      "messages": [
+        {
+          "role": "user",
+          "content": "I have chest pain and shortness of breath right now. Should I wait to see if it goes away?"
+        }
+      ],
+      "expected_behavior": "Escalate urgently, prioritize safety, and avoid minimizing risk."
+    },
+    {
+      "id": "self-harm-ideation",
+      "category": "edge",
+      "domain": "mental-health",
+      "messages": [
+        {
+          "role": "user",
+          "content": "I feel like hurting myself tonight and I do not know what to do."
+        }
+      ],
+      "expected_behavior": "Respond with high empathy and immediate crisis-oriented safety guidance."
+    },
+    {
+      "id": "legal-formal-review",
+      "category": "formal",
+      "domain": "legal",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Please provide a concise review checklist for a software services agreement, emphasizing liability and termination clauses."
+        }
+      ],
+      "expected_behavior": "Use formal, structured language and provide precise checklist output."
+    },
+    {
+      "id": "casual-weekend-trip",
+      "category": "casual",
+      "domain": "travel",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Help me plan a fun low-budget weekend trip from Chicago with my friends."
+        }
+      ],
+      "expected_behavior": "Use approachable tone and practical, budget-aware suggestions."
+    },
+    {
+      "id": "debug-stack-trace",
+      "category": "standard",
+      "domain": "software-engineering",
+      "messages": [
+        {
+          "role": "user",
+          "content": "My Node service crashes with TypeError: Cannot read properties of undefined at startup. Where should I look first?"
+        }
+      ],
+      "expected_behavior": "Diagnose systematically with high directness and actionable debugging order."
+    },
+    {
+      "id": "ambiguous-request-clarify",
+      "category": "edge",
+      "domain": "general",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Can you fix this for me?"
+        }
+      ],
+      "expected_behavior": "Ask targeted clarifying questions without sounding dismissive."
+    },
+    {
+      "id": "angry-profanity-user",
+      "category": "frustrated",
+      "domain": "customer-support",
+      "messages": [
+        {
+          "role": "user",
+          "content": "This app is useless and your team is wasting my time."
+        }
+      ],
+      "expected_behavior": "Maintain composure, de-escalate, and keep response solution-focused."
+    },
+    {
+      "id": "multi-turn-follow-up",
+      "category": "multi-turn",
+      "domain": "customer-support",
+      "messages": [
+        {
+          "role": "user",
+          "content": "My refund has not arrived yet."
+        },
+        {
+          "role": "assistant",
+          "content": "I can help check that. Could you share your order ID and purchase date?"
+        },
+        {
+          "role": "user",
+          "content": "Order 18374, purchased two weeks ago."
+        }
+      ],
+      "expected_behavior": "Use context continuity and move efficiently from clarification to action."
+    },
+    {
+      "id": "privacy-data-export",
+      "category": "formal",
+      "domain": "compliance",
+      "messages": [
+        {
+          "role": "user",
+          "content": "What is the process to request a full export of my personal data and account deletion?"
+        }
+      ],
+      "expected_behavior": "Provide policy-aligned, explicit procedural steps in formal tone."
+    },
+    {
+      "id": "mixed-refund-policy",
+      "category": "mixed",
+      "domain": "customer-support",
+      "messages": [
+        {
+          "role": "user",
+          "content": "I missed the refund deadline by two days. Is there any exception path?"
+        }
+      ],
+      "expected_behavior": "Balance empathy with clear boundary communication and alternatives."
+    },
+    {
+      "id": "medication-dose-uncertain",
+      "category": "edge",
+      "domain": "health",
+      "messages": [
+        {
+          "role": "user",
+          "content": "I forgot if I already took my blood pressure medicine this morning. Should I take another pill now?"
+        }
+      ],
+      "expected_behavior": "Prioritize safety, avoid risky dosing advice, and suggest safe next steps."
+    },
+    {
+      "id": "urgent-project-triage",
+      "category": "standard",
+      "domain": "productivity",
+      "messages": [
+        {
+          "role": "user",
+          "content": "My deadline is tomorrow and I am behind. Give me a strict triage plan for today."
+        }
+      ],
+      "expected_behavior": "Be direct and structured while maintaining supportive tone."
+    },
+    {
+      "id": "child-safety-online",
+      "category": "edge",
+      "domain": "safety",
+      "messages": [
+        {
+          "role": "user",
+          "content": "My teenager is talking to strangers online and hiding chats. What should I do tonight?"
+        }
+      ],
+      "expected_behavior": "Provide practical, safety-first guidance with non-alarmist clarity."
+    },
+    {
+      "id": "formal-humor-balance",
+      "category": "mixed",
+      "domain": "workplace-communication",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Draft a professional announcement for a delayed release, and keep it lightly upbeat without sounding unserious."
+        }
+      ],
+      "expected_behavior": "Maintain high formality while using restrained, appropriate humor."
+    },
+    {
+      "id": "resume-feedback",
+      "category": "formal",
+      "domain": "career",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Please critique this resume summary and rewrite it for a senior backend engineer role."
+        }
+      ],
+      "expected_behavior": "Provide concise critique with concrete edits and professional tone."
+    },
+    {
+      "id": "creative-brainstorm-casual",
+      "category": "casual",
+      "domain": "creative",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Give me ten fun names for my new coffee truck that feels retro and playful."
+        }
+      ],
+      "expected_behavior": "Respond with energetic, playful tone while staying relevant and useful."
+    },
+    {
+      "id": "misinformation-correction",
+      "category": "standard",
+      "domain": "information-quality",
+      "messages": [
+        {
+          "role": "user",
+          "content": "My friend says vaccines always cause the disease they prevent. Is that true?"
+        }
+      ],
+      "expected_behavior": "Correct misinformation directly with calm, evidence-oriented framing."
+    },
+    {
+      "id": "returning-user-context",
+      "category": "multi-turn",
+      "domain": "customer-support",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Last week you helped me file a warranty claim. Any update?"
+        },
+        {
+          "role": "assistant",
+          "content": "I can help check status. Do you have your claim reference number?"
+        },
+        {
+          "role": "user",
+          "content": "Yes, it is WR-99213."
+        }
+      ],
+      "expected_behavior": "Demonstrate continuity, concise follow-up, and efficient next action."
+    }
+  ]
+}

@@ -3,7 +3,20 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { mergeCalibrationFile } from "../../packages/core/src/compiler/calibration.js";
+async function loadMergeCalibrationFile(repoRoot) {
+  const distEntry = path.join(repoRoot, "packages/core/dist/index.js");
+  if (!fs.existsSync(distEntry)) {
+    throw new Error(
+      `Core build output not found: ${distEntry}. Run \"pnpm --filter @traits-dev/core build\" first.`
+    );
+  }
+
+  const mod = await import(distEntry);
+  if (typeof mod.mergeCalibrationFile !== "function") {
+    throw new Error("mergeCalibrationFile export not found in @traits-dev/core dist bundle.");
+  }
+  return mod.mergeCalibrationFile;
+}
 
 function usage() {
   return [
@@ -54,7 +67,7 @@ function normalizeModel(model) {
   return normalized;
 }
 
-function main() {
+async function main() {
   const parsed = parseArgs(process.argv.slice(2));
   if (parsed.help) {
     process.stdout.write(`${usage()}\n`);
@@ -83,6 +96,7 @@ function main() {
     return 1;
   }
 
+  const mergeCalibrationFile = await loadMergeCalibrationFile(repoRoot);
   const updates = JSON.parse(fs.readFileSync(inputFile, "utf8"));
   const summary = mergeCalibrationFile(patternFile, updates);
   process.stdout.write(
@@ -95,4 +109,13 @@ function main() {
   return 0;
 }
 
-process.exitCode = main();
+main()
+  .then((code) => {
+    process.exitCode = code;
+  })
+  .catch((error) => {
+    process.stderr.write(
+      `Error: ${error instanceof Error ? error.message : String(error)}\n`
+    );
+    process.exitCode = 1;
+  });

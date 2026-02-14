@@ -6,6 +6,7 @@
   "scripts": {
     "build": "pnpm --filter @traits-dev/core build",
     "typecheck": "pnpm --filter @traits-dev/core exec tsc --noEmit",
-    "test": "pnpm --filter @traits-dev/core test && pnpm --filter @traits-dev/cli test"
+    "test": "pnpm --filter @traits-dev/core test && pnpm --filter @traits-dev/cli test",
+    "calibration:check": "node experiment/scripts/report-calibration-status.mjs --strict"
   }
 }
