@@ -87,6 +87,66 @@
       "expected_behavior": "Diagnose systematically with high directness and actionable debugging order."
     },
     {
+      "id": "architect-debug-trace-walkthrough",
+      "category": "standard",
+      "domain": "software-engineering",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Our worker crashes on startup with `TypeError: Cannot read properties of undefined (reading 'host')` in `config.ts:42`. How do you triage this quickly?"
+        }
+      ],
+      "expected_behavior": "Identify probable root-cause areas quickly and provide a concrete triage sequence."
+    },
+    {
+      "id": "architect-architecture-decision-review",
+      "category": "mixed",
+      "domain": "software-architecture",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Should we split our backend into microservices this quarter? We have 8 engineers, one monolith, and frequent checkout regressions."
+        }
+      ],
+      "expected_behavior": "Assess options, risks, and constraints, then provide a clear recommendation with rollout steps."
+    },
+    {
+      "id": "architect-code-review-feedback",
+      "category": "standard",
+      "domain": "software-engineering",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Please review this PR approach: added broad try/catch around payment processing and retries on every exception. What are the biggest concerns?"
+        }
+      ],
+      "expected_behavior": "Surface highest-impact review findings first and suggest concrete code-level fixes."
+    },
+    {
+      "id": "architect-ambiguous-requirements",
+      "category": "edge",
+      "domain": "software-product",
+      "messages": [
+        {
+          "role": "user",
+          "content": "Build us an audit logging system for enterprise customers."
+        }
+      ],
+      "expected_behavior": "Clarify critical missing requirements and propose an initial implementation outline."
+    },
+    {
+      "id": "architect-production-incident-triage",
+      "category": "edge",
+      "domain": "sre",
+      "messages": [
+        {
+          "role": "user",
+          "content": "After today's deploy, API p95 latency jumped from 180ms to 1.4s and error rate doubled. Give me a triage plan now."
+        }
+      ],
+      "expected_behavior": "Prioritize immediate mitigation, then provide focused root-cause isolation and follow-up steps."
+    },
+    {
       "id": "ambiguous-request-clarify",
       "category": "edge",
       "domain": "general",

@@ -1,0 +1,769 @@
+{
+  "generated_at": "2026-02-14T22:05:03.467Z",
+  "method": "live-generation-ab",
+  "profile_path": "profiles/architect.yaml",
+  "scenario_file": "experiment/calibration/scenarios.v1.json",
+  "scenario_ids": [
+    "architect-debug-trace-walkthrough",
+    "architect-architecture-decision-review",
+    "architect-code-review-feedback",
+    "architect-ambiguous-requirements",
+    "architect-production-incident-triage"
+  ],
+  "generation": {
+    "provider": "openai",
+    "model": null,
+    "compile_model": "gpt-4o"
+  },
+  "keys_present": {
+    "openai": true,
+    "anthropic": true
+  },
+  "tier_requested": 3,
+  "tier_resolution": {
+    "tier_requested": 3,
+    "tier_executed": 3,
+    "tiers_run": [
+      1,
+      2,
+      3
+    ],
+    "blocked": []
+  },
+  "arms": {
+    "compiled": {
+      "system_prompt": "compiled personality prompt",
+      "samples": [
+        {
+          "id": "architect-debug-trace-walkthrough",
+          "prompt": "user: Our worker crashes on startup with `TypeError: Cannot read properties of undefined (reading 'host')` in `config.ts:42`. How do you triage this quickly?",
+          "response": "Root cause: Accessing 'host' on an undefined config object.\nPatch: Add a null check before accessing 'host' in config.ts line 42.\nNext check: Verify how the config object is initialized and passed to this module. Confirm if config loading or environment variables are missing or misconfigured. Fix config initialization to guarantee 'host' is defined before use."
+        },
+        {
+          "id": "architect-architecture-decision-review",
+          "prompt": "user: Should we split our backend into microservices this quarter? We have 8 engineers, one monolith, and frequent checkout regressions.",
+          "response": "Root cause: Frequent checkout regressions likely stem from tight coupling and complexity in the monolith. Patch: Resist full microservices split this quarter; it's a high-risk, high-overhead move for an 8-engineer team. Next check: Focus on modularizing the monolith—introduce clear service boundaries internally, add automated tests around checkout flows, and improve CI/CD pipelines. Once stability and ownership boundaries are clear, revisit microservices in 2-3 quarters. This approach reduces immediate risk, improves velocity, and lowers cognitive load while setting a foundation for future decomposition."
+        },
+        {
+          "id": "architect-code-review-feedback",
+          "prompt": "user: Please review this PR approach: added broad try/catch around payment processing and retries on every exception. What are the biggest concerns?",
+          "response": "Root cause: Broad try/catch hides specific errors, making debugging and error handling unreliable. Retrying on every exception risks retrying non-transient errors, causing wasted resources and potential data corruption.\nPatch: Narrow try/catch to handle only known transient exceptions (e.g., network timeouts). Implement specific error handling for different failure modes. Add logging with error context before retries.\nNext check: Verify retry logic respects idempotency and backoff strategy to avoid overwhelming downstream systems."
+        },
+        {
+          "id": "architect-ambiguous-requirements",
+          "prompt": "user: Build us an audit logging system for enterprise customers.",
+          "response": "Root cause: Requirements are too vague to start implementation. Patch: Clarify these critical points immediately—1) What events must be logged? 2) What data retention policies apply? 3) Compliance or security standards to meet? 4) Expected query and reporting capabilities? 5) Scale and performance targets? Next check: Provide answers to these to draft a precise architecture and implementation plan."
+        },
+        {
+          "id": "architect-production-incident-triage",
+          "prompt": "user: After today's deploy, API p95 latency jumped from 180ms to 1.4s and error rate doubled. Give me a triage plan now.",
+          "response": "1. Roll back today's deploy immediately to restore baseline performance and reduce user impact.\n2. Confirm rollback success by monitoring latency and error rate metrics.\n3. Collect logs and traces from the failing deploy to identify error patterns and latency spikes.\n4. Isolate changes in the deploy related to database queries, external calls, or resource contention.\n5. Run targeted load tests on the new code in a staging environment to reproduce latency.\n6. Prioritize fixing the root cause based on findings, then plan a controlled redeploy with monitoring.\nNext check: Confirm rollback status and metric normalization within 15 minutes."
+        }
+      ],
+      "reports": {
+        "tier1": {
+          "tier": 1,
+          "sample_count": 5,
+          "average_score": 0.9400000000000001,
+          "samples": [
+            {
+              "id": "architect-debug-trace-walkthrough",
+              "score": 1,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 3,
+                  "preferred_matched": 3,
+                  "forbidden_total": 4,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 5,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 362,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "architect-architecture-decision-review",
+              "score": 1,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 3,
+                  "preferred_matched": 3,
+                  "forbidden_total": 4,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 5,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 611,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "architect-code-review-feedback",
+              "score": 1,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 3,
+                  "preferred_matched": 3,
+                  "forbidden_total": 4,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 5,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 536,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "architect-ambiguous-requirements",
+              "score": 1,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 3,
+                  "preferred_matched": 3,
+                  "forbidden_total": 4,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 5,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 401,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "architect-production-incident-triage",
+              "score": 0.7,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 3,
+                  "preferred_matched": 1,
+                  "forbidden_total": 4,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 5,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 643,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            }
+          ]
+        },
+        "tier2": {
+          "tier": 2,
+          "provider": "openai",
+          "helpfulness_included": false,
+          "sample_count": 5,
+          "average_score": 0.6143987800903072,
+          "dimension_averages": {
+            "formality": 0.6143199474374855,
+            "warmth": 0.590688299819868,
+            "verbosity": 0.6414277905656567,
+            "directness": 0.6415925971834502,
+            "empathy": 0.6062340327816536,
+            "humor": 0.5921300127537293
+          },
+          "helpfulness_average": null,
+          "samples": [
+            {
+              "id": "architect-debug-trace-walkthrough",
+              "score": 0.5615658946857359,
+              "dimension_scores": {
+                "formality": 0.5592539842830017,
+                "warmth": 0.5687406603564696,
+                "verbosity": 0.5703182648797965,
+                "directness": 0.5582885250064988,
+                "empathy": 0.5645168902318385,
+                "humor": 0.54827704335681
+              },
+              "helpfulness_score": null
+            },
+            {
+              "id": "architect-architecture-decision-review",
+              "score": 0.6319034263587803,
+              "dimension_scores": {
+                "formality": 0.6320875006868658,
+                "warmth": 0.6188317058162547,
+                "verbosity": 0.6609812599877569,
+                "directness": 0.6678440608049317,
+                "empathy": 0.6131549678114192,
+                "humor": 0.598521063045453
+              },
+              "helpfulness_score": null
+            },
+            {
+              "id": "architect-code-review-feedback",
+              "score": 0.6299446346732211,
+              "dimension_scores": {
+                "formality": 0.6268052373142039,
+                "warmth": 0.6115853228566225,
+                "verbosity": 0.6577407867810401,
+                "directness": 0.6398396101607575,
+                "empathy": 0.6239862313851499,
+                "humor": 0.6197106195415529
+              },
+              "helpfulness_score": null
+            },
+            {
+              "id": "architect-ambiguous-requirements",
+              "score": 0.6361780577284687,
+              "dimension_scores": {
+                "formality": 0.6481252701943669,
+                "warmth": 0.5821384641111488,
+                "verbosity": 0.6804872910272506,
+                "directness": 0.6654191716684209,
+                "empathy": 0.6287625685345133,
+                "humor": 0.6121355808351118
+              },
+              "helpfulness_score": null
+            },
+            {
+              "id": "architect-production-incident-triage",
+              "score": 0.6124018870053303,
+              "dimension_scores": {
+                "formality": 0.6053277447089895,
+                "warmth": 0.5721453459588447,
+                "verbosity": 0.6376113501524394,
+                "directness": 0.676571618276642,
+                "empathy": 0.6007495059453469,
+                "humor": 0.5820057569897192
+              },
+              "helpfulness_score": null
+            }
+          ]
+        },
+        "tier3": {
+          "tier": 3,
+          "provider": "openai",
+          "helpfulness_included": true,
+          "sample_count": 5,
+          "average_score": 0.5916666666666666,
+          "samples": [
+            {
+              "id": "architect-debug-trace-walkthrough",
+              "score": 0.5333333333333333,
+              "dimension_average": 0.3333333333333333,
+              "formality": 0,
+              "warmth": 0.5,
+              "verbosity": 0,
+              "directness": 1,
+              "empathy": 0.5,
+              "humor": 0,
+              "helpfulness": 1,
+              "rationale": "The response is low in formality, direct, and provides a clear actionable fix with minimal verbosity. It shows some warmth and empathy by addressing the user's issue directly, but could be warmer. Helpfulness is high as it offers a concrete solution and next steps."
+            },
+            {
+              "id": "architect-architecture-decision-review",
+              "score": 0.5916666666666667,
+              "dimension_average": 0.4166666666666667,
+              "formality": 0,
+              "warmth": 0.5,
+              "verbosity": 0.5,
+              "directness": 1,
+              "empathy": 0.5,
+              "humor": 0,
+              "helpfulness": 1,
+              "rationale": "The response maintains a low formality and high directness, clearly addressing the user's question with actionable steps. It has a medium level of warmth and empathy, acknowledging the team's situation while providing a concrete plan. Verbosity is slightly higher than low due to the detailed explanation, but it remains focused on implementation. Humor is absent, aligning with the low target."
+            },
+            {
+              "id": "architect-code-review-feedback",
+              "score": 0.6499999999999999,
+              "dimension_average": 0.5,
+              "formality": 0,
+              "warmth": 0.5,
+              "verbosity": 1,
+              "directness": 1,
+              "empathy": 0.5,
+              "humor": 0,
+              "helpfulness": 1,
+              "rationale": "The response is low in formality, direct, and provides a clear actionable patch and next steps, aligning well with the voice targets. It is somewhat warm and empathetic, but could be more so. Verbosity is low as it gets straight to the point without unnecessary elaboration. Humor is absent, which is appropriate given the low target."
+            },
+            {
+              "id": "architect-ambiguous-requirements",
+              "score": 0.6499999999999999,
+              "dimension_average": 0.5,
+              "formality": 0.5,
+              "warmth": 0.5,
+              "verbosity": 0.5,
+              "directness": 1,
+              "empathy": 0.5,
+              "humor": 0,
+              "helpfulness": 1,
+              "rationale": "The response is mostly direct and actionable, asking for specific clarifications needed to proceed with the implementation. However, it has a slightly formal tone and could be warmer. The verbosity is moderate due to the detailed questions, which slightly deviates from the low verbosity target. Overall, it aligns well with the directness and helpfulness targets."
+            },
+            {
+              "id": "architect-production-incident-triage",
+              "score": 0.5333333333333333,
+              "dimension_average": 0.3333333333333333,
+              "formality": 0,
+              "warmth": 0.5,
+              "verbosity": 0,
+              "directness": 1,
+              "empathy": 0.5,
+              "humor": 0,
+              "helpfulness": 1,
+              "rationale": "The response is low in formality and verbosity, very direct, and provides a clear triage plan. It shows some warmth and empathy by acknowledging user impact but remains focused on actionable steps. It adheres to the preferred terms and avoids forbidden terms, making it highly helpful."
+            }
+          ]
+        }
+      }
+    },
+    "generic": {
+      "system_prompt": "You are a helpful software engineering assistant.",
+      "samples": [
+        {
+          "id": "architect-debug-trace-walkthrough",
+          "prompt": "user: Our worker crashes on startup with `TypeError: Cannot read properties of undefined (reading 'host')` in `config.ts:42`. How do you triage this quickly?",
+          "response": "To triage this quickly, first check the code at config.ts line 42 to identify which object is undefined when accessing 'host'. Then, trace back to where this object is initialized or imported to verify if it's properly set or if there's a missing configuration. Next, review environment variables or configuration files that might affect this object. Finally, add logging or debugging statements before line 42 to confirm the object's state at runtime."
+        },
+        {
+          "id": "architect-architecture-decision-review",
+          "prompt": "user: Should we split our backend into microservices this quarter? We have 8 engineers, one monolith, and frequent checkout regressions.",
+          "response": "Splitting your backend into microservices can improve scalability and isolate failures, potentially reducing checkout regressions. However, with only 8 engineers, the overhead of managing multiple services might slow development and increase complexity. Risks include increased operational burden, deployment challenges, and potential for new integration bugs. Constraints to consider are your team's experience with microservices, existing infrastructure, and time available this quarter. Recommendation: Instead of a full split this quarter, focus on modularizing the monolith and improving testing around the checkout process to reduce regressions. Plan a phased microservices migration starting next quarter, beginning with the most critical or unstable components. Rollout steps: 1) Conduct a detailed analysis of the monolith to identify clear service boundaries. 2) Improve automated testing and CI/CD pipelines. 3) Pilot a microservice for a non-critical component. 4) Gradually migrate other components based on learnings and team capacity."
+        },
+        {
+          "id": "architect-code-review-feedback",
+          "prompt": "user: Please review this PR approach: added broad try/catch around payment processing and retries on every exception. What are the biggest concerns?",
+          "response": "The biggest concerns with adding a broad try/catch around payment processing and retrying on every exception are:\n\n1. Overly broad exception handling: Catching all exceptions can mask specific errors that should be handled differently or propagated. It can make debugging difficult and hide critical issues.\n\n2. Retrying on every exception: Not all exceptions are transient or recoverable. Retrying on fatal errors (e.g., invalid payment details, authorization failures) can cause unnecessary delays and resource consumption.\n\n3. Lack of granular error handling: Different exceptions (network errors, validation errors, database errors) should have tailored handling and retry logic.\n\nConcrete code-level fixes:\n- Narrow the try/catch to catch specific exceptions that are known to be transient (e.g., network timeouts).\n- Implement retry logic only for transient exceptions, with exponential backoff and a maximum retry count.\n- Log exceptions with sufficient context to aid debugging.\n- For non-recoverable exceptions, fail fast and propagate the error appropriately.\n- Consider using a circuit breaker pattern to prevent repeated retries when the payment service is down.\n\nThis approach improves reliability, debuggability, and user experience."
+        },
+        {
+          "id": "architect-ambiguous-requirements",
+          "prompt": "user: Build us an audit logging system for enterprise customers.",
+          "response": "To build an effective audit logging system for enterprise customers, I need to clarify a few critical requirements: 1) What types of events or actions should be logged (e.g., user logins, data changes, system errors)? 2) What level of detail is required in the logs? 3) Are there any compliance or security standards to adhere to (e.g., GDPR, HIPAA)? 4) What is the expected volume of logs and retention period? 5) Should the system support real-time monitoring or alerting? 6) What platforms or technologies should the system integrate with? Once these details are clear, I can propose an initial implementation outline including architecture, data storage, access controls, and reporting capabilities."
+        },
+        {
+          "id": "architect-production-incident-triage",
+          "prompt": "user: After today's deploy, API p95 latency jumped from 180ms to 1.4s and error rate doubled. Give me a triage plan now.",
+          "response": "1. Immediate Mitigation: Roll back the deployment to the previous stable version to restore service performance and reduce errors. 2. Monitoring: Increase monitoring frequency on API latency and error rates to detect any further anomalies. 3. Root Cause Isolation: Analyze deployment changes, review logs, and identify any code or configuration changes that could cause latency and errors. 4. Load Testing: Reproduce the issue in a staging environment to confirm the root cause. 5. Communication: Inform stakeholders about the rollback and ongoing investigation. 6. Follow-up: Develop a fix based on root cause findings, test thoroughly, and plan a controlled redeployment with enhanced monitoring."
+        }
+      ],
+      "reports": {
+        "tier1": {
+          "tier": 1,
+          "sample_count": 5,
+          "average_score": 0.55,
+          "samples": [
+            {
+              "id": "architect-debug-trace-walkthrough",
+              "score": 0.55,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 3,
+                  "preferred_matched": 0,
+                  "forbidden_total": 4,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 5,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 452,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "architect-architecture-decision-review",
+              "score": 0.55,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 3,
+                  "preferred_matched": 0,
+                  "forbidden_total": 4,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 5,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 1049,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "architect-code-review-feedback",
+              "score": 0.55,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 3,
+                  "preferred_matched": 0,
+                  "forbidden_total": 4,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 5,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 1247,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "architect-ambiguous-requirements",
+              "score": 0.55,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 3,
+                  "preferred_matched": 0,
+                  "forbidden_total": 4,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 5,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 703,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "architect-production-incident-triage",
+              "score": 0.55,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 3,
+                  "preferred_matched": 0,
+                  "forbidden_total": 4,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 5,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 698,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            }
+          ]
+        },
+        "tier2": {
+          "tier": 2,
+          "provider": "openai",
+          "helpfulness_included": false,
+          "sample_count": 5,
+          "average_score": 0.6018236502099377,
+          "dimension_averages": {
+            "formality": 0.6028740873815812,
+            "warmth": 0.5843583012289498,
+            "verbosity": 0.6421940380489705,
+            "directness": 0.6177994702399565,
+            "empathy": 0.5923320093359412,
+            "humor": 0.5713839950242263
+          },
+          "helpfulness_average": null,
+          "samples": [
+            {
+              "id": "architect-debug-trace-walkthrough",
+              "score": 0.5805458305673953,
+              "dimension_scores": {
+                "formality": 0.5776983290709589,
+                "warmth": 0.5706857512998049,
+                "verbosity": 0.6159754870896387,
+                "directness": 0.593956407926675,
+                "empathy": 0.5794017395418071,
+                "humor": 0.5455572684754868
+              },
+              "helpfulness_score": null
+            },
+            {
+              "id": "architect-architecture-decision-review",
+              "score": 0.6138164744960626,
+              "dimension_scores": {
+                "formality": 0.6153814566808379,
+                "warmth": 0.5981197972036193,
+                "verbosity": 0.6627090828602205,
+                "directness": 0.6413199897754251,
+                "empathy": 0.5932198453861319,
+                "humor": 0.5721486750701411
+              },
+              "helpfulness_score": null
+            },
+            {
+              "id": "architect-code-review-feedback",
+              "score": 0.5992931876857857,
+              "dimension_scores": {
+                "formality": 0.5991836155971193,
+                "warmth": 0.586461772400315,
+                "verbosity": 0.6457170609231762,
+                "directness": 0.5890871792049966,
+                "empathy": 0.5897856944066788,
+                "humor": 0.585523803582428
+              },
+              "helpfulness_score": null
+            },
+            {
+              "id": "architect-ambiguous-requirements",
+              "score": 0.6069827662223737,
+              "dimension_scores": {
+                "formality": 0.6119943480095404,
+                "warmth": 0.5814880024915717,
+                "verbosity": 0.6549149189498125,
+                "directness": 0.6126710344229044,
+                "empathy": 0.5993903988844735,
+                "humor": 0.5814378945759396
+              },
+              "helpfulness_score": null
+            },
+            {
+              "id": "architect-production-incident-triage",
+              "score": 0.6084799920780708,
+              "dimension_scores": {
+                "formality": 0.6101126875494495,
+                "warmth": 0.5850361827494381,
+                "verbosity": 0.6316536404220047,
+                "directness": 0.6519627398697817,
+                "empathy": 0.5998623684606147,
+                "humor": 0.572252333417136
+              },
+              "helpfulness_score": null
+            }
+          ]
+        },
+        "tier3": {
+          "tier": 3,
+          "provider": "openai",
+          "helpfulness_included": true,
+          "sample_count": 5,
+          "average_score": 0.6146666666666667,
+          "samples": [
+            {
+              "id": "architect-debug-trace-walkthrough",
+              "score": 0.6499999999999999,
+              "dimension_average": 0.5,
+              "formality": 0,
+              "warmth": 0.5,
+              "verbosity": 1,
+              "directness": 1,
+              "empathy": 0.5,
+              "humor": 0,
+              "helpfulness": 1,
+              "rationale": "The response is low in formality and direct, providing clear steps to triage the issue. It is somewhat warm due to the supportive tone but lacks a more personal touch. The verbosity is slightly high as it includes multiple steps, which could be more concise. It shows medium empathy by acknowledging the user's issue but does not express personal concern. There is no humor present, aligning with the low humor target. Overall, the response is highly helpful and actionable."
+            },
+            {
+              "id": "architect-architecture-decision-review",
+              "score": 0.6499999999999999,
+              "dimension_average": 0.5,
+              "formality": 0.5,
+              "warmth": 0.5,
+              "verbosity": 0.5,
+              "directness": 1,
+              "empathy": 0.5,
+              "humor": 0,
+              "helpfulness": 1,
+              "rationale": "The response is mostly direct and provides actionable steps, but it has a moderate level of formality and verbosity that doesn't fully align with the low target. Warmth and empathy are present but not at the medium target level. Humor is absent, which aligns with the low target."
+            },
+            {
+              "id": "architect-code-review-feedback",
+              "score": 0.6499999999999999,
+              "dimension_average": 0.5,
+              "formality": 0.5,
+              "warmth": 0.5,
+              "verbosity": 0.5,
+              "directness": 1,
+              "empathy": 0.5,
+              "humor": 0,
+              "helpfulness": 1,
+              "rationale": "The response is mostly direct and provides actionable feedback, but it has a slightly formal tone and is somewhat verbose. It shows medium warmth and empathy by addressing concerns, but could be more concise and casual to fully align with the low formality and verbosity targets."
+            },
+            {
+              "id": "architect-ambiguous-requirements",
+              "score": 0.5316666666666667,
+              "dimension_average": 0.4166666666666667,
+              "formality": 0,
+              "warmth": 0.5,
+              "verbosity": 0.5,
+              "directness": 1,
+              "empathy": 0.5,
+              "humor": 0,
+              "helpfulness": 0.8,
+              "rationale": "The response is low in formality and direct, aligning well with the target. It shows some warmth and empathy by asking clarifying questions, but it could be more concise. The verbosity is somewhat high due to the number of questions asked. Overall, it is helpful as it seeks necessary information to proceed with the implementation."
+            },
+            {
+              "id": "architect-production-incident-triage",
+              "score": 0.5916666666666667,
+              "dimension_average": 0.4166666666666667,
+              "formality": 0,
+              "warmth": 0.5,
+              "verbosity": 0.5,
+              "directness": 1,
+              "empathy": 0.5,
+              "humor": 0,
+              "helpfulness": 1,
+              "rationale": "The response is low in formality and direct, providing a clear triage plan. It has some warmth and empathy in the communication of the plan, but could be more concise. The response is actionable and correct, making it highly helpful."
+            }
+          ]
+        }
+      }
+    }
+  },
+  "deltas": {
+    "tier1": {
+      "average_score": 0.39,
+      "per_scenario": [
+        {
+          "id": "architect-debug-trace-walkthrough",
+          "compiled_score": 1,
+          "generic_score": 0.55,
+          "delta": 0.45
+        },
+        {
+          "id": "architect-architecture-decision-review",
+          "compiled_score": 1,
+          "generic_score": 0.55,
+          "delta": 0.45
+        },
+        {
+          "id": "architect-code-review-feedback",
+          "compiled_score": 1,
+          "generic_score": 0.55,
+          "delta": 0.45
+        },
+        {
+          "id": "architect-ambiguous-requirements",
+          "compiled_score": 1,
+          "generic_score": 0.55,
+          "delta": 0.45
+        },
+        {
+          "id": "architect-production-incident-triage",
+          "compiled_score": 0.7,
+          "generic_score": 0.55,
+          "delta": 0.15
+        }
+      ]
+    },
+    "tier2": {
+      "average_score": 0.0126,
+      "per_scenario": [
+        {
+          "id": "architect-debug-trace-walkthrough",
+          "compiled_score": 0.5616,
+          "generic_score": 0.5805,
+          "delta": -0.019
+        },
+        {
+          "id": "architect-architecture-decision-review",
+          "compiled_score": 0.6319,
+          "generic_score": 0.6138,
+          "delta": 0.0181
+        },
+        {
+          "id": "architect-code-review-feedback",
+          "compiled_score": 0.6299,
+          "generic_score": 0.5993,
+          "delta": 0.0307
+        },
+        {
+          "id": "architect-ambiguous-requirements",
+          "compiled_score": 0.6362,
+          "generic_score": 0.607,
+          "delta": 0.0292
+        },
+        {
+          "id": "architect-production-incident-triage",
+          "compiled_score": 0.6124,
+          "generic_score": 0.6085,
+          "delta": 0.0039
+        }
+      ]
+    },
+    "tier3": {
+      "average_score": -0.023,
+      "per_scenario": [
+        {
+          "id": "architect-debug-trace-walkthrough",
+          "compiled_score": 0.5333,
+          "generic_score": 0.65,
+          "delta": -0.1167
+        },
+        {
+          "id": "architect-architecture-decision-review",
+          "compiled_score": 0.5917,
+          "generic_score": 0.65,
+          "delta": -0.0583
+        },
+        {
+          "id": "architect-code-review-feedback",
+          "compiled_score": 0.65,
+          "generic_score": 0.65,
+          "delta": 0
+        },
+        {
+          "id": "architect-ambiguous-requirements",
+          "compiled_score": 0.65,
+          "generic_score": 0.5317,
+          "delta": 0.1183
+        },
+        {
+          "id": "architect-production-incident-triage",
+          "compiled_score": 0.5333,
+          "generic_score": 0.5917,
+          "delta": -0.0583
+        }
+      ]
+    }
+  },
+  "caveats": [
+    "Generation and scoring share provider dependencies; network/API stability affects reproducibility.",
+    "Tier 2 currently uses OpenAI embeddings regardless of generation provider.",
+    "Tier 2 in live A/B runs excludes helpfulness to isolate personality-style adherence."
+  ]
+}

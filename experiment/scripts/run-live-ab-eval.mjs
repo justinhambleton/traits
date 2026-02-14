@@ -177,6 +177,15 @@ function defaultScenarioIdsForProfile(slug) {
       "returning-user-context"
     ];
   }
+  if (slug === "architect") {
+    return [
+      "architect-debug-trace-walkthrough",
+      "architect-architecture-decision-review",
+      "architect-code-review-feedback",
+      "architect-ambiguous-requirements",
+      "architect-production-incident-triage"
+    ];
+  }
   return ["support-password-reset", "ambiguous-request-clarify", "debug-stack-trace"];
 }
 
@@ -382,7 +391,7 @@ async function evaluateArm({
       bundledProfilesDir,
       knowledgeBaseDir,
       modelTarget,
-      includeHelpfulness: true,
+      includeHelpfulness: false,
       openaiApiKey: keys.openai ?? undefined,
       embeddingModel: options.embeddingModel ?? undefined,
       openaiBaseUrl: options.openaiBaseUrl ?? undefined,
@@ -634,7 +643,8 @@ async function main() {
     deltas,
     caveats: [
       "Generation and scoring share provider dependencies; network/API stability affects reproducibility.",
-      "Tier 2 currently uses OpenAI embeddings regardless of generation provider."
+      "Tier 2 currently uses OpenAI embeddings regardless of generation provider.",
+      "Tier 2 in live A/B runs excludes helpfulness to isolate personality-style adherence."
     ]
   };
 
