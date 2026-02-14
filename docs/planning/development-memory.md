@@ -275,3 +275,9 @@ Decision log for implementation-critical choices. Keep entries brief and factual
 - Why: `changesets/action` executes the `publish` value as command tokens, so `&&` was treated as literal args and broke filtered package build scripts during publish runs.
 - Files: `package.json`, `.github/workflows/release.yml`, `docs/planning/development-memory.md`
 - Follow-up: Re-run release workflow after merging version PR to validate OIDC publish path and surface npm trusted publisher blockers, if any.
+
+- Date: 2026-02-14
+- Decision: Explicitly clear `NODE_AUTH_TOKEN` for the release publish step and disable setup-node token injection for npm registry setup.
+- Why: Prevent fallback auth from an unrelated token path during trusted publishing so OIDC is the sole publish credential mechanism and failure signals remain actionable.
+- Files: `.github/workflows/release.yml`, `docs/planning/development-memory.md`
+- Follow-up: Re-run release after npm trusted publisher/scope setup to validate first `@traits-dev/*` publish.
