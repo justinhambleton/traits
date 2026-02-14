@@ -254,7 +254,7 @@ function buildResponse(entry, scenario) {
 }
 
 async function loadCoreModules(repoRoot) {
-  const distEntry = path.join(repoRoot, "packages/core/dist/index.js");
+  const distEntry = path.join(repoRoot, "packages/core/dist/internal.js");
   if (!fs.existsSync(distEntry)) {
     throw new Error(
       `Core build output not found: ${distEntry}. Run \"pnpm --filter @traits-dev/core build\" first.`

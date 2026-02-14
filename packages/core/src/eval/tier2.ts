@@ -5,14 +5,9 @@ import { validateProfile } from "../validator/engine.js";
 import { asArray, DIMENSIONS } from "../utils.js";
 import { openAIEmbed } from "./providers/openai.js";
 import type { PersonalityProfile, ValidationResult } from "../types.js";
+import type { EvalSample } from "./types.js";
 
-type EvalSample = {
-  id?: string;
-  prompt?: string;
-  response?: string;
-};
-
-type Tier2Options = {
+export type Tier2Options = {
   includeHelpfulness?: boolean;
   strict?: boolean;
   bundledProfilesDir?: string;

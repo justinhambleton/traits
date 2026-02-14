@@ -1,10 +1,10 @@
 import path from "node:path";
 
+import { compileProfile } from "@traits-dev/core";
 import {
-  compileProfile,
   formatValidationResult,
   toValidationResultObject
-} from "@traits-dev/core";
+} from "@traits-dev/core/internal";
 import type { CommandIO, OutputWriter } from "../types.js";
 
 type ContextValue = boolean | string;

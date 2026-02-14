@@ -3,14 +3,9 @@ import { asArray, DIMENSIONS } from "../utils.js";
 import { anthropicJudge } from "./providers/anthropic.js";
 import { openAIJudge } from "./providers/openai.js";
 import type { PersonalityProfile, ValidationResult } from "../types.js";
+import type { EvalSample } from "./types.js";
 
-type EvalSample = {
-  id?: string;
-  prompt?: string;
-  response?: string;
-};
-
-type Tier3Options = {
+export type Tier3Options = {
   includeHelpfulness?: boolean;
   strict?: boolean;
   bundledProfilesDir?: string;

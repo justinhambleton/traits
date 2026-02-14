@@ -1,12 +1,11 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import { runImportAnalysis, validateResolvedProfile } from "@traits-dev/core";
 import {
   formatValidationResult,
-  runImportAnalysis,
   toValidationResultObject,
-  validateResolvedProfile
-} from "@traits-dev/core";
+} from "@traits-dev/core/internal";
 import type { CommandIO, OutputWriter } from "../types.js";
 
 type ImportProvider = "auto" | "openai" | "anthropic";

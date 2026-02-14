@@ -4,6 +4,7 @@ export {
   resolveActiveContext,
   normalizeProfile
 } from "./profile.js";
+
 export type {
   CompiledPersonality,
   ContextAdaptation,
@@ -25,34 +26,25 @@ export type {
 } from "./types.js";
 
 export { validateProfile, validateResolvedProfile } from "./validator/engine.js";
-export {
-  formatValidationResult,
-  toValidationResultObject
-} from "./validator/format.js";
-
 export { compileProfile, compileResolvedProfile } from "./compiler/engine.js";
-export {
-  applyCalibrationUpdates,
-  mergeCalibrationFile
-} from "./compiler/calibration.js";
+export type { CompileOptions } from "./compiler/engine.js";
 export { injectPersonality } from "./inject/inject.js";
-export { validateEvalScenario, validateEvalScenarios } from "./eval/types.js";
+
 export {
-  detectEvalTierAvailability,
-  resolveTierExecution
-} from "./eval/tier-detection.js";
-export { runOfflineBaselineScaffold } from "./eval/baselines.js";
+  validateEvalScenario,
+  validateEvalScenarios
+} from "./eval/types.js";
+export type { EvalSample } from "./eval/types.js";
 export {
   evaluateTier1Response,
   runTier1Evaluation,
   runTier1EvaluationForProfile
 } from "./eval/tier1.js";
+export type { Tier1Options } from "./eval/tier1.js";
 export { runTier2Evaluation, runTier2EvaluationForProfile } from "./eval/tier2.js";
+export type { Tier2Options } from "./eval/tier2.js";
 export { runTier3Evaluation, runTier3EvaluationForProfile } from "./eval/tier3.js";
-export { anthropicJudge } from "./eval/providers/anthropic.js";
-export { openAIEmbed, openAIJudge } from "./eval/providers/openai.js";
-export {
-  mapImportAnalysisToProfile,
-  renderImportedProfileYAML,
-  runImportAnalysis
-} from "./import/engine.js";
+export type { Tier3Options } from "./eval/tier3.js";
+
+export { runImportAnalysis } from "./import/engine.js";
+export type { ImportOptions } from "./import/engine.js";

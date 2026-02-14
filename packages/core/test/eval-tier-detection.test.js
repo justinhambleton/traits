@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { detectEvalTierAvailability, resolveTierExecution } from "../dist/index.js";
+import { detectEvalTierAvailability, resolveTierExecution } from "../dist/internal.js";
 
 test("detectEvalTierAvailability reports key-gated Tier 2 and Tier 3", () => {
   const availability = detectEvalTierAvailability({});

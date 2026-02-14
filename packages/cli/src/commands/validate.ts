@@ -1,10 +1,10 @@
 import path from "node:path";
 
+import { validateProfile } from "@traits-dev/core";
 import {
   formatValidationResult,
-  toValidationResultObject,
-  validateProfile
-} from "@traits-dev/core";
+  toValidationResultObject
+} from "@traits-dev/core/internal";
 import type { CommandIO, OutputWriter } from "../types.js";
 
 type ValidateArgs = {

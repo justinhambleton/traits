@@ -16,7 +16,7 @@ import type {
   PersonalityProfile
 } from "../types.js";
 
-type CompileOptions = {
+export type CompileOptions = {
   model?: string;
   context?: Record<string, unknown>;
   explain?: boolean;

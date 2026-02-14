@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { anthropicJudge, openAIEmbed, openAIJudge } from "../dist/index.js";
+import { anthropicJudge, openAIEmbed, openAIJudge } from "../dist/internal.js";
 
 function makeResponse(status, bodyText) {
   return {

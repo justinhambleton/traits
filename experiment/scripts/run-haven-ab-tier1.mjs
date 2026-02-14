@@ -160,7 +160,7 @@ function printSummary(summary) {
 }
 
 async function loadCore(repoRoot) {
-  const distPath = path.join(repoRoot, "packages/core/dist/index.js");
+  const distPath = path.join(repoRoot, "packages/core/dist/internal.js");
   assertFile(distPath, "Core dist entry");
   const mod = await import(distPath);
   if (typeof mod.runTier1EvaluationForProfile !== "function") {

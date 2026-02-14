@@ -4,11 +4,13 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
-  formatValidationResult,
-  toValidationResultObject,
   validateProfile,
   validateResolvedProfile
 } from "../dist/index.js";
+import {
+  formatValidationResult,
+  toValidationResultObject
+} from "../dist/internal.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 const PROFILES_DIR = path.join(ROOT, "profiles");

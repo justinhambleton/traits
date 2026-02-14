@@ -2,15 +2,17 @@ import fs from "node:fs";
 import path from "node:path";
 
 import {
+  runTier1EvaluationForProfile,
+  runTier2EvaluationForProfile,
+  runTier3EvaluationForProfile
+} from "@traits-dev/core";
+import {
   detectEvalTierAvailability,
   formatValidationResult,
   resolveTierExecution,
   runOfflineBaselineScaffold,
-  runTier1EvaluationForProfile,
-  runTier2EvaluationForProfile,
-  runTier3EvaluationForProfile,
   toValidationResultObject
-} from "@traits-dev/core";
+} from "@traits-dev/core/internal";
 import type { CommandIO, OutputWriter } from "../types.js";
 
 type EvalProvider = "auto" | "openai" | "anthropic";

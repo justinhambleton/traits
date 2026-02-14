@@ -1,14 +1,9 @@
 import { validateProfile } from "../validator/engine.js";
 import { asArray } from "../utils.js";
 import type { PersonalityProfile, ValidationResult } from "../types.js";
+import type { EvalSample } from "./types.js";
 
-type EvalSample = {
-  id?: string;
-  prompt?: string;
-  response?: string;
-};
-
-type Tier1Options = {
+export type Tier1Options = {
   includeHelpfulness?: boolean;
   strict?: boolean;
   bundledProfilesDir?: string;

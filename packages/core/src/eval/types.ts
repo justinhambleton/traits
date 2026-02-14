@@ -22,6 +22,12 @@ export type EvalScenario = {
   expected_behavior?: string;
 };
 
+export type EvalSample = {
+  id?: string;
+  prompt?: string;
+  response?: string;
+};
+
 const VALID_CATEGORIES = new Set([
   "standard",
   "frustrated",

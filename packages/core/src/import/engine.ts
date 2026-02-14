@@ -13,7 +13,7 @@ import type {
 
 const HUMOR_STYLES: HumorStyle[] = ["none", "dry", "subtle-wit", "playful"];
 
-type ImportOptions = {
+export type ImportOptions = {
   provider?: string;
   analysisFn?: (args: { systemPrompt: string; userPrompt: string }) => Promise<unknown>;
   openaiApiKey?: string;
