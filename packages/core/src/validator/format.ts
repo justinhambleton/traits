@@ -1,27 +1,46 @@
-function symbolForStatus(status) {
+import type { ValidationCheckSummary, ValidationDiagnostic, ValidationResult } from "../types.js";
+
+type ValidationResultObject = {
+  profilePath: string | null;
+  parentPath: string | null;
+  strict: boolean;
+  isValid: boolean;
+  exitCode: number;
+  checks: Record<string, ValidationCheckSummary>;
+  constraintCount: number;
+  constraintBreakdown: Record<string, number>;
+  diagnostics: {
+    errors: ValidationDiagnostic[];
+    warnings: ValidationDiagnostic[];
+    promotedWarnings: ValidationDiagnostic[];
+    effectiveErrors: ValidationDiagnostic[];
+  };
+};
+
+function symbolForStatus(status?: string): string {
   if (status === "error") return "✗";
   if (status === "warning") return "⚠";
   return "✓";
 }
 
-function pluralize(count, noun) {
+function pluralize(count: number, noun: string): string {
   return `${count} ${noun}${count === 1 ? "" : "s"}`;
 }
 
-function formatCheckLine(label, check) {
+function formatCheckLine(label: string, check: Partial<ValidationCheckSummary>): string {
   return `${symbolForStatus(check.status)} ${label}`;
 }
 
-function formatDiagnostic(diagnostic) {
+function formatDiagnostic(diagnostic: ValidationDiagnostic): string {
   const label = diagnostic.severity === "error" ? "ERROR" : "WARNING";
   return `${label} [${diagnostic.code}]: ${diagnostic.message}`;
 }
 
-function countSafetyDiagnostics(diagnostics) {
+function countSafetyDiagnostics(diagnostics: ValidationDiagnostic[]): number {
   return diagnostics.filter((diagnostic) => /^S00[1-7]$/.test(String(diagnostic.code))).length;
 }
 
-export function toValidationResultObject(result) {
+export function toValidationResultObject(result: Partial<ValidationResult>): ValidationResultObject {
   return {
     profilePath: result.profilePath ?? null,
     parentPath: result.parentPath ?? null,
@@ -40,8 +59,8 @@ export function toValidationResultObject(result) {
   };
 }
 
-export function formatValidationResult(result) {
-  const output = [];
+export function formatValidationResult(result: Partial<ValidationResult>): string {
+  const output: string[] = [];
   const schemaVersion = result?.profile?.schema ? ` (${result.profile.schema})` : "";
   const checks = result.checks ?? {};
   output.push(
@@ -98,15 +117,17 @@ export function formatValidationResult(result) {
   }
 
   output.push("");
-  if ((result.effectiveErrors ?? []).length > 0) {
+  const effectiveErrors = result.effectiveErrors ?? [];
+  const warnings = result.warnings ?? [];
+  if (effectiveErrors.length > 0) {
     output.push(
       `Profile is invalid: ${pluralize(
-        result.effectiveErrors.length,
+        effectiveErrors.length,
         "error"
-      )}, ${pluralize((result.warnings ?? []).length, "warning")}.`
+      )}, ${pluralize(warnings.length, "warning")}.`
     );
-  } else if ((result.warnings ?? []).length > 0) {
-    output.push(`Profile is valid with ${pluralize(result.warnings.length, "warning")}.`);
+  } else if (warnings.length > 0) {
+    output.push(`Profile is valid with ${pluralize(warnings.length, "warning")}.`);
   } else {
     output.push("Profile is valid.");
   }

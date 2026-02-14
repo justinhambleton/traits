@@ -131,3 +131,21 @@ Decision log for implementation-critical choices. Keep entries brief and factual
 - Why: Align CLI behavior with documented flag semantics and allow adherence-only analysis without helpfulness coupling during debugging/calibration.
 - Files: `packages/core/src/eval/tier1.js`, `packages/core/src/eval/tier2.js`, `packages/core/src/eval/tier3.js`, `packages/core/test/eval-tier1.test.js`, `packages/core/test/eval-tier2.test.js`, `packages/core/test/eval-tier3.test.js`, `packages/cli/src/commands/eval.js`, `packages/cli/test/eval.test.js`, `docs/planning/development-memory.md`
 - Follow-up: Implement `--no-baselines` and `--constraint-impact` beyond scaffold mode so all declared eval flags are functional.
+
+- Date: 2026-02-14
+- Decision: Implement deterministic offline baseline scaffold in core eval and wire it into `traits eval` by default, with `--no-baselines` now functionally skipping baseline generation.
+- Why: Deliver baseline-comparison capability immediately without network/model dependencies while preserving a clean upgrade path to live baseline generation later.
+- Files: `packages/core/src/eval/baselines.js`, `packages/core/src/index.js`, `packages/core/test/eval-baselines.test.js`, `packages/cli/src/commands/eval.js`, `packages/cli/test/eval.test.js`, `docs/planning/development-memory.md`
+- Follow-up: Add live baseline generation behind an explicit mode flag and keep offline scaffold as fallback when provider keys are unavailable.
+
+- Date: 2026-02-14
+- Decision: Bootstrap in JS complete; migrate to TypeScript before additional feature expansion. JS was a valid acceleration choice for de-risking safety semantics and extends behavior, but shipping a developer SDK without first-class types is the wrong long-term decision. Treat JS as a temporary bootstrap, not the final architecture.
+- Why: Principal developer review identified TypeScript gap as the single largest deviation from the implementation plan. Every file written in JS compounds retrofit cost. The codebase is ~2,500 LOC source — this is the cheapest the migration will ever be. DX, API trust, and npm publish readiness all require typed output.
+- Files: All `packages/core/src/**/*.js` → `.ts`, new `tsconfig.json`, new `tsup.config.ts`, updated `package.json` exports. Tests remain `.js` importing from built output initially.
+- Follow-up: Migrate `packages/cli` to TypeScript after core is complete. Add CI gates (typecheck + tests + build). Resume feature work only after typed public API is in place.
+
+- Date: 2026-02-14
+- Decision: Complete core TypeScript migration and switch core tests to built-output imports (`dist/index.js`) with build-first test execution.
+- Why: Enforce typed API artifacts (`index.d.ts`) as the runtime contract, eliminate source/import drift during tests, and ensure CLI consumes core via package exports rather than source internals.
+- Files: `packages/core/src/**/*.ts`, `packages/core/package.json`, `packages/core/tsconfig.json`, `packages/core/tsup.config.ts`, `packages/core/test/*.test.js`, `packages/cli/package.json`, `package.json`, `docs/planning/pre-push-checklist.md`
+- Follow-up: Split `profile.ts` into schema-focused modules and begin calibration quality pass before CLI TypeScript migration.

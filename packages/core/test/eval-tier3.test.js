@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { runTier3Evaluation, runTier3EvaluationForProfile } from "../src/index.js";
+import { runTier3Evaluation, runTier3EvaluationForProfile } from "../dist/index.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 const PROFILES_DIR = path.join(ROOT, "profiles");

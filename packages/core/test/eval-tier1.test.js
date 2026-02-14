@@ -10,7 +10,7 @@ import {
   runTier1EvaluationForProfile,
   validateEvalScenario,
   validateEvalScenarios
-} from "../src/index.js";
+} from "../dist/index.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 const PROFILES_DIR = path.join(ROOT, "profiles");

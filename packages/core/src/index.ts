@@ -4,6 +4,25 @@ export {
   resolveActiveContext,
   normalizeProfile
 } from "./profile.js";
+export type {
+  CompiledPersonality,
+  ContextAdaptation,
+  ContextResolution,
+  DimensionName,
+  DimensionObject,
+  DimensionShorthand,
+  DimensionValue,
+  ExtendsDiagnostics,
+  ExtendsResult,
+  HumorDimensionObject,
+  HumorDimensionValue,
+  HumorStyle,
+  Level,
+  PersonalityProfile,
+  ValidationDiagnostic,
+  ValidationResult,
+  VocabularyConstraints
+} from "./types.js";
 
 export { validateProfile, validateResolvedProfile } from "./validator/engine.js";
 export {
@@ -22,6 +41,7 @@ export {
   detectEvalTierAvailability,
   resolveTierExecution
 } from "./eval/tier-detection.js";
+export { runOfflineBaselineScaffold } from "./eval/baselines.js";
 export {
   evaluateTier1Response,
   runTier1Evaluation,
@@ -29,6 +49,8 @@ export {
 } from "./eval/tier1.js";
 export { runTier2Evaluation, runTier2EvaluationForProfile } from "./eval/tier2.js";
 export { runTier3Evaluation, runTier3EvaluationForProfile } from "./eval/tier3.js";
+export { anthropicJudge } from "./eval/providers/anthropic.js";
+export { openAIEmbed, openAIJudge } from "./eval/providers/openai.js";
 export {
   mapImportAnalysisToProfile,
   renderImportedProfileYAML,

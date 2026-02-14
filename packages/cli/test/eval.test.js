@@ -27,6 +27,7 @@ test("traits eval runs Tier 1 with inline response samples", () => {
   ]);
   assert.equal(result.status, 0);
   assert.match(result.stdout, /Tier 1 average score/);
+  assert.match(result.stdout, /Baseline \(none\) Tier 1 avg/);
 });
 
 test("traits eval prints progress indicators in text mode", () => {
@@ -57,6 +58,7 @@ test("traits eval --json emits structured report", () => {
   const output = JSON.parse(result.stdout);
   assert.equal(output.tier_executed, 1);
   assert.equal(output.report.tier1.tier, 1);
+  assert.equal(output.report.baselines.type, "offline-scaffold");
   assert.equal(output.report.overall_score > 0, true);
 });
 
@@ -74,6 +76,23 @@ test("traits eval --no-helpfulness disables helpfulness checks", () => {
   assert.equal(result.status, 0);
   const output = JSON.parse(result.stdout);
   assert.equal(output.report.tier1.samples[0].checks.helpfulness.skipped, true);
+  assert.equal(output.report.baselines.helpfulness_included, false);
+});
+
+test("traits eval --no-baselines removes baseline report", () => {
+  const result = runCLI([
+    "eval",
+    "profiles/resolve.yaml",
+    "--model",
+    "claude-sonnet",
+    "--response",
+    "I understand. Here's what I can do.",
+    "--no-baselines",
+    "--json"
+  ]);
+  assert.equal(result.status, 0);
+  const output = JSON.parse(result.stdout);
+  assert.equal(output.report.baselines, undefined);
 });
 
 test("traits eval with tier 2 request falls back to tier 1 scaffold", () => {

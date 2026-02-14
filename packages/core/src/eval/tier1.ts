@@ -1,15 +1,24 @@
 import { validateProfile } from "../validator/engine.js";
+import { asArray } from "../utils.js";
+import type { PersonalityProfile, ValidationResult } from "../types.js";
 
-function asArray(value) {
-  if (!Array.isArray(value)) return [];
-  return value;
-}
+type EvalSample = {
+  id?: string;
+  prompt?: string;
+  response?: string;
+};
 
-function normalize(value) {
+type Tier1Options = {
+  includeHelpfulness?: boolean;
+  strict?: boolean;
+  bundledProfilesDir?: string;
+};
+
+function normalize(value: unknown): string {
   return String(value ?? "").toLowerCase();
 }
 
-function countMatches(text, terms) {
+function countMatches(text: string, terms: string[]): number {
   const lowered = normalize(text);
   let count = 0;
   for (const term of terms) {
@@ -19,11 +28,36 @@ function countMatches(text, terms) {
   return count;
 }
 
-export function evaluateTier1Response(profile, responseText, options = {}) {
+export function evaluateTier1Response(
+  profile: PersonalityProfile,
+  responseText: string,
+  options: Tier1Options = {}
+): {
+  score: number;
+  checks: {
+    vocabulary: {
+      preferred_total: number;
+      preferred_matched: number;
+      forbidden_total: number;
+      forbidden_matched: number;
+      pass: boolean;
+    };
+    structure: {
+      behavioral_rule_count: number;
+      response_non_empty: boolean;
+      pass: boolean;
+    };
+    helpfulness: {
+      char_count: number;
+      pass: boolean;
+      skipped: boolean;
+    };
+  };
+} {
   const response = String(responseText ?? "");
   const includeHelpfulness = options.includeHelpfulness !== false;
-  const preferredTerms = asArray(profile?.vocabulary?.preferred_terms);
-  const forbiddenTerms = asArray(profile?.vocabulary?.forbidden_terms);
+  const preferredTerms = asArray<string>(profile?.vocabulary?.preferred_terms);
+  const forbiddenTerms = asArray<string>(profile?.vocabulary?.forbidden_terms);
 
   const preferredMatches = countMatches(response, preferredTerms);
   const forbiddenMatches = countMatches(response, forbiddenTerms);
@@ -36,7 +70,7 @@ export function evaluateTier1Response(profile, responseText, options = {}) {
     pass: forbiddenMatches === 0
   };
 
-  const behavioralRules = asArray(profile?.behavioral_rules);
+  const behavioralRules = asArray<string>(profile?.behavioral_rules);
   const structureCheck = {
     behavioral_rule_count: behavioralRules.length,
     response_non_empty: response.trim().length > 0,
@@ -58,10 +92,11 @@ export function evaluateTier1Response(profile, responseText, options = {}) {
       ? 1
       : Math.min(1, response.trim().length / 40)
     : null;
+  const helpfulnessWeighted = helpfulnessScore ?? 0;
   const score = includeHelpfulness
     ? Math.max(
         0,
-        0.45 * preferredCoverage + 0.35 * (1 - forbiddenPenalty) + 0.2 * helpfulnessScore
+        0.45 * preferredCoverage + 0.35 * (1 - forbiddenPenalty) + 0.2 * helpfulnessWeighted
       )
     : Math.max(0, 0.55 * preferredCoverage + 0.45 * (1 - forbiddenPenalty));
 
@@ -75,8 +110,21 @@ export function evaluateTier1Response(profile, responseText, options = {}) {
   };
 }
 
-export function runTier1Evaluation(profile, samples, options = {}) {
-  const items = asArray(samples);
+export function runTier1Evaluation(
+  profile: PersonalityProfile,
+  samples: EvalSample[],
+  options: Tier1Options = {}
+): {
+  tier: number;
+  sample_count: number;
+  average_score: number;
+  samples: Array<{
+    id: string;
+    score: number;
+    checks: ReturnType<typeof evaluateTier1Response>["checks"];
+  }>;
+} {
+  const items = asArray<EvalSample>(samples);
   const perSample = items.map((sample) => {
     const id = sample?.id ?? "unknown";
     const response = sample?.response ?? "";
@@ -100,15 +148,29 @@ export function runTier1Evaluation(profile, samples, options = {}) {
   };
 }
 
-export function runTier1EvaluationForProfile(profilePath, samples, options = {}) {
+export function runTier1EvaluationForProfile(
+  profilePath: string,
+  samples: EvalSample[],
+  options: Tier1Options = {}
+): {
+  validation: ValidationResult;
+  report: ReturnType<typeof runTier1Evaluation>;
+} {
   const validation = validateProfile(profilePath, {
     strict: Boolean(options.strict),
     bundledProfilesDir: options.bundledProfilesDir
   });
   if (validation.effectiveErrors.length > 0) {
     const error = new Error("Profile failed validation for eval.");
-    error.code = "E_EVAL_VALIDATION";
-    error.validation = validation;
+    (error as Error & { code?: string; validation?: unknown }).code = "E_EVAL_VALIDATION";
+    (error as Error & { code?: string; validation?: unknown }).validation = validation;
+    throw error;
+  }
+
+  if (!validation.profile) {
+    const error = new Error("Profile failed validation for eval.");
+    (error as Error & { code?: string; validation?: unknown }).code = "E_EVAL_VALIDATION";
+    (error as Error & { code?: string; validation?: unknown }).validation = validation;
     throw error;
   }
 

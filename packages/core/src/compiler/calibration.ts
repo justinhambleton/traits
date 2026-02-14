@@ -1,23 +1,41 @@
 import fs from "node:fs";
+import { asArray, clone } from "../utils.js";
 
-function clone(value) {
-  return JSON.parse(JSON.stringify(value));
-}
+type CalibrationUpdateItem = {
+  dimension?: string;
+  level?: string;
+  id?: string;
+  pattern?: string;
+  adherence?: number;
+};
 
-function asArray(value) {
-  if (!Array.isArray(value)) return [];
-  return value;
-}
+type CalibrationUpdates = {
+  dimensions?: CalibrationUpdateItem[];
+  interactions?: CalibrationUpdateItem[];
+};
 
-export function applyCalibrationUpdates(patternData, updates) {
-  const next = clone(patternData ?? {});
+type PatternFileData = {
+  dimensions?: Record<string, Record<string, Record<string, unknown>>>;
+  interactions?: Record<string, Record<string, unknown>>;
+  updated_at?: string;
+  [key: string]: unknown;
+};
+
+export function applyCalibrationUpdates(
+  patternData: PatternFileData,
+  updates: CalibrationUpdates
+): {
+  data: PatternFileData;
+  summary: { dimension_updates: number; interaction_updates: number };
+} {
+  const next = clone(patternData ?? {}) as PatternFileData;
   next.dimensions = next.dimensions ?? {};
   next.interactions = next.interactions ?? {};
 
   let dimensionUpdates = 0;
   let interactionUpdates = 0;
 
-  for (const update of asArray(updates?.dimensions)) {
+  for (const update of asArray<CalibrationUpdateItem>(updates?.dimensions)) {
     if (!update?.dimension || !update?.level) continue;
     const dimension = String(update.dimension);
     const level = String(update.level);
@@ -33,7 +51,7 @@ export function applyCalibrationUpdates(patternData, updates) {
     dimensionUpdates += 1;
   }
 
-  for (const update of asArray(updates?.interactions)) {
+  for (const update of asArray<CalibrationUpdateItem>(updates?.interactions)) {
     if (!update?.id) continue;
     const id = String(update.id);
     next.interactions[id] = next.interactions[id] ?? {};
@@ -57,8 +75,11 @@ export function applyCalibrationUpdates(patternData, updates) {
   };
 }
 
-export function mergeCalibrationFile(patternFilePath, updates) {
-  const current = JSON.parse(fs.readFileSync(patternFilePath, "utf8"));
+export function mergeCalibrationFile(
+  patternFilePath: string,
+  updates: CalibrationUpdates
+): { dimension_updates: number; interaction_updates: number } {
+  const current = JSON.parse(fs.readFileSync(patternFilePath, "utf8")) as PatternFileData;
   const merged = applyCalibrationUpdates(current, updates);
   fs.writeFileSync(patternFilePath, `${JSON.stringify(merged.data, null, 2)}\n`, "utf8");
   return merged.summary;

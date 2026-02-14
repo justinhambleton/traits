@@ -1,13 +1,7 @@
-const LEVELS = ["very-low", "low", "medium", "high", "very-high"];
+import { DIMENSIONS, LEVEL_INDEX } from "../utils.js";
+import type { ValidationCheckSummary, ValidationDiagnostic } from "../types.js";
+
 const HUMOR_STYLES = ["none", "dry", "subtle-wit", "playful"];
-const DIMENSIONS = [
-  "formality",
-  "warmth",
-  "verbosity",
-  "directness",
-  "empathy",
-  "humor"
-];
 
 const TOP_LEVEL_KEYS = new Set([
   "schema",
@@ -31,21 +25,24 @@ const VOCABULARY_KEYS = new Set([
   "forbidden_terms_remove"
 ]);
 
-const DIMENSION_INDEX = new Map(LEVELS.map((level, index) => [level, index]));
-
-function isObject(value) {
+function isObject(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
-function isString(value) {
+function isString(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
 }
 
-function isStringArray(value) {
+function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((item) => typeof item === "string");
 }
 
-function pushDiagnostic(target, code, message, location) {
+function pushDiagnostic(
+  target: ValidationDiagnostic[],
+  code: string,
+  message: string,
+  location?: string
+): void {
   target.push({
     code,
     severity: "error",
@@ -54,7 +51,7 @@ function pushDiagnostic(target, code, message, location) {
   });
 }
 
-function summarizeDiagnostics(diagnostics) {
+function summarizeDiagnostics(diagnostics: ValidationDiagnostic[]): ValidationCheckSummary {
   return {
     status: diagnostics.length > 0 ? "error" : "pass",
     errors: diagnostics.length,
@@ -62,7 +59,12 @@ function summarizeDiagnostics(diagnostics) {
   };
 }
 
-function validateScalarField(parent, key, location, diagnostics) {
+function validateScalarField(
+  parent: Record<string, unknown>,
+  key: string,
+  location: string,
+  diagnostics: ValidationDiagnostic[]
+): void {
   if (!isString(parent?.[key])) {
     pushDiagnostic(
       diagnostics,
@@ -73,9 +75,15 @@ function validateScalarField(parent, key, location, diagnostics) {
   }
 }
 
-function validateDimensionValue(value, dimension, location, dimensionsDiagnostics, rangeDiagnostics) {
+function validateDimensionValue(
+  value: unknown,
+  dimension: string,
+  location: string,
+  dimensionsDiagnostics: ValidationDiagnostic[],
+  rangeDiagnostics: ValidationDiagnostic[]
+): void {
   if (typeof value === "string") {
-    if (!DIMENSION_INDEX.has(value)) {
+    if (!LEVEL_INDEX.has(value as any)) {
       pushDiagnostic(
         dimensionsDiagnostics,
         "V002",
@@ -112,7 +120,7 @@ function validateDimensionValue(value, dimension, location, dimensionsDiagnostic
     }
   }
 
-  if (!DIMENSION_INDEX.has(value.target)) {
+  if (!LEVEL_INDEX.has(value.target as any)) {
     pushDiagnostic(
       dimensionsDiagnostics,
       "V002",
@@ -130,7 +138,7 @@ function validateDimensionValue(value, dimension, location, dimensionsDiagnostic
     );
   }
 
-  if (value.floor != null && !DIMENSION_INDEX.has(value.floor)) {
+  if (value.floor != null && !LEVEL_INDEX.has(value.floor as any)) {
     pushDiagnostic(
       dimensionsDiagnostics,
       "V002",
@@ -139,7 +147,7 @@ function validateDimensionValue(value, dimension, location, dimensionsDiagnostic
     );
   }
 
-  if (value.ceiling != null && !DIMENSION_INDEX.has(value.ceiling)) {
+  if (value.ceiling != null && !LEVEL_INDEX.has(value.ceiling as any)) {
     pushDiagnostic(
       dimensionsDiagnostics,
       "V002",
@@ -149,7 +157,7 @@ function validateDimensionValue(value, dimension, location, dimensionsDiagnostic
   }
 
   if (dimension === "humor") {
-    if (value.style != null && !HUMOR_STYLES.includes(value.style)) {
+    if (value.style != null && !HUMOR_STYLES.includes(String(value.style) as any)) {
       pushDiagnostic(
         dimensionsDiagnostics,
         "V002",
@@ -177,13 +185,20 @@ function validateDimensionValue(value, dimension, location, dimensionsDiagnostic
       return;
     }
 
-    if (!DIMENSION_INDEX.has(value.target) || !DIMENSION_INDEX.has(value.floor) || !DIMENSION_INDEX.has(value.ceiling)) {
+    if (
+      !LEVEL_INDEX.has(value.target as any) ||
+      !LEVEL_INDEX.has(value.floor as any) ||
+      !LEVEL_INDEX.has(value.ceiling as any)
+    ) {
       return;
     }
 
-    const floorIndex = DIMENSION_INDEX.get(value.floor);
-    const targetIndex = DIMENSION_INDEX.get(value.target);
-    const ceilingIndex = DIMENSION_INDEX.get(value.ceiling);
+    const floorIndex = LEVEL_INDEX.get(value.floor as any);
+    const targetIndex = LEVEL_INDEX.get(value.target as any);
+    const ceilingIndex = LEVEL_INDEX.get(value.ceiling as any);
+    if (floorIndex == null || targetIndex == null || ceilingIndex == null) {
+      return;
+    }
     if (floorIndex > targetIndex || targetIndex > ceilingIndex) {
       pushDiagnostic(
         rangeDiagnostics,
@@ -195,10 +210,13 @@ function validateDimensionValue(value, dimension, location, dimensionsDiagnostic
   }
 }
 
-export function validateSchema(profile) {
-  const structureDiagnostics = [];
-  const dimensionDiagnostics = [];
-  const rangeDiagnostics = [];
+export function validateSchema(profile: any): {
+  diagnostics: ValidationDiagnostic[];
+  checks: Record<string, ValidationCheckSummary>;
+} {
+  const structureDiagnostics: ValidationDiagnostic[] = [];
+  const dimensionDiagnostics: ValidationDiagnostic[] = [];
+  const rangeDiagnostics: ValidationDiagnostic[] = [];
 
   if (!isObject(profile)) {
     pushDiagnostic(structureDiagnostics, "V001", "Profile must be a YAML object", "root");
@@ -485,7 +503,7 @@ export function validateSchema(profile) {
             );
           } else {
             for (const [dimension, value] of Object.entries(adaptation.adjustments)) {
-              if (!DIMENSIONS.includes(dimension)) {
+              if (!DIMENSIONS.includes(dimension as any)) {
                 pushDiagnostic(
                   dimensionDiagnostics,
                   "V002",

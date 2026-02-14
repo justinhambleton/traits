@@ -4,8 +4,9 @@ import {
 } from "./runtime.js";
 
 const ANTHROPIC_BASE_URL = "https://api.anthropic.com/v1";
+type FetchLike = (input: string, init?: RequestInit) => Promise<Response>;
 
-function parseJSONResponse(service, bodyText) {
+function parseJSONResponse(service: string, bodyText: string): any {
   try {
     return JSON.parse(bodyText);
   } catch {
@@ -23,7 +24,17 @@ export async function anthropicJudge({
   timeoutMs,
   maxRetries,
   retryBaseMs
-}) {
+}: {
+  apiKey: string;
+  systemPrompt: string;
+  userPrompt: string;
+  model?: string;
+  baseUrl?: string;
+  fetchImpl?: FetchLike;
+  timeoutMs?: number;
+  maxRetries?: number;
+  retryBaseMs?: number;
+}): Promise<string> {
   if (!apiKey) {
     throw new Error("Missing Anthropic API key for judge request.");
   }
@@ -65,7 +76,7 @@ export async function anthropicJudge({
 
   const data = parseJSONResponse("Anthropic judge", bodyText);
   const textBlock = Array.isArray(data?.content)
-    ? data.content.find((item) => item?.type === "text")
+    ? data.content.find((item: any) => item?.type === "text")
     : null;
   const content = textBlock?.text;
   if (typeof content !== "string" || content.trim().length === 0) {

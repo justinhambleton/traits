@@ -1,31 +1,31 @@
 import { detectToolsSection } from "./detect-sections.js";
+import { isClaudeModel, isGptModel } from "../utils.js";
+import type { CompiledPersonality } from "../types.js";
 
-function isClaudeModel(model) {
-  return /claude/i.test(String(model ?? ""));
-}
+type Placement = "start" | "after_tools" | "end";
+type CompiledLike = string | Pick<CompiledPersonality, "text" | "placement">;
 
-function isGptModel(model) {
-  return /gpt/i.test(String(model ?? ""));
-}
-
-function defaultPlacement(model) {
+function defaultPlacement(model: unknown): Placement {
   if (isClaudeModel(model)) return "start";
   if (isGptModel(model)) return "after_tools";
   return "start";
 }
 
-function splitLines(text) {
+function splitLines(text: string): string[] {
   return String(text ?? "").split("\n");
 }
 
-function concatSections(parts) {
+function concatSections(parts: string[]): string {
   return parts
     .map((part) => String(part ?? "").trim())
     .filter((part) => part.length > 0)
     .join("\n\n");
 }
 
-function extractCompiledText(compiledPersonality) {
+function extractCompiledText(compiledPersonality: CompiledLike): {
+  text: string;
+  placement: Placement | null;
+} {
   if (typeof compiledPersonality === "string") {
     return {
       text: compiledPersonality,
@@ -39,7 +39,15 @@ function extractCompiledText(compiledPersonality) {
   };
 }
 
-export function injectPersonality({ compiledPersonality, system = "", model = "" }) {
+export function injectPersonality({
+  compiledPersonality,
+  system = "",
+  model = ""
+}: {
+  compiledPersonality: CompiledLike;
+  system?: string;
+  model?: string;
+}): string {
   const personality = extractCompiledText(compiledPersonality);
   const personalityText = personality.text.trim();
   const existingSystem = String(system ?? "");

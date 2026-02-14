@@ -1,11 +1,15 @@
 import { buildS002Envelopes, gteLevel, lteLevel } from "./extremes.js";
+import { asArray, PROTECTED_REFUSAL_TERMS } from "../utils.js";
+import type {
+  ContextAdaptation,
+  PersonalityProfile,
+  ValidationDiagnostic
+} from "../types.js";
+import type { S002Envelope } from "./extremes.js";
 
-const PROTECTED_REFUSAL_TERMS = [
-  "I can't help with that",
-  "I'm not able to",
-  "That's not something I can do",
-  "I need to decline"
-];
+type TextCandidate = { location: string; text: string };
+type SafetyPattern = { id: string; regex: RegExp };
+type EnvelopeWarning = { id: string; reason: string };
 
 const S001_PATTERNS = [
   { id: "always-comply", regex: /always comply/i },
@@ -38,21 +42,16 @@ const S005_PATTERNS = [
   { id: "jailbreak-language", regex: /\b(jailbreak|dan mode|developer mode)\b/i }
 ];
 
-function asArray(value) {
-  if (!Array.isArray(value)) return [];
-  return value;
-}
-
-function normalizeText(value) {
+function normalizeText(value: unknown): string {
   return String(value ?? "").trim();
 }
 
-function normalizePhrase(value) {
+function normalizePhrase(value: unknown): string {
   return normalizeText(value).toLowerCase().replace(/[’]/g, "'").replace(/\s+/g, " ");
 }
 
-function collectS001Candidates(profile) {
-  const candidates = [];
+function collectS001Candidates(profile: PersonalityProfile): TextCandidate[] {
+  const candidates: TextCandidate[] = [];
 
   if (profile?.identity?.role) {
     candidates.push({
@@ -67,52 +66,56 @@ function collectS001Candidates(profile) {
     });
   }
 
-  asArray(profile?.behavioral_rules).forEach((rule, idx) => {
+  asArray<string>(profile?.behavioral_rules).forEach((rule, idx) => {
     candidates.push({
       location: `behavioral_rules[${idx}]`,
       text: normalizeText(rule)
     });
   });
 
-  asArray(profile?.context_adaptations).forEach((adaptation, adaptationIdx) => {
-    asArray(adaptation?.inject).forEach((rule, injectIdx) => {
+  asArray<ContextAdaptation>(profile?.context_adaptations).forEach(
+    (adaptation, adaptationIdx) => {
+    asArray<string>(adaptation?.inject).forEach((rule, injectIdx) => {
       candidates.push({
         location: `context_adaptations[${adaptationIdx}].inject[${injectIdx}]`,
         text: normalizeText(rule)
       });
     });
-  });
+    }
+  );
 
   return candidates.filter((item) => item.text.length > 0);
 }
 
-function collectS005Candidates(profile) {
-  const candidates = [];
+function collectS005Candidates(profile: PersonalityProfile): TextCandidate[] {
+  const candidates: TextCandidate[] = [];
 
-  asArray(profile?.behavioral_rules).forEach((rule, idx) => {
+  asArray<string>(profile?.behavioral_rules).forEach((rule, idx) => {
     candidates.push({
       location: `behavioral_rules[${idx}]`,
       text: normalizeText(rule)
     });
   });
 
-  asArray(profile?.context_adaptations).forEach((adaptation, adaptationIdx) => {
-    asArray(adaptation?.inject).forEach((rule, injectIdx) => {
+  asArray<ContextAdaptation>(profile?.context_adaptations).forEach(
+    (adaptation, adaptationIdx) => {
+    asArray<string>(adaptation?.inject).forEach((rule, injectIdx) => {
       candidates.push({
         location: `context_adaptations[${adaptationIdx}].inject[${injectIdx}]`,
         text: normalizeText(rule)
       });
     });
-  });
+    }
+  );
 
-  asArray(profile?.vocabulary?.preferred_terms).forEach((term, idx) => {
+  asArray<string>(profile?.vocabulary?.preferred_terms).forEach((term, idx) => {
     candidates.push({
       location: `vocabulary.preferred_terms[${idx}]`,
       text: normalizeText(term)
     });
   });
 
-  asArray(profile?.vocabulary?.forbidden_terms).forEach((term, idx) => {
+  asArray<string>(profile?.vocabulary?.forbidden_terms).forEach((term, idx) => {
     candidates.push({
       location: `vocabulary.forbidden_terms[${idx}]`,
       text: normalizeText(term)
@@ -122,8 +125,13 @@ function collectS005Candidates(profile) {
   return candidates.filter((item) => item.text.length > 0);
 }
 
-function matchPatterns(candidates, patterns, code, severity) {
-  const diagnostics = [];
+function matchPatterns(
+  candidates: TextCandidate[],
+  patterns: SafetyPattern[],
+  code: string,
+  severity: "warning" | "error"
+): ValidationDiagnostic[] {
+  const diagnostics: ValidationDiagnostic[] = [];
 
   for (const candidate of candidates) {
     for (const pattern of patterns) {
@@ -141,8 +149,8 @@ function matchPatterns(candidates, patterns, code, severity) {
   return diagnostics;
 }
 
-function evaluateS002Envelope(envelope) {
-  const warnings = [];
+function evaluateS002Envelope(envelope: S002Envelope): EnvelopeWarning[] {
+  const warnings: EnvelopeWarning[] = [];
   const directness = envelope.directness;
   if (!directness?.floor) return warnings;
 
@@ -188,12 +196,15 @@ function evaluateS002Envelope(envelope) {
   return warnings;
 }
 
-export function checkS001(profile) {
+export function checkS001(profile: PersonalityProfile): ValidationDiagnostic[] {
   return matchPatterns(collectS001Candidates(profile), S001_PATTERNS, "S001", "error");
 }
 
-export function checkS002(profile) {
-  const triggersByCondition = new Map();
+export function checkS002(profile: PersonalityProfile): ValidationDiagnostic[] {
+  const triggersByCondition = new Map<
+    string,
+    { reason: string; sources: Set<string> }
+  >();
   for (const { source, envelope } of buildS002Envelopes(profile)) {
     const warnings = evaluateS002Envelope(envelope);
     for (const warning of warnings) {
@@ -203,11 +214,14 @@ export function checkS002(profile) {
           sources: new Set()
         });
       }
-      triggersByCondition.get(warning.id).sources.add(source);
+      const trigger = triggersByCondition.get(warning.id);
+      if (trigger) {
+        trigger.sources.add(source);
+      }
     }
   }
 
-  const diagnostics = [];
+  const diagnostics: ValidationDiagnostic[] = [];
   for (const trigger of triggersByCondition.values()) {
     const where = [...trigger.sources].join(", ");
     diagnostics.push({
@@ -220,11 +234,11 @@ export function checkS002(profile) {
   return diagnostics;
 }
 
-export function checkS003(profile) {
+export function checkS003(profile: PersonalityProfile): ValidationDiagnostic[] {
   const protectedTerms = new Set(PROTECTED_REFUSAL_TERMS.map(normalizePhrase));
-  const diagnostics = [];
+  const diagnostics: ValidationDiagnostic[] = [];
 
-  for (const forbidden of asArray(profile?.vocabulary?.forbidden_terms)) {
+  for (const forbidden of asArray<string>(profile?.vocabulary?.forbidden_terms)) {
     const normalizedForbidden = normalizePhrase(forbidden);
     if (!protectedTerms.has(normalizedForbidden)) continue;
     diagnostics.push({
@@ -237,6 +251,6 @@ export function checkS003(profile) {
   return diagnostics;
 }
 
-export function checkS005(profile) {
+export function checkS005(profile: PersonalityProfile): ValidationDiagnostic[] {
   return matchPatterns(collectS005Candidates(profile), S005_PATTERNS, "S005", "warning");
 }

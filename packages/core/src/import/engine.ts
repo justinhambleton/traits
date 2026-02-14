@@ -2,37 +2,61 @@ import { stringify as toYaml } from "yaml";
 
 import { anthropicJudge } from "../eval/providers/anthropic.js";
 import { openAIJudge } from "../eval/providers/openai.js";
+import { asArray, LEVELS } from "../utils.js";
+import type {
+  DimensionValue,
+  HumorDimensionValue,
+  HumorStyle,
+  Level,
+  PersonalityProfile
+} from "../types.js";
 
-const LEVELS = ["very-low", "low", "medium", "high", "very-high"];
-const HUMOR_STYLES = ["none", "dry", "subtle-wit", "playful"];
+const HUMOR_STYLES: HumorStyle[] = ["none", "dry", "subtle-wit", "playful"];
 
-function asArray(value) {
-  if (!Array.isArray(value)) return [];
-  return value;
-}
+type ImportOptions = {
+  provider?: string;
+  analysisFn?: (args: { systemPrompt: string; userPrompt: string }) => Promise<unknown>;
+  openaiApiKey?: string;
+  anthropicApiKey?: string;
+  model?: string;
+  openaiBaseUrl?: string;
+  openAIBaseUrl?: string;
+  anthropicBaseUrl?: string;
+  fetchImpl?: typeof fetch;
+  fetchTimeoutMs?: number;
+  fetchMaxRetries?: number;
+  fetchRetryBaseMs?: number;
+  profileName?: string;
+  description?: string;
+};
 
-function asObject(value) {
+type ImportProvider = {
+  provider: string;
+  analyzeFn: (args: { systemPrompt: string; userPrompt: string }) => Promise<unknown>;
+};
+
+function asObject(value: unknown): Record<string, unknown> {
   if (!value || typeof value !== "object" || Array.isArray(value)) return {};
-  return value;
+  return value as Record<string, unknown>;
 }
 
-function normalizeLevel(value, fallback = "medium") {
+function normalizeLevel(value: unknown, fallback: Level = "medium"): Level {
   if (typeof value !== "string") return fallback;
   const normalized = value.trim().toLowerCase();
-  if (!LEVELS.includes(normalized)) return fallback;
-  return normalized;
+  if (!LEVELS.includes(normalized as Level)) return fallback;
+  return normalized as Level;
 }
 
-function normalizeHumorStyle(value) {
+function normalizeHumorStyle(value: unknown): HumorStyle {
   if (typeof value !== "string") return "none";
   const normalized = value.trim().toLowerCase();
-  if (!HUMOR_STYLES.includes(normalized)) return "none";
-  return normalized;
+  if (!HUMOR_STYLES.includes(normalized as HumorStyle)) return "none";
+  return normalized as HumorStyle;
 }
 
-function normalizeStringArray(value, limit = 12) {
-  const deduped = new Set();
-  for (const item of asArray(value)) {
+function normalizeStringArray(value: unknown, limit = 12): string[] {
+  const deduped = new Set<string>();
+  for (const item of asArray<unknown>(value)) {
     const normalized = String(item ?? "").trim();
     if (!normalized) continue;
     if (deduped.has(normalized)) continue;
@@ -42,16 +66,16 @@ function normalizeStringArray(value, limit = 12) {
   return [...deduped];
 }
 
-function normalizeDimensionValue(value, fallbackLevel = "medium") {
+function normalizeDimensionValue(
+  value: unknown,
+  fallbackLevel: Level = "medium"
+): DimensionValue {
   if (typeof value === "string") {
     return normalizeLevel(value, fallbackLevel);
   }
 
   const dimension = asObject(value);
-  const target = normalizeLevel(
-    dimension.target ?? dimension.level,
-    fallbackLevel
-  );
+  const target = normalizeLevel(dimension.target ?? dimension.level, fallbackLevel);
   const adapt = dimension.adapt === true;
   if (!adapt) {
     return target;
@@ -65,7 +89,7 @@ function normalizeDimensionValue(value, fallbackLevel = "medium") {
   };
 }
 
-function normalizeHumorValue(value) {
+function normalizeHumorValue(value: unknown): HumorDimensionValue {
   if (typeof value === "string") {
     return {
       target: normalizeLevel(value, "low"),
@@ -76,11 +100,11 @@ function normalizeHumorValue(value) {
   const dimension = asObject(value);
   return {
     target: normalizeLevel(dimension.target ?? dimension.level, "low"),
-    style: normalizeHumorStyle(dimension.style)
+    style: normalizeHumorStyle((dimension as { style?: unknown }).style)
   };
 }
 
-function slugifyName(value) {
+function slugifyName(value: unknown): string {
   const slug = String(value ?? "")
     .trim()
     .toLowerCase()
@@ -89,7 +113,7 @@ function slugifyName(value) {
   return slug || "imported-profile";
 }
 
-function extractJSONObject(text) {
+function extractJSONObject(text: unknown): Record<string, unknown> {
   const raw = String(text ?? "").trim();
   if (!raw) return {};
   try {
@@ -103,7 +127,7 @@ function extractJSONObject(text) {
   }
 }
 
-function selectImportProvider(options = {}) {
+function selectImportProvider(options: ImportOptions = {}): ImportProvider {
   if (typeof options.analysisFn === "function") {
     return {
       provider: "custom",
@@ -120,7 +144,7 @@ function selectImportProvider(options = {}) {
       const error = new Error(
         "Import requested OpenAI provider but TRAITS_OPENAI_API_KEY is missing."
       );
-      error.code = "E_IMPORT_PROVIDER_UNAVAILABLE";
+      (error as Error & { code?: string }).code = "E_IMPORT_PROVIDER_UNAVAILABLE";
       throw error;
     }
     return {
@@ -145,7 +169,7 @@ function selectImportProvider(options = {}) {
       const error = new Error(
         "Import requested Anthropic provider but TRAITS_ANTHROPIC_API_KEY is missing."
       );
-      error.code = "E_IMPORT_PROVIDER_UNAVAILABLE";
+      (error as Error & { code?: string }).code = "E_IMPORT_PROVIDER_UNAVAILABLE";
       throw error;
     }
     return {
@@ -168,11 +192,11 @@ function selectImportProvider(options = {}) {
   const error = new Error(
     "Import requires TRAITS_OPENAI_API_KEY or TRAITS_ANTHROPIC_API_KEY."
   );
-  error.code = "E_IMPORT_PROVIDER_UNAVAILABLE";
+  (error as Error & { code?: string }).code = "E_IMPORT_PROVIDER_UNAVAILABLE";
   throw error;
 }
 
-function buildImportSystemPrompt() {
+function buildImportSystemPrompt(): string {
   return [
     "Analyze the system prompt and extract personality signals.",
     "Return strict JSON only with this shape:",
@@ -195,7 +219,7 @@ function buildImportSystemPrompt() {
   ].join("\n");
 }
 
-function buildImportUserPrompt(promptText) {
+function buildImportUserPrompt(promptText: unknown): string {
   return [
     "System prompt to analyze:",
     "<system_prompt>",
@@ -204,14 +228,18 @@ function buildImportUserPrompt(promptText) {
   ].join("\n");
 }
 
-export function mapImportAnalysisToProfile(analysis, options = {}) {
+export function mapImportAnalysisToProfile(
+  analysis: unknown,
+  options: ImportOptions = {}
+): PersonalityProfile {
   const source = asObject(analysis);
   const dimensions = asObject(source.detected_dimensions);
   const vocabulary = asObject(source.detected_vocabulary);
 
   const profileName =
     options.profileName ?? slugifyName(source.detected_role ?? "imported-profile");
-  const role = String(source.detected_role ?? "Helpful assistant").trim() || "Helpful assistant";
+  const role =
+    String(source.detected_role ?? "Helpful assistant").trim() || "Helpful assistant";
   const notes = String(source.notes ?? "").trim();
   const confidence =
     typeof source.confidence === "number" && Number.isFinite(source.confidence)
@@ -222,7 +250,7 @@ export function mapImportAnalysisToProfile(analysis, options = {}) {
   const forbiddenTerms = normalizeStringArray(vocabulary.forbidden, 16);
   const behavioralRules = normalizeStringArray(source.detected_behavioral_rules, 20);
 
-  const profile = {
+  const profile: PersonalityProfile = {
     schema: "v1.4",
     meta: {
       name: profileName,
@@ -258,11 +286,19 @@ export function mapImportAnalysisToProfile(analysis, options = {}) {
   return profile;
 }
 
-export function renderImportedProfileYAML(profile) {
+export function renderImportedProfileYAML(profile: PersonalityProfile): string {
   return toYaml(profile);
 }
 
-export async function runImportAnalysis(promptText, options = {}) {
+export async function runImportAnalysis(
+  promptText: unknown,
+  options: ImportOptions = {}
+): Promise<{
+  provider: string;
+  analysis: Record<string, unknown>;
+  profile: PersonalityProfile;
+  yaml: string;
+}> {
   const provider = selectImportProvider(options);
   const raw = await provider.analyzeFn({
     systemPrompt: buildImportSystemPrompt(),

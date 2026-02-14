@@ -4,7 +4,9 @@ const XML_TOOLS_OPEN = /<tools>/i;
 const XML_TOOLS_CLOSE = /<\/tools>/i;
 const TOOLS_SENTENCE = /you have access to/i;
 
-function findMarkdownToolsWindow(lines) {
+export type SectionWindow = { start: number; end: number };
+
+function findMarkdownToolsWindow(lines: string[]): SectionWindow | null {
   const start = lines.findIndex((line) => TOOLS_HEADING.test(line.trim()));
   if (start === -1) return null;
 
@@ -16,7 +18,7 @@ function findMarkdownToolsWindow(lines) {
   return { start, end: lines.length };
 }
 
-function findXmlToolsWindow(lines) {
+function findXmlToolsWindow(lines: string[]): SectionWindow | null {
   const open = lines.findIndex((line) => XML_TOOLS_OPEN.test(line));
   if (open === -1) return null;
 
@@ -25,7 +27,7 @@ function findXmlToolsWindow(lines) {
   return { start: open, end: close + 1 };
 }
 
-function findToolsSentenceWindow(lines) {
+function findToolsSentenceWindow(lines: string[]): SectionWindow | null {
   const sentenceIndex = lines.findIndex((line) => TOOLS_SENTENCE.test(line));
   if (sentenceIndex === -1) return null;
 
@@ -37,7 +39,7 @@ function findToolsSentenceWindow(lines) {
   return { start: sentenceIndex, end: lines.length };
 }
 
-export function detectToolsSection(systemPrompt) {
+export function detectToolsSection(systemPrompt: string): SectionWindow | null {
   const lines = String(systemPrompt).split("\n");
   return (
     findXmlToolsWindow(lines) ??

@@ -5,7 +5,7 @@ import fs from "node:fs";
 import os from "node:os";
 import { fileURLToPath } from "node:url";
 
-import { resolveActiveContext, resolveExtends } from "../src/index.js";
+import { resolveActiveContext, resolveExtends } from "../dist/index.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 const PROFILES_DIR = path.join(ROOT, "profiles");

@@ -1,26 +1,31 @@
 import { resolveActiveContext } from "../profile.js";
+import {
+  asArray,
+  clone,
+  isClaudeModel,
+  isGptModel,
+  PROTECTED_REFUSAL_TERMS
+} from "../utils.js";
 import { validateProfile } from "../validator/engine.js";
 import { selectInteractionPatterns, selectPatterns } from "./patterns.js";
-import { getSafetyFloor, PROTECTED_REFUSAL_TERMS } from "./safety-floor.js";
+import { getSafetyFloor } from "./safety-floor.js";
+import type {
+  CompiledPersonality,
+  ContextResolution,
+  DimensionValue,
+  PersonalityProfile
+} from "../types.js";
 
-function asArray(value) {
-  if (!Array.isArray(value)) return [];
-  return value;
-}
+type CompileOptions = {
+  model?: string;
+  context?: Record<string, unknown>;
+  explain?: boolean;
+  strict?: boolean;
+  bundledProfilesDir?: string;
+  knowledgeBaseDir?: string;
+};
 
-function clone(value) {
-  return JSON.parse(JSON.stringify(value));
-}
-
-function isClaudeModel(model) {
-  return /claude/i.test(String(model));
-}
-
-function isGptModel(model) {
-  return /gpt/i.test(String(model));
-}
-
-function selectPlacement(model) {
+function selectPlacement(model: string): CompiledPersonality["placement"] {
   if (isClaudeModel(model)) {
     return {
       model,
@@ -45,21 +50,29 @@ function selectPlacement(model) {
   };
 }
 
-function stringifyDimensionTarget(value) {
+function stringifyDimensionTarget(value: unknown): string {
   if (typeof value === "string") return value;
-  if (value && typeof value === "object") return String(value.target ?? "medium");
+  if (value && typeof value === "object") {
+    return String((value as { target?: unknown }).target ?? "medium");
+  }
   return "medium";
 }
 
-function applyContextAdjustments(profile, context = {}) {
+function applyContextAdjustments(
+  profile: PersonalityProfile,
+  context: Record<string, unknown> = {}
+): { profile: PersonalityProfile; contextResolution: ContextResolution } {
   const resolved = resolveActiveContext(profile, context);
-  const effective = clone(profile);
+  const effective = clone(profile) as PersonalityProfile;
   effective.voice = effective.voice ?? {};
   for (const [dimension, adjustment] of Object.entries(resolved.resolvedAdjustments)) {
-    effective.voice[dimension] = clone(adjustment);
+    effective.voice[dimension] = clone(adjustment) as DimensionValue;
   }
 
-  const behavioralRules = [...asArray(effective.behavioral_rules), ...resolved.injectRules];
+  const behavioralRules = [
+    ...asArray<string>(effective.behavioral_rules),
+    ...resolved.injectRules
+  ];
   effective.behavioral_rules = behavioralRules;
   return {
     profile: effective,
@@ -67,12 +80,15 @@ function applyContextAdjustments(profile, context = {}) {
   };
 }
 
-function enforceProtectedVocabulary(forbiddenTerms) {
+function enforceProtectedVocabulary(forbiddenTerms: unknown): {
+  filteredForbidden: string[];
+  restoredProtectedTerms: string[];
+} {
   const protectedLower = new Set(PROTECTED_REFUSAL_TERMS.map((term) => term.toLowerCase()));
-  const restored = [];
-  const filteredForbidden = [];
+  const restored: string[] = [];
+  const filteredForbidden: string[] = [];
 
-  for (const term of asArray(forbiddenTerms)) {
+  for (const term of asArray<string>(forbiddenTerms)) {
     const normalized = String(term).toLowerCase();
     if (protectedLower.has(normalized)) {
       restored.push(term);
@@ -87,22 +103,36 @@ function enforceProtectedVocabulary(forbiddenTerms) {
   };
 }
 
-function estimateTokenCount(text) {
+function estimateTokenCount(text: string): number {
   const wordCount = String(text).trim().split(/\s+/).filter(Boolean).length;
   return Math.ceil(wordCount * 1.3);
 }
 
-function collectAdaptiveDimensions(voice = {}) {
-  const adaptive = [];
+function collectAdaptiveDimensions(voice: Record<string, unknown> = {}): string[] {
+  const adaptive: string[] = [];
   for (const [dimension, value] of Object.entries(voice)) {
-    if (value && typeof value === "object" && value.adapt === true) {
+    if (
+      value &&
+      typeof value === "object" &&
+      (value as { adapt?: unknown }).adapt === true
+    ) {
       adaptive.push(dimension);
     }
   }
   return adaptive;
 }
 
-function renderPersonalityText(profile, model, contextResolution, compileOptions = {}) {
+function renderPersonalityText(
+  profile: PersonalityProfile,
+  model: string,
+  contextResolution: ContextResolution,
+  compileOptions: CompileOptions = {}
+): {
+  text: string;
+  restoredProtectedTerms: string[];
+  patternSelections: unknown[];
+  interactionPatterns: unknown[];
+} {
   const voice = profile.voice ?? {};
   const vocabulary = profile.vocabulary ?? {};
   const safeForbidden = enforceProtectedVocabulary(vocabulary.forbidden_terms);
@@ -114,7 +144,7 @@ function renderPersonalityText(profile, model, contextResolution, compileOptions
     knowledgeBaseDir: compileOptions.knowledgeBaseDir
   });
 
-  const lines = [];
+  const lines: string[] = [];
   lines.push("[TRAITS PERSONALITY]");
   lines.push(`Name: ${profile?.meta?.name ?? "unknown"}`);
   lines.push(`Version: ${profile?.meta?.version ?? "unknown"}`);
@@ -149,8 +179,8 @@ function renderPersonalityText(profile, model, contextResolution, compileOptions
   }
   lines.push("");
   lines.push("[VOCABULARY]");
-  if (asArray(vocabulary.preferred_terms).length > 0) {
-    lines.push(`Preferred terms: ${asArray(vocabulary.preferred_terms).join("; ")}`);
+  if (asArray<string>(vocabulary.preferred_terms).length > 0) {
+    lines.push(`Preferred terms: ${asArray<string>(vocabulary.preferred_terms).join("; ")}`);
   } else {
     lines.push("Preferred terms: (none)");
   }
@@ -162,7 +192,7 @@ function renderPersonalityText(profile, model, contextResolution, compileOptions
   lines.push(`Protected refusal terms (always available): ${PROTECTED_REFUSAL_TERMS.join("; ")}`);
   lines.push("");
   lines.push("[BEHAVIORAL RULES]");
-  const rules = asArray(profile.behavioral_rules);
+  const rules = asArray<string>(profile.behavioral_rules);
   if (rules.length === 0) {
     lines.push("- (none)");
   } else {
@@ -192,7 +222,10 @@ function renderPersonalityText(profile, model, contextResolution, compileOptions
   };
 }
 
-export function compileResolvedProfile(profile, options = {}) {
+export function compileResolvedProfile(
+  profile: PersonalityProfile,
+  options: CompileOptions = {}
+): CompiledPersonality {
   const model = String(options.model ?? "claude-sonnet");
   const context = options.context ?? {};
   const explain = Boolean(options.explain);
@@ -202,7 +235,7 @@ export function compileResolvedProfile(profile, options = {}) {
   const placement = selectPlacement(model);
   const text = rendered.text;
 
-  const compiled = {
+  const compiled: CompiledPersonality = {
     text,
     placement,
     metadata: {
@@ -235,7 +268,10 @@ export function compileResolvedProfile(profile, options = {}) {
   return compiled;
 }
 
-export function compileProfile(profilePath, options = {}) {
+export function compileProfile(
+  profilePath: string,
+  options: CompileOptions = {}
+): CompiledPersonality {
   const strict = Boolean(options.strict);
   const validation = validateProfile(profilePath, {
     strict,
@@ -244,8 +280,15 @@ export function compileProfile(profilePath, options = {}) {
 
   if (validation.effectiveErrors.length > 0) {
     const error = new Error("Profile failed validation and cannot be compiled.");
-    error.code = "E_COMPILE_VALIDATION";
-    error.validation = validation;
+    (error as Error & { code?: string; validation?: unknown }).code = "E_COMPILE_VALIDATION";
+    (error as Error & { code?: string; validation?: unknown }).validation = validation;
+    throw error;
+  }
+
+  if (!validation.profile) {
+    const error = new Error("Profile failed validation and cannot be compiled.");
+    (error as Error & { code?: string; validation?: unknown }).code = "E_COMPILE_VALIDATION";
+    (error as Error & { code?: string; validation?: unknown }).validation = validation;
     throw error;
   }
 

@@ -4,7 +4,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-import { applyCalibrationUpdates, mergeCalibrationFile } from "../src/index.js";
+import { applyCalibrationUpdates, mergeCalibrationFile } from "../dist/index.js";
 
 test("applyCalibrationUpdates applies dimension and interaction scores", () => {
   const input = {

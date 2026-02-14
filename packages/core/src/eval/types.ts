@@ -1,3 +1,27 @@
+import { asArray } from "../utils.js";
+
+export type EvalScenarioCategory =
+  | "standard"
+  | "frustrated"
+  | "edge"
+  | "multi-turn"
+  | "formal"
+  | "casual"
+  | "mixed";
+
+export type EvalScenarioMessage = {
+  role: "user" | "assistant";
+  content: string;
+};
+
+export type EvalScenario = {
+  id: string;
+  category: EvalScenarioCategory;
+  domain?: string;
+  messages: EvalScenarioMessage[];
+  expected_behavior?: string;
+};
+
 const VALID_CATEGORIES = new Set([
   "standard",
   "frustrated",
@@ -10,21 +34,19 @@ const VALID_CATEGORIES = new Set([
 
 const VALID_ROLES = new Set(["user", "assistant"]);
 
-function isObject(value) {
+function isObject(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
-function isNonEmptyString(value) {
+function isNonEmptyString(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
 }
 
-function asArray(value) {
-  if (!Array.isArray(value)) return [];
-  return value;
-}
-
-export function validateEvalScenario(scenario) {
-  const errors = [];
+export function validateEvalScenario(scenario: unknown): {
+  valid: boolean;
+  errors: string[];
+} {
+  const errors: string[] = [];
   if (!isObject(scenario)) {
     return {
       valid: false,
@@ -42,7 +64,7 @@ export function validateEvalScenario(scenario) {
     );
   }
 
-  const messages = asArray(scenario.messages);
+  const messages = asArray<EvalScenarioMessage>(scenario.messages);
   if (messages.length === 0) {
     errors.push('Scenario must include at least one message in "messages"');
   } else {
@@ -76,9 +98,13 @@ export function validateEvalScenario(scenario) {
   };
 }
 
-export function validateEvalScenarios(scenarios) {
-  const input = asArray(scenarios);
-  const invalid = [];
+export function validateEvalScenarios(scenarios: unknown): {
+  valid: boolean;
+  count: number;
+  invalid: Array<{ index: number; id: string | null; errors: string[] }>;
+} {
+  const input = asArray<EvalScenario>(scenarios);
+  const invalid: Array<{ index: number; id: string | null; errors: string[] }> = [];
   input.forEach((scenario, index) => {
     const result = validateEvalScenario(scenario);
     if (result.valid) return;

@@ -5,6 +5,7 @@ import {
   detectEvalTierAvailability,
   formatValidationResult,
   resolveTierExecution,
+  runOfflineBaselineScaffold,
   runTier1EvaluationForProfile,
   runTier2EvaluationForProfile,
   runTier3EvaluationForProfile,
@@ -35,7 +36,7 @@ function printEvalUsage(out = process.stderr) {
       "  --strict                  Treat validation warnings as errors",
       "  --verbose                 Include command metadata output",
       "  --no-color                Disable colorized output",
-      "  --no-baselines            Reserved flag (accepted, no-op in scaffold)",
+      "  --no-baselines            Skip offline baseline scaffold comparison",
       "  --no-helpfulness          Skip helpfulness checks in scoring",
       "  --constraint-impact       Reserved flag (accepted, no-op in scaffold)",
       ""
@@ -258,6 +259,7 @@ export async function runEval(args, io = process) {
 
   try {
     const tierReports = {};
+    let baselineReport = null;
 
     let evaluation = null;
     if (tierResolution.tiers_run.includes(1)) {
@@ -308,6 +310,15 @@ export async function runEval(args, io = process) {
       writeProgress(io, options, "Tier 3 complete.");
     }
 
+    if (!options.noBaselines && evaluation?.validation?.profile) {
+      writeProgress(io, options, "Running offline baseline scaffold...");
+      baselineReport = runOfflineBaselineScaffold(evaluation.validation.profile, samples, {
+        includeHelpfulness: !options.noHelpfulness,
+        compiledTier1Report: tierReports.tier1
+      });
+      writeProgress(io, options, "Offline baseline scaffold complete.");
+    }
+
     const allScores = Object.values(tierReports)
       .map((report) => Number(report?.average_score))
       .filter((score) => Number.isFinite(score));
@@ -326,7 +337,8 @@ export async function runEval(args, io = process) {
       tier_availability: availability,
       report: {
         overall_score: overallScore,
-        ...tierReports
+        ...tierReports,
+        ...(baselineReport ? { baselines: baselineReport } : {})
       }
     };
     if (validationForPayload) {
@@ -352,6 +364,21 @@ export async function runEval(args, io = process) {
     }
     if (tierReports.tier3) {
       io.stdout.write(`Tier 3 average score: ${tierReports.tier3.average_score.toFixed(3)}\n`);
+    }
+    if (baselineReport?.tier1) {
+      io.stdout.write(
+        `Baseline (none) Tier 1 avg: ${baselineReport.tier1.none.average_score.toFixed(3)}\n`
+      );
+      io.stdout.write(
+        `Baseline (basic) Tier 1 avg: ${baselineReport.tier1.basic.average_score.toFixed(3)}\n`
+      );
+      const deltas = baselineReport.tier1.deltas ?? {};
+      if (Number.isFinite(deltas.compiled_vs_none)) {
+        io.stdout.write(`Delta vs none baseline: ${deltas.compiled_vs_none.toFixed(3)}\n`);
+      }
+      if (Number.isFinite(deltas.compiled_vs_basic)) {
+        io.stdout.write(`Delta vs basic baseline: ${deltas.compiled_vs_basic.toFixed(3)}\n`);
+      }
     }
     io.stdout.write(`Overall eval score: ${overallScore.toFixed(3)}\n`);
     return 0;

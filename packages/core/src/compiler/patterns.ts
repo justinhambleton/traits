@@ -1,23 +1,49 @@
 import fs from "node:fs";
 import path from "node:path";
+import type { DimensionName, Level } from "../types.js";
 
-const KB_CACHE = new Map();
+type ModelFlavor = "claude" | "gpt" | "generic";
+type PatternEntry = {
+  pattern?: string;
+  adherence?: number | null;
+  calibrated?: boolean;
+};
+type PatternData = {
+  version?: string;
+  dimensions?: Record<string, Record<string, PatternEntry>>;
+  interactions?: Record<string, PatternEntry>;
+};
+type Selection = {
+  dimension: string;
+  level: string;
+  pattern: string;
+  adherence: number | null;
+  source: string;
+};
+type InteractionSelection = {
+  id: string;
+  pattern: string;
+  adherence: number | null;
+  source: string;
+};
+const KB_CACHE = new Map<string, PatternData | null>();
 
-function modelFlavor(model) {
+function modelFlavor(model: unknown): ModelFlavor {
   if (/claude/i.test(String(model))) return "claude";
   if (/gpt/i.test(String(model))) return "gpt";
   return "generic";
 }
 
-function dimensionTargetLevel(value) {
+function dimensionTargetLevel(value: unknown): string {
   if (typeof value === "string") return value;
-  if (value && typeof value === "object" && typeof value.target === "string") {
-    return value.target;
+  if (value && typeof value === "object") {
+    const target = (value as { target?: unknown }).target;
+    if (typeof target === "string") return target;
   }
   return "medium";
 }
 
-function patternTemplate(flavor, dimension, level) {
+function patternTemplate(flavor: ModelFlavor, dimension: string, level: string): string {
   if (flavor === "claude") {
     return `Use ${dimension} at ${level} with explicit behavioral framing.`;
   }
@@ -27,7 +53,7 @@ function patternTemplate(flavor, dimension, level) {
   return `Keep ${dimension} at ${level}.`;
 }
 
-function interactionTemplate(flavor, id) {
+function interactionTemplate(flavor: ModelFlavor, id: string): string {
   if (id === "warmth-high_directness-high") {
     return flavor === "gpt"
       ? "Acknowledge quickly, then move directly to concrete next steps."
@@ -42,7 +68,10 @@ function interactionTemplate(flavor, id) {
   return "Apply balanced interaction handling.";
 }
 
-function resolvePatternFile(model, options = {}) {
+function resolvePatternFile(
+  model: unknown,
+  options: { knowledgeBaseDir?: string } = {}
+): string | null {
   const flavor = modelFlavor(model);
   if (flavor === "generic") return null;
   const knowledgeBaseDir =
@@ -50,10 +79,16 @@ function resolvePatternFile(model, options = {}) {
   return path.resolve(knowledgeBaseDir, flavor, "patterns.json");
 }
 
-function loadPatternData(model, options = {}) {
+function loadPatternData(
+  model: unknown,
+  options: { knowledgeBaseDir?: string } = {}
+): PatternData | null {
   const patternFile = resolvePatternFile(model, options);
   if (!patternFile) return null;
-  if (KB_CACHE.has(patternFile)) return KB_CACHE.get(patternFile);
+  if (KB_CACHE.has(patternFile)) {
+    const cached = KB_CACHE.get(patternFile);
+    return cached ?? null;
+  }
 
   try {
     if (!fs.existsSync(patternFile)) {
@@ -70,24 +105,35 @@ function loadPatternData(model, options = {}) {
   }
 }
 
-function normalizeLevel(level) {
+function normalizeLevel(level: unknown): string {
   return String(level ?? "medium").toLowerCase();
 }
 
-function isAtLeast(level, threshold) {
-  const order = ["very-low", "low", "medium", "high", "very-high"];
-  return order.indexOf(normalizeLevel(level)) >= order.indexOf(threshold);
+function isAtLeast(level: unknown, threshold: Level): boolean {
+  const order: Level[] = ["very-low", "low", "medium", "high", "very-high"];
+  return order.indexOf(normalizeLevel(level) as Level) >= order.indexOf(threshold);
 }
 
-function isAtMost(level, threshold) {
-  const order = ["very-low", "low", "medium", "high", "very-high"];
-  return order.indexOf(normalizeLevel(level)) <= order.indexOf(threshold);
+function isAtMost(level: unknown, threshold: Level): boolean {
+  const order: Level[] = ["very-low", "low", "medium", "high", "very-high"];
+  return order.indexOf(normalizeLevel(level) as Level) <= order.indexOf(threshold);
 }
 
-export function selectPatterns(voice, model, options = {}) {
+export function selectPatterns(
+  voice: Record<string, unknown>,
+  model: unknown,
+  options: { knowledgeBaseDir?: string } = {}
+): Selection[] {
   const flavor = modelFlavor(model);
   const patternData = loadPatternData(model, options);
-  const dimensions = ["formality", "warmth", "verbosity", "directness", "empathy", "humor"];
+  const dimensions: DimensionName[] = [
+    "formality",
+    "warmth",
+    "verbosity",
+    "directness",
+    "empathy",
+    "humor"
+  ];
   return dimensions.map((dimension) => {
     const level = dimensionTargetLevel(voice?.[dimension]);
     const levelEntry = patternData?.dimensions?.[dimension]?.[level];
@@ -103,7 +149,11 @@ export function selectPatterns(voice, model, options = {}) {
   });
 }
 
-export function selectInteractionPatterns(voice, model, options = {}) {
+export function selectInteractionPatterns(
+  voice: Record<string, unknown>,
+  model: unknown,
+  options: { knowledgeBaseDir?: string } = {}
+): InteractionSelection[] {
   const flavor = modelFlavor(model);
   const patternData = loadPatternData(model, options);
   const warmth = dimensionTargetLevel(voice?.warmth);
@@ -111,7 +161,7 @@ export function selectInteractionPatterns(voice, model, options = {}) {
   const empathy = dimensionTargetLevel(voice?.empathy);
   const formality = dimensionTargetLevel(voice?.formality);
   const humor = dimensionTargetLevel(voice?.humor);
-  const interactions = [];
+  const interactions: InteractionSelection[] = [];
 
   if (isAtLeast(warmth, "high") && isAtLeast(directness, "high")) {
     const entry = patternData?.interactions?.["warmth-high_directness-high"];

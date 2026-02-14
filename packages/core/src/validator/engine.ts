@@ -2,17 +2,29 @@ import { resolveExtends } from "../profile.js";
 import { checkOverspec } from "./overspec.js";
 import { validateSchema } from "./schema.js";
 import { checkS001, checkS002, checkS003, checkS005 } from "./safety.js";
+import type {
+  PersonalityProfile,
+  ValidationCheckSummary,
+  ValidationDiagnostic,
+  ValidationResult
+} from "../types.js";
 
-function normalizeDiagnosticSeverity(diagnostic, fallbackSeverity) {
+function normalizeDiagnosticSeverity(
+  diagnostic: ValidationDiagnostic,
+  fallbackSeverity: "warning" | "error"
+): ValidationDiagnostic {
   return {
     ...diagnostic,
     severity: diagnostic?.severity ?? fallbackSeverity
   };
 }
 
-function partitionDiagnostics(diagnostics) {
-  const warnings = [];
-  const errors = [];
+function partitionDiagnostics(diagnostics: ValidationDiagnostic[]): {
+  warnings: ValidationDiagnostic[];
+  errors: ValidationDiagnostic[];
+} {
+  const warnings: ValidationDiagnostic[] = [];
+  const errors: ValidationDiagnostic[] = [];
 
   for (const diagnostic of diagnostics) {
     if (diagnostic.severity === "error") {
@@ -25,7 +37,10 @@ function partitionDiagnostics(diagnostics) {
   return { warnings, errors };
 }
 
-function promoteWarningsForStrictMode(warnings, strict) {
+function promoteWarningsForStrictMode(
+  warnings: ValidationDiagnostic[],
+  strict: boolean
+): ValidationDiagnostic[] {
   if (!strict) return [];
   return warnings.map((warning) => ({
     ...warning,
@@ -35,13 +50,13 @@ function promoteWarningsForStrictMode(warnings, strict) {
   }));
 }
 
-function computeExitCode(warnings, effectiveErrors) {
+function computeExitCode(warnings: ValidationDiagnostic[], effectiveErrors: ValidationDiagnostic[]): number {
   if (effectiveErrors.length > 0) return 2;
   if (warnings.length > 0) return 1;
   return 0;
 }
 
-function summarizeCheck(diagnostics) {
+function summarizeCheck(diagnostics: ValidationDiagnostic[]): ValidationCheckSummary {
   const errorCount = diagnostics.filter((diagnostic) => diagnostic.severity === "error").length;
   const warningCount = diagnostics.filter(
     (diagnostic) => diagnostic.severity === "warning"
@@ -55,7 +70,10 @@ function summarizeCheck(diagnostics) {
   return { status: "pass", errors: 0, warnings: 0 };
 }
 
-function buildCompositionCheck(resolvedWarnings, resolvedErrors) {
+function buildCompositionCheck(
+  resolvedWarnings: ValidationDiagnostic[],
+  resolvedErrors: ValidationDiagnostic[]
+): ValidationCheckSummary {
   const compositionWarnings = resolvedWarnings.filter(
     (diagnostic) => diagnostic.code === "E_RESOLVE_EXTENDS"
   );
@@ -66,7 +84,10 @@ function buildCompositionCheck(resolvedWarnings, resolvedErrors) {
   return summarizeCheck([...compositionWarnings, ...compositionErrors]);
 }
 
-export function validateResolvedProfile(profile, options = {}) {
+export function validateResolvedProfile(
+  profile: PersonalityProfile,
+  options: { strict?: boolean } = {}
+): ValidationResult {
   const strict = Boolean(options.strict);
   const schemaValidation = validateSchema(profile);
 
@@ -85,6 +106,7 @@ export function validateResolvedProfile(profile, options = {}) {
   const effectiveErrors = [...errors, ...promotedWarnings];
 
   return {
+    parentPath: null,
     profile,
     strict,
     warnings,
@@ -102,14 +124,17 @@ export function validateResolvedProfile(profile, options = {}) {
   };
 }
 
-export function validateProfile(profilePath, options = {}) {
+export function validateProfile(
+  profilePath: string,
+  options: { strict?: boolean; bundledProfilesDir?: string } = {}
+): ValidationResult {
   const strict = Boolean(options.strict);
-  let resolved;
+  let resolved: ReturnType<typeof resolveExtends>;
 
   try {
     resolved = resolveExtends(profilePath, options);
   } catch (error) {
-    const diagnostic = {
+    const diagnostic: ValidationDiagnostic = {
       code: "E_PARSE_PROFILE",
       severity: "error",
       message: `Failed to load profile: ${error instanceof Error ? error.message : String(error)}`

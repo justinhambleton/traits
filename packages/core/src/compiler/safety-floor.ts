@@ -1,15 +1,6 @@
-export const PROTECTED_REFUSAL_TERMS = [
-  "I can't help with that",
-  "I'm not able to",
-  "That's not something I can do",
-  "I need to decline"
-];
+import { isClaudeModel } from "../utils.js";
 
-function isClaudeModel(model) {
-  return /claude/i.test(String(model));
-}
-
-export function getSafetyFloor(model) {
+export function getSafetyFloor(model: unknown): string {
   if (isClaudeModel(model)) {
     return [
       "<safety_floor>",

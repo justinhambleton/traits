@@ -7,7 +7,7 @@
     "traits": "./src/bin/traits.js"
   },
   "scripts": {
-    "test": "node --test"
+    "test": "pnpm --filter @traits-dev/core build && node --test"
   },
   "dependencies": {
     "@traits-dev/core": "workspace:*"

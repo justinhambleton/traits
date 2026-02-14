@@ -4,8 +4,9 @@ import {
 } from "./runtime.js";
 
 const OPENAI_BASE_URL = "https://api.openai.com/v1";
+type FetchLike = (input: string, init?: RequestInit) => Promise<Response>;
 
-function parseJSONResponse(service, bodyText) {
+function parseJSONResponse(service: string, bodyText: string): any {
   try {
     return JSON.parse(bodyText);
   } catch {
@@ -22,7 +23,16 @@ export async function openAIEmbed({
   timeoutMs,
   maxRetries,
   retryBaseMs
-}) {
+}: {
+  apiKey: string;
+  input: string;
+  model?: string;
+  baseUrl?: string;
+  fetchImpl?: FetchLike;
+  timeoutMs?: number;
+  maxRetries?: number;
+  retryBaseMs?: number;
+}): Promise<number[]> {
   if (!apiKey) {
     throw new Error("Missing OpenAI API key for embedding request.");
   }
@@ -71,7 +81,17 @@ export async function openAIJudge({
   timeoutMs,
   maxRetries,
   retryBaseMs
-}) {
+}: {
+  apiKey: string;
+  systemPrompt: string;
+  userPrompt: string;
+  model?: string;
+  baseUrl?: string;
+  fetchImpl?: FetchLike;
+  timeoutMs?: number;
+  maxRetries?: number;
+  retryBaseMs?: number;
+}): Promise<string> {
   if (!apiKey) {
     throw new Error("Missing OpenAI API key for judge request.");
   }

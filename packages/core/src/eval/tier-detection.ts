@@ -1,4 +1,15 @@
-function resolveTier3Availability(providerPreference, hasOpenAI, hasAnthropic) {
+type TierState = {
+  tier: number;
+  available: boolean;
+  implemented: boolean;
+  reason: string;
+};
+
+function resolveTier3Availability(
+  providerPreference: unknown,
+  hasOpenAI: boolean,
+  hasAnthropic: boolean
+): { available: boolean; reason: string } {
   const provider = String(providerPreference ?? "auto").toLowerCase();
 
   if (provider === "openai") {
@@ -27,7 +38,10 @@ function resolveTier3Availability(providerPreference, hasOpenAI, hasAnthropic) {
   };
 }
 
-export function detectEvalTierAvailability(env = process.env, options = {}) {
+export function detectEvalTierAvailability(
+  env: Record<string, string | undefined> = process.env,
+  options: { provider?: string } = {}
+): Record<number, TierState> {
   const hasOpenAI = Boolean(env.TRAITS_OPENAI_API_KEY);
   const hasAnthropic = Boolean(env.TRAITS_ANTHROPIC_API_KEY);
   const tier3 = resolveTier3Availability(options.provider, hasOpenAI, hasAnthropic);
@@ -56,9 +70,22 @@ export function detectEvalTierAvailability(env = process.env, options = {}) {
   };
 }
 
-export function resolveTierExecution(requestedTier, availability) {
+export function resolveTierExecution(
+  requestedTier: number | string,
+  availability: Record<number, TierState>
+): {
+  tier_requested: number;
+  tier_executed: number;
+  tiers_run: number[];
+  blocked: Array<{
+    tier: number;
+    available: boolean;
+    implemented: boolean;
+    reason: string;
+  }>;
+} {
   const requested = Number(requestedTier);
-  const tiersRun = [];
+  const tiersRun: number[] = [];
   for (let tier = 1; tier <= requested; tier += 1) {
     const state = availability?.[tier];
     if (state?.available && state?.implemented) {
@@ -67,7 +94,12 @@ export function resolveTierExecution(requestedTier, availability) {
   }
   const tierExecuted = tiersRun.length > 0 ? Math.max(...tiersRun) : 0;
 
-  const blocked = [];
+  const blocked: Array<{
+    tier: number;
+    available: boolean;
+    implemented: boolean;
+    reason: string;
+  }> = [];
   for (let tier = 1; tier <= requested; tier += 1) {
     if (tiersRun.includes(tier)) continue;
     const state = availability?.[tier];

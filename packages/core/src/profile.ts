@@ -1,21 +1,23 @@
 import fs from "node:fs";
 import path from "node:path";
 import { parse as parseYaml } from "yaml";
+import { asArray, clone } from "./utils.js";
+import type {
+  ContextAdaptation,
+  ContextResolution,
+  DimensionValue,
+  ExtendsDiagnostics,
+  ExtendsResult,
+  PersonalityProfile
+} from "./types.js";
 
 const SAFETY_ADAPTATION_NAME = /(crisis|emergency|harm|suicid|self[-_ ]?harm)/i;
+type GenericObject = Record<string, unknown>;
+type ContextWithPriority = ContextAdaptation & { _index: number; _priority: number };
 
-function clone(value) {
-  return JSON.parse(JSON.stringify(value));
-}
-
-function asArray(value) {
-  if (!Array.isArray(value)) return [];
-  return value;
-}
-
-function dedupExact(items) {
-  const seen = new Set();
-  const out = [];
+function dedupExact<T>(items: T[]): T[] {
+  const seen = new Set<string>();
+  const out: T[] = [];
   for (const item of items) {
     const key = String(item);
     if (seen.has(key)) continue;
@@ -25,9 +27,9 @@ function dedupExact(items) {
   return out;
 }
 
-function dedupCaseInsensitive(items) {
-  const seen = new Set();
-  const out = [];
+function dedupCaseInsensitive(items: string[]): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
   for (const item of items) {
     const key = String(item).toLowerCase();
     if (seen.has(key)) continue;
@@ -37,52 +39,71 @@ function dedupCaseInsensitive(items) {
   return out;
 }
 
-function mergeMeta(parentMeta = {}, childMeta = {}) {
+function mergeMeta(
+  parentMeta: GenericObject = {},
+  childMeta: GenericObject = {}
+): PersonalityProfile["meta"] {
   const merged = { ...parentMeta, ...childMeta };
-  const parentTags = asArray(parentMeta.tags);
-  const childTags = asArray(childMeta.tags);
+  const parentTags = asArray<string>(parentMeta.tags);
+  const childTags = asArray<string>(childMeta.tags);
   if (parentTags.length || childTags.length) {
     merged.tags = dedupCaseInsensitive([...parentTags, ...childTags]);
   }
-  return merged;
+  return merged as PersonalityProfile["meta"];
 }
 
-function mergeIdentity(parentIdentity = {}, childIdentity = {}) {
-  return { ...parentIdentity, ...childIdentity };
+function mergeIdentity(
+  parentIdentity: GenericObject = {},
+  childIdentity: GenericObject = {}
+): PersonalityProfile["identity"] {
+  return { ...parentIdentity, ...childIdentity } as PersonalityProfile["identity"];
 }
 
-function mergeVoice(parentVoice = {}, childVoice = {}) {
+function mergeVoice(
+  parentVoice: GenericObject = {},
+  childVoice: GenericObject = {}
+): PersonalityProfile["voice"] {
   // Dimension-level replace: if child sets a dimension, it replaces the whole dimension value.
-  return { ...parentVoice, ...childVoice };
+  return { ...parentVoice, ...childVoice } as PersonalityProfile["voice"];
 }
 
-function mergeVocabulary(parentVocab = {}, childVocab = {}) {
-  const merged = { ...parentVocab, ...childVocab };
+function mergeVocabulary(
+  parentVocab: unknown = {},
+  childVocab: unknown = {}
+): NonNullable<PersonalityProfile["vocabulary"]> {
+  const parent = (parentVocab ?? {}) as GenericObject;
+  const child = (childVocab ?? {}) as GenericObject;
+  const merged = { ...parent, ...child };
   const mergedPreferred = dedupCaseInsensitive([
-    ...asArray(parentVocab.preferred_terms),
-    ...asArray(childVocab.preferred_terms)
+    ...asArray<string>(parent.preferred_terms),
+    ...asArray<string>(child.preferred_terms)
   ]);
   const mergedForbidden = dedupCaseInsensitive([
-    ...asArray(parentVocab.forbidden_terms),
-    ...asArray(childVocab.forbidden_terms)
+    ...asArray<string>(parent.forbidden_terms),
+    ...asArray<string>(child.forbidden_terms)
   ]);
 
   if (mergedPreferred.length) merged.preferred_terms = mergedPreferred;
   if (mergedForbidden.length) merged.forbidden_terms = mergedForbidden;
-  return merged;
+  return merged as NonNullable<PersonalityProfile["vocabulary"]>;
 }
 
-function mergeBehavioralRules(parentRules = [], childRules = []) {
-  return dedupExact([...asArray(parentRules), ...asArray(childRules)]);
+function mergeBehavioralRules(parentRules: unknown = [], childRules: unknown = []): string[] {
+  return dedupExact([...asArray<string>(parentRules), ...asArray<string>(childRules)]);
 }
 
-function mergeContextAdaptations(parentAdaptations = [], childAdaptations = []) {
-  const base = asArray(parentAdaptations).map((item) => clone(item));
-  const replacement = asArray(childAdaptations);
+function mergeContextAdaptations(
+  parentAdaptations: unknown = [],
+  childAdaptations: unknown = []
+): ContextAdaptation[] {
+  const base = asArray<ContextAdaptation>(parentAdaptations).map((item) => clone(item));
+  const replacement = asArray<ContextAdaptation>(childAdaptations);
 
-  const byWhen = new Map();
+  const byWhen = new Map<string, { item: ContextAdaptation; idx: number }>();
   base.forEach((item, idx) => {
-    byWhen.set(item?.when, { item, idx });
+    if (item?.when) {
+      byWhen.set(item.when, { item, idx });
+    }
   });
 
   const out = [...base];
@@ -90,6 +111,7 @@ function mergeContextAdaptations(parentAdaptations = [], childAdaptations = []) 
     const whenKey = next?.when;
     if (whenKey && byWhen.has(whenKey)) {
       const slot = byWhen.get(whenKey);
+      if (!slot) continue;
       out[slot.idx] = clone(next);
       continue;
     }
@@ -98,28 +120,36 @@ function mergeContextAdaptations(parentAdaptations = [], childAdaptations = []) 
   return out;
 }
 
-function removeCaseInsensitive(items, removals) {
-  const removalSet = new Set(asArray(removals).map((item) => String(item).toLowerCase()));
-  return asArray(items).filter((item) => !removalSet.has(String(item).toLowerCase()));
+function removeCaseInsensitive(items: unknown, removals: unknown): string[] {
+  const removalSet = new Set(
+    asArray<string>(removals).map((item) => String(item).toLowerCase())
+  );
+  return asArray<string>(items).filter((item) => !removalSet.has(String(item).toLowerCase()));
 }
 
-function applyExplicitRemovals(parentProfile, childProfile, mergedProfile, diagnostics) {
-  const childBehavioralRemovals = asArray(childProfile.behavioral_rules_remove);
-  const childForbiddenRemovals = asArray(
+function applyExplicitRemovals(
+  parentProfile: PersonalityProfile,
+  childProfile: PersonalityProfile,
+  mergedProfile: PersonalityProfile,
+  diagnostics: ExtendsDiagnostics
+): void {
+  const childBehavioralRemovals = asArray<string>(childProfile.behavioral_rules_remove);
+  const childForbiddenRemovals = asArray<string>(
     childProfile?.vocabulary?.forbidden_terms_remove
   );
-  const childPreferredRemovals = asArray(
+  const childPreferredRemovals = asArray<string>(
     childProfile?.vocabulary?.preferred_terms_remove
   );
-  const childAdaptationRemovals = asArray(childProfile.context_adaptations_remove);
+  const childAdaptationRemovals = asArray<string>(childProfile.context_adaptations_remove);
 
   if (childBehavioralRemovals.length) {
     diagnostics.warnings.push({
       code: "S006",
+      severity: "warning",
       message:
         "Explicit behavioral_rules_remove detected. Behavioral rules are safety-relevant."
     });
-    mergedProfile.behavioral_rules = asArray(mergedProfile.behavioral_rules).filter(
+    mergedProfile.behavioral_rules = asArray<string>(mergedProfile.behavioral_rules).filter(
       (rule) => !childBehavioralRemovals.includes(rule)
     );
   }
@@ -127,6 +157,7 @@ function applyExplicitRemovals(parentProfile, childProfile, mergedProfile, diagn
   if (childForbiddenRemovals.length) {
     diagnostics.warnings.push({
       code: "S006",
+      severity: "warning",
       message:
         "Explicit vocabulary.forbidden_terms_remove detected. Forbidden terms are safety-relevant."
     });
@@ -148,44 +179,55 @@ function applyExplicitRemovals(parentProfile, childProfile, mergedProfile, diagn
   }
 
   if (childAdaptationRemovals.length) {
-    const removalSet = new Set(childAdaptationRemovals);
-    mergedProfile.context_adaptations = asArray(mergedProfile.context_adaptations).filter(
+    const removalSet = new Set<string>(childAdaptationRemovals);
+    mergedProfile.context_adaptations = asArray<ContextAdaptation>(
+      mergedProfile.context_adaptations
+    ).filter(
       (adaptation) => !removalSet.has(adaptation?.when)
     );
   }
 
-  const parentBehavioralCount = asArray(parentProfile.behavioral_rules).length;
-  const parentForbiddenCount = asArray(parentProfile?.vocabulary?.forbidden_terms).length;
-  const mergedBehavioralCount = asArray(mergedProfile.behavioral_rules).length;
-  const mergedForbiddenCount = asArray(mergedProfile?.vocabulary?.forbidden_terms).length;
+  const parentBehavioralCount = asArray<string>(parentProfile.behavioral_rules).length;
+  const parentForbiddenCount = asArray<string>(parentProfile?.vocabulary?.forbidden_terms).length;
+  const mergedBehavioralCount = asArray<string>(mergedProfile.behavioral_rules).length;
+  const mergedForbiddenCount = asArray<string>(mergedProfile?.vocabulary?.forbidden_terms).length;
 
   if (mergedBehavioralCount < parentBehavioralCount || mergedForbiddenCount < parentForbiddenCount) {
     diagnostics.errors.push({
       code: "S006",
+      severity: "error",
       message:
         "Merged profile has fewer safety constraints than parent profile."
     });
   }
 }
 
-function checkS007SafetyPriority(profile, diagnostics) {
-  for (const adaptation of asArray(profile.context_adaptations)) {
+function checkS007SafetyPriority(
+  profile: PersonalityProfile,
+  diagnostics: ExtendsDiagnostics
+): void {
+  for (const adaptation of asArray<ContextAdaptation>(profile.context_adaptations)) {
     if (!SAFETY_ADAPTATION_NAME.test(String(adaptation?.when ?? ""))) continue;
     const priority = Number(adaptation?.priority ?? 0);
     if (priority >= 100) continue;
     diagnostics.warnings.push({
       code: "S007",
+      severity: "warning",
       message: `Safety adaptation "${adaptation.when}" should set priority: 100.`
     });
   }
 }
 
-export function loadProfileFile(filePath) {
+export function loadProfileFile(filePath: string): PersonalityProfile {
   const raw = fs.readFileSync(filePath, "utf8");
-  return parseYaml(raw);
+  return parseYaml(raw) as PersonalityProfile;
 }
 
-function resolveParentPath(profilePath, extendsName, options = {}) {
+function resolveParentPath(
+  profilePath: string,
+  extendsName: string,
+  options: { bundledProfilesDir?: string } = {}
+): string | null {
   const localCandidate = path.join(path.dirname(profilePath), `${extendsName}.yaml`);
   if (fs.existsSync(localCandidate)) return localCandidate;
 
@@ -197,7 +239,11 @@ function resolveParentPath(profilePath, extendsName, options = {}) {
   return null;
 }
 
-function mergeProfiles(parentProfile, childProfile, diagnostics) {
+function mergeProfiles(
+  parentProfile: PersonalityProfile,
+  childProfile: PersonalityProfile,
+  diagnostics: ExtendsDiagnostics
+): PersonalityProfile {
   const merged = clone(parentProfile);
 
   // Keep child schema/meta identity and explicit fields where relevant.
@@ -241,8 +287,11 @@ function mergeProfiles(parentProfile, childProfile, diagnostics) {
   return merged;
 }
 
-export function resolveExtends(profilePath, options = {}) {
-  const diagnostics = { warnings: [], errors: [] };
+export function resolveExtends(
+  profilePath: string,
+  options: { bundledProfilesDir?: string } = {}
+): ExtendsResult {
+  const diagnostics: ExtendsDiagnostics = { warnings: [], errors: [] };
   const childProfile = loadProfileFile(profilePath);
 
   if (!childProfile?.extends) {
@@ -258,6 +307,7 @@ export function resolveExtends(profilePath, options = {}) {
   if (!parentPath) {
     diagnostics.errors.push({
       code: "E_RESOLVE_EXTENDS",
+      severity: "error",
       message: `Unable to resolve parent profile "${childProfile.extends}".`
     });
     return { profile: childProfile, parentPath: null, diagnostics };
@@ -267,6 +317,7 @@ export function resolveExtends(profilePath, options = {}) {
   if (parentProfile?.extends) {
     diagnostics.errors.push({
       code: "E_EXTENDS_CHAIN",
+      severity: "error",
       message: "extends chains are not supported in MVP."
     });
     return { profile: childProfile, parentPath, diagnostics };
@@ -277,16 +328,24 @@ export function resolveExtends(profilePath, options = {}) {
   return { profile: merged, parentPath, diagnostics };
 }
 
-export function normalizeProfile(profilePath, options = {}) {
+export function normalizeProfile(
+  profilePath: string,
+  options: { bundledProfilesDir?: string } = {}
+): PersonalityProfile {
   return resolveExtends(profilePath, options).profile;
 }
 
-export function resolveActiveContext(profile, context = {}) {
-  const contextAdaptations = asArray(profile.context_adaptations).map((adaptation, index) => ({
+export function resolveActiveContext(
+  profile: PersonalityProfile,
+  context: Record<string, unknown> = {}
+): ContextResolution {
+  const contextAdaptations = asArray<ContextAdaptation>(profile.context_adaptations).map(
+    (adaptation, index) => ({
     ...adaptation,
     _index: index,
     _priority: Number(adaptation?.priority ?? 0)
-  }));
+    })
+  ) as ContextWithPriority[];
 
   const active = contextAdaptations.filter((adaptation) => {
     const whenKey = adaptation?.when;
@@ -300,13 +359,13 @@ export function resolveActiveContext(profile, context = {}) {
     return a._index - b._index;
   });
 
-  const resolvedAdjustments = {};
-  const collectedInject = [];
+  const resolvedAdjustments: Record<string, DimensionValue> = {};
+  const collectedInject: string[] = [];
   for (const adaptation of ordered) {
     for (const [dimension, value] of Object.entries(adaptation.adjustments ?? {})) {
-      resolvedAdjustments[dimension] = value;
+      resolvedAdjustments[dimension] = value as DimensionValue;
     }
-    for (const rule of asArray(adaptation.inject)) {
+    for (const rule of asArray<string>(adaptation.inject)) {
       collectedInject.push(rule);
     }
   }
