@@ -167,3 +167,33 @@ Decision log for implementation-critical choices. Keep entries brief and factual
 - Why: Close the final housekeeping gap from the initial assessment (#7) and create an implementation-ready plan for the remaining high-severity quality item (#4) without mixing it into unrelated feature work.
 - Files: `.gitignore`, `docs/plans/2026-02-14-remediation-knowledge-base-calibration-directive.md`, `docs/planning/development-memory.md`
 - Follow-up: Execute the #4 directive in sequence (status script -> authoring pass -> calibration harness -> apply updates -> calibration guard).
+
+- Date: 2026-02-14
+- Decision: Implement #4 Step 1 calibration contracts and status reporting with strict-fail gating for uncalibrated or placeholder entries.
+- Why: Establish measurable baseline visibility and machine-readable calibration inputs/outputs before authoring or scoring updates.
+- Files: `experiment/scripts/report-calibration-status.mjs`, `experiment/calibration/README.md`, `experiment/calibration/scenarios.v1.json`, `docs/planning/development-memory.md`
+- Follow-up: Execute Step 2 authoring pass to replace placeholder pattern text while keeping `calibrated: false` until measured by harness runs.
+
+- Date: 2026-02-14
+- Decision: Complete #4 Step 2 authoring pass by replacing all placeholder dimension pattern strings for both Claude and GPT knowledge-base files while preserving uncalibrated status.
+- Why: Remove scaffold/template text so compilation uses meaningful model- and level-specific guidance before quantitative calibration (Step 3/4) updates adherence and `calibrated` flags.
+- Files: `knowledge-base/claude/patterns.json`, `knowledge-base/gpt/patterns.json`, `docs/planning/development-memory.md`
+- Follow-up: Implement Step 3 harness (`calibrate-patterns.mjs`) to produce `raw-results.json` and merge-compatible `updates.json` artifacts.
+
+- Date: 2026-02-14
+- Decision: Implement #4 Step 3 calibration harness (`calibrate-patterns.mjs`) with deterministic embedding mode and merge-compatible update artifact output; also repair `calibrate-from-json.mjs` to load `@traits-dev/core` from built dist after TypeScript migration.
+- Why: Enable measurable, repeatable per-entry scoring runs for both model knowledge bases and ensure generated `updates.json` can be applied without broken source-path imports.
+- Files: `experiment/scripts/calibrate-patterns.mjs`, `experiment/scripts/calibrate-from-json.mjs`, `docs/planning/development-memory.md`
+- Follow-up: Execute Step 4 by applying harness-generated updates to real knowledge-base files and updating `knowledge-base/manifest.json`.
+
+- Date: 2026-02-14
+- Decision: Execute #4 Step 4 by applying harness-generated calibration updates to both model knowledge-base files and updating manifest metadata to calibration baseline version `0.2.0`.
+- Why: Transition from authored-but-uncalibrated patterns to measured calibration state (`calibrated: true` + adherence values) and record run provenance for traceability.
+- Files: `knowledge-base/claude/patterns.json`, `knowledge-base/gpt/patterns.json`, `knowledge-base/manifest.json`, `docs/planning/development-memory.md`
+- Follow-up: Execute Step 5 with calibration notes and add `calibration:check` guard script wired to strict status reporting.
+
+- Date: 2026-02-14
+- Decision: Complete #4 Step 5 by adding calibration evidence notes and wiring `calibration:check` guard to strict calibration status validation.
+- Why: Make calibration outcomes auditable and enforceable so future changes cannot silently regress into placeholder or uncalibrated knowledge-base state.
+- Files: `knowledge-base/calibration-notes.md`, `package.json`, `docs/planning/development-memory.md`
+- Follow-up: Run a provider-backed (`--embedding-mode openai`) calibration refinement pass to improve score differentiation and raise base-dimension adherence above initial threshold targets.

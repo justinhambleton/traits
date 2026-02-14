@@ -1,9 +1,18 @@
 {
-  "version": "0.1.0",
-  "updated_at": "2026-02-14T02:01:59.860Z",
+  "version": "0.2.0",
+  "updated_at": "2026-02-14T16:16:01.897Z",
   "models": [
     "claude",
     "gpt"
   ],
-  "notes": "Baseline placeholder patterns for MVP compile scaffolding."
+  "notes": "Dimension and interaction adherence updated from deterministic offline calibration harness run (Step 4 baseline).",
+  "last_calibration": {
+    "method": "deterministic-offline",
+    "scenario_set": "experiment/calibration/scenarios.v1.json",
+    "runs": {
+      "claude": "experiment/calibration/runs/claude-step3",
+      "gpt": "experiment/calibration/runs/gpt-step3"
+    },
+    "calibrated_at": "2026-02-14T16:16:01.897Z"
+  }
 }

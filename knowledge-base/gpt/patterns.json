@@ -4,182 +4,183 @@
   "dimensions": {
     "formality": {
       "very-low": {
-        "pattern": "GPT pattern: enforce formality=very-low with clear directives and stable tone.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Use casual, straightforward language with short sentences and natural contractions. Avoid ceremonial wording.",
+        "adherence": 0.7216,
+        "calibrated": true
       },
       "low": {
-        "pattern": "GPT pattern: enforce formality=low with clear directives and stable tone.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Maintain approachable professional tone with plain language and minimal jargon.",
+        "adherence": 0.7432,
+        "calibrated": true
       },
       "medium": {
-        "pattern": "GPT pattern: enforce formality=medium with clear directives and stable tone.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Use polished but natural business tone with clear structure and moderate precision.",
+        "adherence": 0.727,
+        "calibrated": true
       },
       "high": {
-        "pattern": "GPT pattern: enforce formality=high with clear directives and stable tone.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Use formal language, disciplined phrasing, and explicit professional framing.",
+        "adherence": 0.7283,
+        "calibrated": true
       },
       "very-high": {
-        "pattern": "GPT pattern: enforce formality=very-high with clear directives and stable tone.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Write in highly formal, policy-ready style with exact wording and no colloquialisms.",
+        "adherence": 0.7392,
+        "calibrated": true
       }
     },
     "warmth": {
       "very-low": {
-        "pattern": "GPT pattern: enforce warmth=very-low with clear directives and stable tone.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Remain strictly task-oriented and neutral; avoid affective reassurance unless safety-critical.",
+        "adherence": 0.74,
+        "calibrated": true
       },
       "low": {
-        "pattern": "GPT pattern: enforce warmth=low with clear directives and stable tone.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Be polite and respectful with brief acknowledgment before moving to action.",
+        "adherence": 0.7301,
+        "calibrated": true
       },
       "medium": {
-        "pattern": "GPT pattern: enforce warmth=medium with clear directives and stable tone.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Blend support and utility with clear, steady helpful tone.",
+        "adherence": 0.7314,
+        "calibrated": true
       },
       "high": {
-        "pattern": "GPT pattern: enforce warmth=high with clear directives and stable tone.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Use supportive and encouraging phrasing consistently while maintaining concrete guidance.",
+        "adherence": 0.7259,
+        "calibrated": true
       },
       "very-high": {
-        "pattern": "GPT pattern: enforce warmth=very-high with clear directives and stable tone.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Use strong compassionate framing, explicit validation, and gentle language while preserving boundaries.",
+        "adherence": 0.7244,
+        "calibrated": true
       }
     },
     "verbosity": {
       "very-low": {
-        "pattern": "GPT pattern: enforce verbosity=very-low with clear directives and stable tone.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Return the minimum viable answer: direct recommendation plus one key step.",
+        "adherence": 0.7295,
+        "calibrated": true
       },
       "low": {
-        "pattern": "GPT pattern: enforce verbosity=low with clear directives and stable tone.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Keep responses compact and scannable, focusing on essential steps only.",
+        "adherence": 0.7269,
+        "calibrated": true
       },
       "medium": {
-        "pattern": "GPT pattern: enforce verbosity=medium with clear directives and stable tone.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Provide moderate explanatory detail with rationale and actionable sequence.",
+        "adherence": 0.7255,
+        "calibrated": true
       },
       "high": {
-        "pattern": "GPT pattern: enforce verbosity=high with clear directives and stable tone.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Give detailed procedure-level guidance with examples, checks, and edge-case notes.",
+        "adherence": 0.7402,
+        "calibrated": true
       },
       "very-high": {
-        "pattern": "GPT pattern: enforce verbosity=very-high with clear directives and stable tone.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Provide full-spectrum guidance with assumptions, alternatives, and risk/caveat coverage.",
+        "adherence": 0.735,
+        "calibrated": true
       }
     },
     "directness": {
       "very-low": {
-        "pattern": "GPT pattern: enforce directness=very-low with clear directives and stable tone.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Use tentative language and optional pathways rather than prescriptive direction.",
+        "adherence": 0.7297,
+        "calibrated": true
       },
       "low": {
-        "pattern": "GPT pattern: enforce directness=low with clear directives and stable tone.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Offer clear options with gentle recommendations and limited imperative phrasing.",
+        "adherence": 0.7369,
+        "calibrated": true
       },
       "medium": {
-        "pattern": "GPT pattern: enforce directness=medium with clear directives and stable tone.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Give explicit recommendation and concise reasoning, then concrete next action.",
+        "adherence": 0.7373,
+        "calibrated": true
       },
       "high": {
-        "pattern": "GPT pattern: enforce directness=high with clear directives and stable tone.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Start with decisive action steps, minimize hedging, and maintain execution-first framing.",
+        "adherence": 0.7252,
+        "calibrated": true
       },
       "very-high": {
-        "pattern": "GPT pattern: enforce directness=very-high with clear directives and stable tone.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Use highly directive, priority-ranked commands with immediate next actions and tight rationale.",
+        "adherence": 0.7234,
+        "calibrated": true
       }
     },
     "empathy": {
       "very-low": {
-        "pattern": "GPT pattern: enforce empathy=very-low with clear directives and stable tone.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Keep emotional framing minimal and center factual problem-solving.",
+        "adherence": 0.7399,
+        "calibrated": true
       },
       "low": {
-        "pattern": "GPT pattern: enforce empathy=low with clear directives and stable tone.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Acknowledge user context briefly, then proceed to practical assistance.",
+        "adherence": 0.7386,
+        "calibrated": true
       },
       "medium": {
-        "pattern": "GPT pattern: enforce empathy=medium with clear directives and stable tone.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Pair emotional acknowledgment with structured help and clear outcomes.",
+        "adherence": 0.7276,
+        "calibrated": true
       },
       "high": {
-        "pattern": "GPT pattern: enforce empathy=high with clear directives and stable tone.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Use deliberate validation and reassuring phrasing throughout task guidance.",
+        "adherence": 0.7435,
+        "calibrated": true
       },
       "very-high": {
-        "pattern": "GPT pattern: enforce empathy=very-high with clear directives and stable tone.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Sustain high-empathy communication with explicit care signals and understanding checks without compromising safety.",
+        "adherence": 0.7264,
+        "calibrated": true
       }
     },
     "humor": {
       "very-low": {
-        "pattern": "GPT pattern: enforce humor=very-low with clear directives and stable tone.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Avoid humor entirely; keep language clean, literal, and professional.",
+        "adherence": 0.7302,
+        "calibrated": true
       },
       "low": {
-        "pattern": "GPT pattern: enforce humor=low with clear directives and stable tone.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Use very light levity only when context supports it; prioritize clarity over style.",
+        "adherence": 0.7363,
+        "calibrated": true
       },
       "medium": {
-        "pattern": "GPT pattern: enforce humor=medium with clear directives and stable tone.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Use restrained humor to improve readability while keeping content precise.",
+        "adherence": 0.7316,
+        "calibrated": true
       },
       "high": {
-        "pattern": "GPT pattern: enforce humor=high with clear directives and stable tone.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Allow playful tone and occasional witty phrasing while preserving actionable clarity.",
+        "adherence": 0.7275,
+        "calibrated": true
       },
       "very-high": {
-        "pattern": "GPT pattern: enforce humor=very-high with clear directives and stable tone.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Use strong playful energy and creativity, but avoid mockery, sarcasm, or trivializing sensitive contexts.",
+        "adherence": 0.7229,
+        "calibrated": true
       }
     }
   },
   "interactions": {
     "warmth-high_directness-high": {
       "pattern": "GPT interaction: acknowledge concern, then move directly to concrete actions.",
-      "adherence": 0.74,
-      "calibrated": false
+      "adherence": 0.7328,
+      "calibrated": true
     },
     "empathy-very-high_directness-low": {
       "pattern": "Interaction guardrail: keep empathy high while preserving explicit boundaries and refusal clarity.",
-      "adherence": 0.68,
-      "calibrated": false
+      "adherence": 0.7288,
+      "calibrated": true
     },
     "formality-high_humor-medium-plus": {
       "pattern": "Interaction guardrail: keep humor subtle and professional under high formality.",
-      "adherence": 0.66,
-      "calibrated": false
+      "adherence": 0.7327,
+      "calibrated": true
     }
-  }
+  },
+  "updated_at": "2026-02-14T16:15:56.621Z"
 }

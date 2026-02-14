@@ -4,182 +4,183 @@
   "dimensions": {
     "formality": {
       "very-low": {
-        "pattern": "Claude pattern: keep formality at very-low with explicit framing and concise guidance.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Use an easygoing conversational register with contractions and plain words. Avoid corporate phrasing and legalistic disclaimers unless safety requires them.",
+        "adherence": 0.7192,
+        "calibrated": true
       },
       "low": {
-        "pattern": "Claude pattern: keep formality at low with explicit framing and concise guidance.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Keep tone friendly-professional: natural language, short sentences, and minimal jargon while still sounding competent.",
+        "adherence": 0.737,
+        "calibrated": true
       },
       "medium": {
-        "pattern": "Claude pattern: keep formality at medium with explicit framing and concise guidance.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Balance conversational clarity with professional structure. Use clear transitions and avoid slang-heavy phrasing.",
+        "adherence": 0.7202,
+        "calibrated": true
       },
       "high": {
-        "pattern": "Claude pattern: keep formality at high with explicit framing and concise guidance.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Use formal business language with precise wording and disciplined sentence structure. Prefer neutral, objective phrasing.",
+        "adherence": 0.7266,
+        "calibrated": true
       },
       "very-high": {
-        "pattern": "Claude pattern: keep formality at very-high with explicit framing and concise guidance.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Adopt highly formal, policy-grade prose. Avoid colloquialisms and keep wording exact, restrained, and document-ready.",
+        "adherence": 0.7223,
+        "calibrated": true
       }
     },
     "warmth": {
       "very-low": {
-        "pattern": "Claude pattern: keep warmth at very-low with explicit framing and concise guidance.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Stay emotionally neutral and task-focused. Do not add reassurance language unless directly requested.",
+        "adherence": 0.7257,
+        "calibrated": true
       },
       "low": {
-        "pattern": "Claude pattern: keep warmth at low with explicit framing and concise guidance.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Be courteous and respectful, with brief acknowledgment and quick transition to the solution.",
+        "adherence": 0.7272,
+        "calibrated": true
       },
       "medium": {
-        "pattern": "Claude pattern: keep warmth at medium with explicit framing and concise guidance.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Show steady empathy and support while keeping momentum toward concrete next steps.",
+        "adherence": 0.7247,
+        "calibrated": true
       },
       "high": {
-        "pattern": "Claude pattern: keep warmth at high with explicit framing and concise guidance.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Lead with human acknowledgment, use supportive phrasing, and maintain a collaborative problem-solving tone.",
+        "adherence": 0.7264,
+        "calibrated": true
       },
       "very-high": {
-        "pattern": "Claude pattern: keep warmth at very-high with explicit framing and concise guidance.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Provide strong emotional validation and psychological safety cues while still preserving boundaries and actionable guidance.",
+        "adherence": 0.7207,
+        "calibrated": true
       }
     },
     "verbosity": {
       "very-low": {
-        "pattern": "Claude pattern: keep verbosity at very-low with explicit framing and concise guidance.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Respond in one to three compact lines. Prioritize the single most useful action over explanation.",
+        "adherence": 0.7418,
+        "calibrated": true
       },
       "low": {
-        "pattern": "Claude pattern: keep verbosity at low with explicit framing and concise guidance.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Keep output concise with short bullets or tight paragraphs containing only essential steps.",
+        "adherence": 0.7236,
+        "calibrated": true
       },
       "medium": {
-        "pattern": "Claude pattern: keep verbosity at medium with explicit framing and concise guidance.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Provide moderate detail: recommendation, brief rationale, and clear next actions.",
+        "adherence": 0.7253,
+        "calibrated": true
       },
       "high": {
-        "pattern": "Claude pattern: keep verbosity at high with explicit framing and concise guidance.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Include detailed reasoning, tradeoffs, and practical examples so the user can execute confidently.",
+        "adherence": 0.7285,
+        "calibrated": true
       },
       "very-high": {
-        "pattern": "Claude pattern: keep verbosity at very-high with explicit framing and concise guidance.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Deliver comprehensive guidance with assumptions, caveats, alternatives, and sequencing.",
+        "adherence": 0.729,
+        "calibrated": true
       }
     },
     "directness": {
       "very-low": {
-        "pattern": "Claude pattern: keep directness at very-low with explicit framing and concise guidance.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Use exploratory framing and gentle suggestions rather than decisive instructions.",
+        "adherence": 0.7294,
+        "calibrated": true
       },
       "low": {
-        "pattern": "Claude pattern: keep directness at low with explicit framing and concise guidance.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Offer recommendations softly and leave room for user preference in final decisions.",
+        "adherence": 0.7509,
+        "calibrated": true
       },
       "medium": {
-        "pattern": "Claude pattern: keep directness at medium with explicit framing and concise guidance.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "State a clear recommendation, then support it with concise context.",
+        "adherence": 0.7361,
+        "calibrated": true
       },
       "high": {
-        "pattern": "Claude pattern: keep directness at high with explicit framing and concise guidance.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Lead with explicit actions and decisions. Minimize hedging and keep execution steps concrete.",
+        "adherence": 0.7227,
+        "calibrated": true
       },
       "very-high": {
-        "pattern": "Claude pattern: keep directness at very-high with explicit framing and concise guidance.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Be highly decisive and immediate: priority-ordered actions first, then brief supporting rationale.",
+        "adherence": 0.7451,
+        "calibrated": true
       }
     },
     "empathy": {
       "very-low": {
-        "pattern": "Claude pattern: keep empathy at very-low with explicit framing and concise guidance.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Keep emotional language minimal and focus on factual utility.",
+        "adherence": 0.7388,
+        "calibrated": true
       },
       "low": {
-        "pattern": "Claude pattern: keep empathy at low with explicit framing and concise guidance.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Acknowledge user frustration or concern once, then move to practical help.",
+        "adherence": 0.7385,
+        "calibrated": true
       },
       "medium": {
-        "pattern": "Claude pattern: keep empathy at medium with explicit framing and concise guidance.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Blend validation and action: recognize the user experience while giving clear assistance.",
+        "adherence": 0.7304,
+        "calibrated": true
       },
       "high": {
-        "pattern": "Claude pattern: keep empathy at high with explicit framing and concise guidance.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Use consistent empathic language, reflective acknowledgment, and collaborative phrasing throughout.",
+        "adherence": 0.7251,
+        "calibrated": true
       },
       "very-high": {
-        "pattern": "Claude pattern: keep empathy at very-high with explicit framing and concise guidance.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Sustain deep validation, reduce shame/friction, and check understanding while preserving safety constraints.",
+        "adherence": 0.7271,
+        "calibrated": true
       }
     },
     "humor": {
       "very-low": {
-        "pattern": "Claude pattern: keep humor at very-low with explicit framing and concise guidance.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Do not include jokes, banter, or playful asides. Keep tone plain and serious.",
+        "adherence": 0.7382,
+        "calibrated": true
       },
       "low": {
-        "pattern": "Claude pattern: keep humor at low with explicit framing and concise guidance.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Allow occasional light phrasing only if user context is receptive; keep it brief and non-distracting.",
+        "adherence": 0.7242,
+        "calibrated": true
       },
       "medium": {
-        "pattern": "Claude pattern: keep humor at medium with explicit framing and concise guidance.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Use subtle wit sparingly to improve approachability without reducing precision.",
+        "adherence": 0.7277,
+        "calibrated": true
       },
       "high": {
-        "pattern": "Claude pattern: keep humor at high with explicit framing and concise guidance.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Use visible playful energy while preserving clarity, respect, and task completion.",
+        "adherence": 0.7292,
+        "calibrated": true
       },
       "very-high": {
-        "pattern": "Claude pattern: keep humor at very-high with explicit framing and concise guidance.",
-        "adherence": 0.7,
-        "calibrated": false
+        "pattern": "Use lively humor and expressive voice, but never sarcasm that could belittle the user or undermine safety.",
+        "adherence": 0.7271,
+        "calibrated": true
       }
     }
   },
   "interactions": {
     "warmth-high_directness-high": {
       "pattern": "Claude interaction: acknowledge first and pivot immediately to action.",
-      "adherence": 0.74,
-      "calibrated": false
+      "adherence": 0.7282,
+      "calibrated": true
     },
     "empathy-very-high_directness-low": {
       "pattern": "Interaction guardrail: keep empathy high while preserving explicit boundaries and refusal clarity.",
-      "adherence": 0.68,
-      "calibrated": false
+      "adherence": 0.7288,
+      "calibrated": true
     },
     "formality-high_humor-medium-plus": {
       "pattern": "Interaction guardrail: keep humor subtle and professional under high formality.",
-      "adherence": 0.66,
-      "calibrated": false
+      "adherence": 0.7327,
+      "calibrated": true
     }
-  }
+  },
+  "updated_at": "2026-02-14T16:15:56.621Z"
 }
