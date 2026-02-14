@@ -1,6 +1,6 @@
 {
   "name": "@traits-dev/cli",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "traits.dev command-line interface for profile init, validate, compile, eval, and import workflows.",
   "keywords": [
     "traits-dev",
