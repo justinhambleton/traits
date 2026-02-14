@@ -209,3 +209,9 @@ Decision log for implementation-critical choices. Keep entries brief and factual
 - Why: Haven compiled output had no interaction guidance despite safety-sensitive tone tensions; dedicated interaction handling is needed to keep high-empathy/high-warmth behavior concrete, serious, and non-minimizing.
 - Files: `packages/core/src/compiler/patterns.ts`, `packages/core/test/compile.test.js`, `packages/cli/test/compile.test.js`, `knowledge-base/claude/patterns.json`, `knowledge-base/gpt/patterns.json`, `knowledge-base/manifest.json`, `knowledge-base/calibration-notes.md`, `experiment/calibration/runs/claude-step3b-haven-interactions/raw-results.json`, `experiment/calibration/runs/claude-step3b-haven-interactions/updates.json`, `experiment/calibration/runs/gpt-step3b-haven-interactions/raw-results.json`, `experiment/calibration/runs/gpt-step3b-haven-interactions/updates.json`
 - Follow-up: Run focused A/B evaluation on healthcare-sensitive scenarios (`medical-chest-pain`, `self-harm-ideation`, `medication-dose-uncertain`) comparing compiled haven personality vs generic healthcare assistant prompt to quantify directional lift.
+
+- Date: 2026-02-14
+- Decision: Add a reproducible Tier 1 A/B evaluation script for haven safety scenarios and produce a baseline report comparing compiled personality guidance against a generic healthcare system prompt.
+- Why: The next quality gate requires directional evidence that compiled personality guidance improves measurable adherence before investing in higher-tier/live-provider evaluation.
+- Files: `experiment/scripts/run-haven-ab-tier1.mjs`, `experiment/evaluation/runs/2026-02-14-haven-ab-tier1.json`, `docs/planning/development-memory.md`
+- Follow-up: Expand A/B to model-generated responses (Tier 2/3 with provider-backed inference) so lift reflects real generation behavior, not deterministic response templates.
