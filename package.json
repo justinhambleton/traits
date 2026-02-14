@@ -10,7 +10,8 @@
     "calibration:check": "node experiment/scripts/report-calibration-status.mjs --strict",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "changeset publish"
+    "release": "changeset publish",
+    "release:ci": "pnpm build && pnpm release"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.8"

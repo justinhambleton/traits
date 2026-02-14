@@ -269,3 +269,9 @@ Decision log for implementation-critical choices. Keep entries brief and factual
 - Why: npm's current CI policy favors trusted publishing with short-lived OIDC credentials; removing token dependence reduces secret management risk and aligns with provenance-first publish.
 - Files: `.github/workflows/release.yml`, `docs/planning/development-memory.md`
 - Follow-up: Configure trusted publishers for `@traits-dev/core` and `@traits-dev/cli` on npm, then merge the version PR to trigger first OIDC-backed publish.
+
+- Date: 2026-02-14
+- Decision: Replace `changesets/action` publish command from inline shell chaining to a single script invocation (`pnpm release:ci`).
+- Why: `changesets/action` executes the `publish` value as command tokens, so `&&` was treated as literal args and broke filtered package build scripts during publish runs.
+- Files: `package.json`, `.github/workflows/release.yml`, `docs/planning/development-memory.md`
+- Follow-up: Re-run release workflow after merging version PR to validate OIDC publish path and surface npm trusted publisher blockers, if any.
