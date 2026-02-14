@@ -1,6 +1,6 @@
 {
   "name": "@traits-dev/core",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Core traits.dev SDK for personality profile validation, compilation, and evaluation.",
   "keywords": [
     "traits-dev",
