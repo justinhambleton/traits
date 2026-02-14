@@ -1,11 +1,15 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
 const CLI_ENTRY = path.join(ROOT, "packages/cli/dist/traits.js");
+const CLI_VERSION = JSON.parse(
+  fs.readFileSync(path.join(ROOT, "packages/cli/package.json"), "utf8")
+).version;
 
 function runCLI(args) {
   return spawnSync(process.execPath, [CLI_ENTRY, ...args], {
@@ -51,7 +55,7 @@ test("traits --json validate supports global json flag", () => {
 test("traits --version prints CLI package version", () => {
   const result = runCLI(["--version"]);
   assert.equal(result.status, 0);
-  assert.match(result.stdout.trim(), /^0\.1\.0$/);
+  assert.equal(result.stdout.trim(), CLI_VERSION);
 });
 
 test("traits validate returns exit 2 for intentionally unsafe fixture", () => {
