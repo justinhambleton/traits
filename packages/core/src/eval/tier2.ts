@@ -1,3 +1,6 @@
+import fs from "node:fs";
+import path from "node:path";
+
 import { validateProfile } from "../validator/engine.js";
 import { asArray, DIMENSIONS } from "../utils.js";
 import { openAIEmbed } from "./providers/openai.js";
@@ -22,7 +25,21 @@ type Tier2Options = {
   fetchMaxRetries?: number;
   fetchRetryBaseMs?: number;
   embeddingFn?: (text: string) => Promise<number[]>;
+  knowledgeBaseDir?: string;
+  modelTarget?: string;
 };
+
+type ModelFlavor = "claude" | "gpt" | "generic";
+
+type PatternEntry = {
+  pattern?: string;
+};
+
+type PatternData = {
+  dimensions?: Record<string, Record<string, PatternEntry>>;
+};
+
+const KB_CACHE = new Map<string, PatternData | null>();
 
 function targetLevel(value: unknown): string {
   if (typeof value === "string") return value;
@@ -61,7 +78,69 @@ function normalizeCosine(similarity: number): number {
   return clamp01((similarity + 1) / 2);
 }
 
-function buildDimensionReferenceText(dimension: string, level: string): string {
+function modelFlavor(model: unknown): ModelFlavor {
+  if (/claude/i.test(String(model))) return "claude";
+  if (/gpt/i.test(String(model))) return "gpt";
+  return "generic";
+}
+
+function inferModelTarget(profile: PersonalityProfile, options: Tier2Options): string | null {
+  if (options.modelTarget) return options.modelTarget;
+  const tags = asArray<string>(profile?.meta?.tags);
+  for (const tag of tags) {
+    if (!String(tag).startsWith("model:")) continue;
+    const value = String(tag).slice("model:".length).trim();
+    if (value) return value;
+  }
+  return null;
+}
+
+function resolvePatternFile(
+  profile: PersonalityProfile,
+  options: Tier2Options
+): string | null {
+  const flavor = modelFlavor(inferModelTarget(profile, options));
+  if (flavor === "generic") return null;
+  const knowledgeBaseDir =
+    options.knowledgeBaseDir ?? path.resolve(process.cwd(), "knowledge-base");
+  return path.resolve(knowledgeBaseDir, flavor, "patterns.json");
+}
+
+function loadPatternData(
+  profile: PersonalityProfile,
+  options: Tier2Options
+): PatternData | null {
+  const patternFile = resolvePatternFile(profile, options);
+  if (!patternFile) return null;
+  if (KB_CACHE.has(patternFile)) {
+    const cached = KB_CACHE.get(patternFile);
+    return cached ?? null;
+  }
+
+  try {
+    if (!fs.existsSync(patternFile)) {
+      KB_CACHE.set(patternFile, null);
+      return null;
+    }
+    const parsed = JSON.parse(fs.readFileSync(patternFile, "utf8"));
+    KB_CACHE.set(patternFile, parsed);
+    return parsed;
+  } catch {
+    KB_CACHE.set(patternFile, null);
+    return null;
+  }
+}
+
+function buildDimensionReferenceText(
+  profile: PersonalityProfile,
+  dimension: string,
+  level: string,
+  options: Tier2Options
+): string {
+  const patternText = loadPatternData(profile, options)?.dimensions?.[dimension]?.[level]?.pattern;
+  if (typeof patternText === "string" && patternText.trim()) {
+    return patternText.trim();
+  }
   return `Reference response style for ${dimension} at ${level} level.`;
 }
 
@@ -133,7 +212,7 @@ export async function runTier2Evaluation(
   const dimensionRefs: Record<string, number[]> = {};
   for (const dimension of DIMENSIONS) {
     const level = targetLevel(voice?.[dimension]);
-    const refText = buildDimensionReferenceText(dimension, level);
+    const refText = buildDimensionReferenceText(profile, dimension, level, options);
     dimensionRefs[dimension] = await getEmbedding(refText);
   }
 

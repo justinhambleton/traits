@@ -1,5 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -46,6 +48,97 @@ test("runTier2Evaluation computes deterministic tier 2 scores with mock embeddin
   assert.equal(report.sample_count, 1);
   assert.ok(report.average_score >= 0 && report.average_score <= 1);
   assert.ok(report.dimension_averages.warmth >= 0);
+});
+
+test("runTier2Evaluation uses knowledge-base patterns as reference text when available", async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "traits-tier2-kb-"));
+  const kbDir = path.join(tmpDir, "gpt");
+  fs.mkdirSync(kbDir, { recursive: true });
+
+  const dimensions = {
+    formality: { medium: { pattern: "KB formality medium reference text." } },
+    warmth: { medium: { pattern: "KB warmth medium reference text." } },
+    verbosity: { medium: { pattern: "KB verbosity medium reference text." } },
+    directness: { medium: { pattern: "KB directness medium reference text." } },
+    empathy: { medium: { pattern: "KB empathy medium reference text." } },
+    humor: { medium: { pattern: "KB humor medium reference text." } }
+  };
+  fs.writeFileSync(
+    path.join(kbDir, "patterns.json"),
+    JSON.stringify({ dimensions }, null, 2),
+    "utf8"
+  );
+
+  const seen = [];
+  const profile = {
+    meta: { tags: ["model:gpt-4o"] },
+    voice: {
+      formality: "medium",
+      warmth: "medium",
+      verbosity: "medium",
+      directness: "medium",
+      empathy: "medium",
+      humor: "medium"
+    }
+  };
+
+  try {
+    await runTier2Evaluation(
+      profile,
+      [{ id: "sample-1", response: "I can help with that right now." }],
+      {
+        knowledgeBaseDir: tmpDir,
+        embeddingFn: async (text) => {
+          seen.push(String(text));
+          return [0.2, 0.4, 0.6];
+        }
+      }
+    );
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+
+  assert.ok(seen.includes("KB warmth medium reference text."));
+  assert.ok(seen.includes("KB empathy medium reference text."));
+  assert.ok(seen.includes("KB humor medium reference text."));
+});
+
+test("runTier2Evaluation falls back to abstract reference text when KB is unavailable", async () => {
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "traits-tier2-kb-missing-"));
+  const seen = [];
+  const profile = {
+    voice: {
+      formality: "medium",
+      warmth: "medium",
+      verbosity: "medium",
+      directness: "medium",
+      empathy: "medium",
+      humor: "medium"
+    }
+  };
+
+  try {
+    await runTier2Evaluation(
+      profile,
+      [{ id: "sample-1", response: "I can help with that right now." }],
+      {
+        modelTarget: "gpt-4o",
+        knowledgeBaseDir: tmpDir,
+        embeddingFn: async (text) => {
+          seen.push(String(text));
+          return [0.3, 0.5, 0.7];
+        }
+      }
+    );
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
+  }
+
+  assert.ok(
+    seen.some((value) =>
+      value.includes("Reference response style for formality at medium level.")
+    )
+  );
 });
 
 test("runTier2EvaluationForProfile throws unavailable without OpenAI key or embeddingFn", async () => {

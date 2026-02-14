@@ -27,9 +27,12 @@ test("runTier3Evaluation scores responses with custom judge function", async () 
     {
       judgeFn: async () =>
         JSON.stringify({
+          formality: 0.7,
+          warmth: 0.85,
+          verbosity: 0.75,
           directness: 0.9,
-          warmth_empathy_depth: 0.8,
-          humor_appropriateness: 0.7,
+          empathy: 0.8,
+          humor: 0.7,
           helpfulness: 0.85,
           rationale: "Good balance."
         })
@@ -39,6 +42,9 @@ test("runTier3Evaluation scores responses with custom judge function", async () 
   assert.equal(report.tier, 3);
   assert.equal(report.sample_count, 1);
   assert.equal(report.provider, "custom");
+  assert.ok(report.samples[0].warmth > 0);
+  assert.ok(report.samples[0].empathy > 0);
+  assert.ok(report.samples[0].dimension_average > 0);
   assert.ok(report.average_score > 0.7);
 });
 
@@ -110,7 +116,7 @@ test("runTier3Evaluation auto provider prefers OpenAI and forwards model/base UR
                 {
                   message: {
                     content:
-                      '{"directness":0.9,"warmth_empathy_depth":0.8,"humor_appropriateness":0.7,"helpfulness":0.85,"rationale":"Good."}'
+                      '{"formality":0.7,"warmth":0.85,"verbosity":0.75,"directness":0.9,"empathy":0.8,"humor":0.7,"helpfulness":0.85,"rationale":"Good."}'
                   }
                 }
               ]
@@ -146,9 +152,12 @@ test("runTier3Evaluation supports disabling helpfulness scoring", async () => {
       includeHelpfulness: false,
       judgeFn: async () =>
         JSON.stringify({
+          formality: 0.7,
+          warmth: 0.85,
+          verbosity: 0.75,
           directness: 0.9,
-          warmth_empathy_depth: 0.8,
-          humor_appropriateness: 0.7,
+          empathy: 0.8,
+          humor: 0.7,
           rationale: "Good balance."
         })
     }

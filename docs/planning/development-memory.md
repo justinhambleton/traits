@@ -233,3 +233,9 @@ Decision log for implementation-critical choices. Keep entries brief and factual
 - Why: Convert deterministic template evidence into live-model evidence for compiled-vs-generic system prompt impact under the existing tiered scoring pipeline.
 - Files: `experiment/evaluation/runs/2026-02-14-live-ab-haven.json`, `experiment/evaluation/runs/2026-02-14-live-ab-resolve.json`, `docs/planning/development-memory.md`
 - Follow-up: Improve Tier 2/3 discrimination (currently near-zero deltas) by strengthening reference texts/judge rubric and rerun live A/B for haven+resolve.
+
+- Date: 2026-02-14
+- Decision: Refine Tier 3 to target-aware six-dimension judging and Tier 2 to knowledge-base-aware reference embeddings, then rerun live A/B with separate refined-v2 reports.
+- Why: Tier 2/3 baseline deltas were near-zero and failed to discriminate compiled vs generic responses; scoring now explicitly aligns to profile targets and uses calibrated KB pattern text for reference embeddings.
+- Files: `packages/core/src/eval/tier3.ts`, `packages/core/src/eval/tier2.ts`, `packages/core/test/eval-tier3.test.js`, `packages/core/test/eval-tier2.test.js`, `packages/cli/src/commands/eval.ts`, `experiment/scripts/run-live-ab-eval.mjs`, `experiment/evaluation/runs/2026-02-14-live-ab-haven-refined-v2.json`, `experiment/evaluation/runs/2026-02-14-live-ab-resolve-refined-v2.json`, `package.json`, `docs/planning/development-memory.md`
+- Follow-up: Tier 3 improved materially (especially `resolve`), but Tier 2 remains below target threshold; next refinement should add contrastive/negative anchors or per-dimension response-segment scoring to increase embedding discrimination.

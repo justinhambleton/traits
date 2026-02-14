@@ -280,6 +280,7 @@ export async function runEval(args: string[], io: CommandIO = process): Promise<
 
   const profilePath = path.resolve(io.cwd(), options.profilePath);
   const bundledProfilesDir = path.resolve(io.cwd(), "profiles");
+  const knowledgeBaseDir = path.resolve(io.cwd(), "knowledge-base");
 
   let samples: EvalSample[];
   try {
@@ -346,6 +347,8 @@ export async function runEval(args: string[], io: CommandIO = process): Promise<
       const tier2 = await runTier2EvaluationForProfile(profilePath, samples, {
         strict: options.strict,
         bundledProfilesDir,
+        knowledgeBaseDir,
+        modelTarget: options.model,
         openaiApiKey: process.env.TRAITS_OPENAI_API_KEY,
         embeddingModel: options.embeddingModel ?? undefined,
         openaiBaseUrl: options.openaiBaseUrl ?? undefined,

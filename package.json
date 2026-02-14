@@ -5,7 +5,7 @@
   "packageManager": "pnpm@10.29.1",
   "scripts": {
     "build": "pnpm --filter @traits-dev/core build && pnpm --filter @traits-dev/cli build",
-    "typecheck": "pnpm --filter @traits-dev/core exec tsc --noEmit && pnpm --filter @traits-dev/cli typecheck",
+    "typecheck": "pnpm --filter @traits-dev/core build && pnpm --filter @traits-dev/core exec tsc --noEmit && pnpm --filter @traits-dev/cli typecheck",
     "test": "pnpm --filter @traits-dev/core test && pnpm --filter @traits-dev/cli test",
     "calibration:check": "node experiment/scripts/report-calibration-status.mjs --strict"
   }

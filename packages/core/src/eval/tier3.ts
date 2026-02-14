@@ -1,5 +1,5 @@
 import { validateProfile } from "../validator/engine.js";
-import { asArray } from "../utils.js";
+import { asArray, DIMENSIONS } from "../utils.js";
 import { anthropicJudge } from "./providers/anthropic.js";
 import { openAIJudge } from "./providers/openai.js";
 import type { PersonalityProfile, ValidationResult } from "../types.js";
@@ -32,6 +32,26 @@ type JudgeProvider = {
   provider: string;
   judgeFn: (args: { systemPrompt: string; userPrompt: string }) => Promise<string>;
 };
+
+type DimensionName = (typeof DIMENSIONS)[number];
+
+type DimensionScores = {
+  formality: number;
+  warmth: number;
+  verbosity: number;
+  directness: number;
+  empathy: number;
+  humor: number;
+};
+
+const SCORING_DIMENSIONS: DimensionName[] = [
+  "formality",
+  "warmth",
+  "verbosity",
+  "directness",
+  "empathy",
+  "humor"
+];
 
 function targetLevel(value: unknown): string {
   if (typeof value === "string") return value;
@@ -127,38 +147,96 @@ function selectJudgeProvider(options: Tier3Options = {}): JudgeProvider {
   throw error;
 }
 
-function buildJudgeSystemPrompt(includeHelpfulness = true): string {
+function collectVoiceTargets(profile: PersonalityProfile): Record<DimensionName, string> {
+  const voice = profile?.voice ?? {};
+  return {
+    formality: targetLevel(voice.formality),
+    warmth: targetLevel(voice.warmth),
+    verbosity: targetLevel(voice.verbosity),
+    directness: targetLevel(voice.directness),
+    empathy: targetLevel(voice.empathy),
+    humor: targetLevel(voice.humor)
+  };
+}
+
+function buildJudgeSystemPrompt(
+  profile: PersonalityProfile,
+  includeHelpfulness = true
+): string {
+  const targets = collectVoiceTargets(profile);
   const lines = [
-    "You are evaluating a model response for personality adherence and helpfulness.",
-    "Return strict JSON with numeric fields in [0,1]:",
-    "- directness",
-    "- warmth_empathy_depth",
-    "- humor_appropriateness"
+    "You are evaluating personality target adherence for a single assistant response.",
+    "Score adherence to the stated target level for each dimension, not generic response quality.",
+    "Scoring scale per dimension:",
+    "- 1.0: response clearly matches target level",
+    "- 0.5: partially aligned or ambiguous",
+    "- 0.0: clearly misaligned/opposite target",
+    "Example: if humor target is very-low, a response with no humor should score 1.0 because it matches target adherence.",
+    "Voice targets to score:",
+    `- formality (target: ${targets.formality})`,
+    `- warmth (target: ${targets.warmth})`,
+    `- verbosity (target: ${targets.verbosity})`,
+    `- directness (target: ${targets.directness})`,
+    `- empathy (target: ${targets.empathy})`,
+    `- humor (target: ${targets.humor})`
   ];
+
   if (includeHelpfulness) {
-    lines.push("- helpfulness");
+    lines.push(
+      "Also score helpfulness in [0,1] based on actionable utility and correctness intent."
+    );
+  } else {
+    lines.push("Helpfulness scoring is disabled for this run.");
   }
-  lines.push("- rationale (short string)");
+
+  lines.push(
+    "Return strict JSON only with numeric fields in [0,1] and a short rationale string.",
+    includeHelpfulness
+      ? '{"formality":0,"warmth":0,"verbosity":0,"directness":0,"empathy":0,"humor":0,"helpfulness":0,"rationale":"..."}'
+      : '{"formality":0,"warmth":0,"verbosity":0,"directness":0,"empathy":0,"humor":0,"rationale":"..."}'
+  );
+
   return lines.join("\n");
 }
 
 function buildJudgeUserPrompt(profile: PersonalityProfile, sample: EvalSample): string {
-  const voice = profile?.voice ?? {};
-  const targetSummary = [
-    `formality=${targetLevel(voice.formality)}`,
-    `warmth=${targetLevel(voice.warmth)}`,
-    `verbosity=${targetLevel(voice.verbosity)}`,
-    `directness=${targetLevel(voice.directness)}`,
-    `empathy=${targetLevel(voice.empathy)}`,
-    `humor=${targetLevel(voice.humor)}`
-  ].join(", ");
+  const targets = collectVoiceTargets(profile);
+  const preferredTerms = asArray<string>(profile?.vocabulary?.preferred_terms);
+  const forbiddenTerms = asArray<string>(profile?.vocabulary?.forbidden_terms);
+  const behavioralRules = asArray<string>(profile?.behavioral_rules);
 
   return [
     `Profile: ${profile?.meta?.name ?? "unknown"}`,
-    `Voice targets: ${targetSummary}`,
+    `Role: ${profile?.identity?.role ?? "assistant"}`,
+    `Voice targets: ${JSON.stringify(targets)}`,
+    preferredTerms.length > 0
+      ? `Preferred terms: ${preferredTerms.join("; ")}`
+      : "Preferred terms: (none)",
+    forbiddenTerms.length > 0
+      ? `Forbidden terms: ${forbiddenTerms.join("; ")}`
+      : "Forbidden terms: (none)",
+    behavioralRules.length > 0
+      ? `Behavioral rules: ${behavioralRules.join("; ")}`
+      : "Behavioral rules: (none)",
     sample?.prompt ? `User prompt: ${sample.prompt}` : "User prompt: (not provided)",
     `Assistant response: ${String(sample?.response ?? "")}`
   ].join("\n");
+}
+
+function parseDimensionScores(parsed: Record<string, unknown>): DimensionScores {
+  return {
+    formality: clamp01(parsed.formality),
+    warmth: clamp01(parsed.warmth),
+    verbosity: clamp01(parsed.verbosity),
+    directness: clamp01(parsed.directness),
+    empathy: clamp01(parsed.empathy),
+    humor: clamp01(parsed.humor)
+  };
+}
+
+function averageDimensionScores(scores: DimensionScores): number {
+  const total = SCORING_DIMENSIONS.reduce((sum, dimension) => sum + scores[dimension], 0);
+  return total / SCORING_DIMENSIONS.length;
 }
 
 export async function runTier3Evaluation(
@@ -174,24 +252,32 @@ export async function runTier3Evaluation(
   samples: Array<{
     id: string;
     score: number;
+    dimension_average: number;
+    formality: number;
+    warmth: number;
+    verbosity: number;
     directness: number;
-    warmth_empathy_depth: number;
-    humor_appropriateness: number;
+    empathy: number;
+    humor: number;
     helpfulness: number | null;
     rationale: string;
   }>;
 }> {
   const judge = selectJudgeProvider(options);
   const includeHelpfulness = options.includeHelpfulness !== false;
-  const systemPrompt = buildJudgeSystemPrompt(includeHelpfulness);
+  const systemPrompt = buildJudgeSystemPrompt(profile, includeHelpfulness);
   const items = asArray<EvalSample>(samples);
 
   const perSample: Array<{
     id: string;
     score: number;
+    dimension_average: number;
+    formality: number;
+    warmth: number;
+    verbosity: number;
     directness: number;
-    warmth_empathy_depth: number;
-    humor_appropriateness: number;
+    empathy: number;
+    humor: number;
     helpfulness: number | null;
     rationale: string;
   }> = [];
@@ -202,20 +288,18 @@ export async function runTier3Evaluation(
       userPrompt: buildJudgeUserPrompt(profile, sample)
     });
     const parsed = extractJSONObject(raw);
-    const directness = clamp01(parsed.directness);
-    const warmthEmpathyDepth = clamp01(parsed.warmth_empathy_depth);
-    const humorAppropriateness = clamp01(parsed.humor_appropriateness);
+    const dimensions = parseDimensionScores(parsed);
+    const dimensionAverage = averageDimensionScores(dimensions);
     const helpfulness = includeHelpfulness ? clamp01(parsed.helpfulness) : null;
     const score = includeHelpfulness
-      ? (directness + warmthEmpathyDepth + humorAppropriateness + (helpfulness ?? 0)) / 4
-      : (directness + warmthEmpathyDepth + humorAppropriateness) / 3;
+      ? clamp01(0.7 * dimensionAverage + 0.3 * (helpfulness ?? 0))
+      : clamp01(dimensionAverage);
 
     perSample.push({
       id: sample?.id ?? "unknown",
       score,
-      directness,
-      warmth_empathy_depth: warmthEmpathyDepth,
-      humor_appropriateness: humorAppropriateness,
+      dimension_average: dimensionAverage,
+      ...dimensions,
       helpfulness,
       rationale: String(parsed.rationale ?? "")
     });
