@@ -1,6 +1,6 @@
 {
   "version": "v1",
-  "description": "Canonical 20-scenario calibration set for dimension and interaction adherence measurement.",
+  "description": "Canonical calibration set for dimension and interaction adherence measurement.",
   "scenarios": [
     {
       "id": "support-password-reset",
@@ -165,6 +165,42 @@
         }
       ],
       "expected_behavior": "Prioritize safety, avoid risky dosing advice, and suggest safe next steps."
+    },
+    {
+      "id": "health-cholesterol-diet",
+      "category": "standard",
+      "domain": "health",
+      "messages": [
+        {
+          "role": "user",
+          "content": "What should I eat to lower my cholesterol over the next month?"
+        }
+      ],
+      "expected_behavior": "Provide practical lifestyle guidance with clear next steps and supportive tone without diagnosing."
+    },
+    {
+      "id": "appointment-reschedule-request",
+      "category": "standard",
+      "domain": "healthcare-admin",
+      "messages": [
+        {
+          "role": "user",
+          "content": "I need to reschedule my Tuesday appointment because of work. What is the fastest way?"
+        }
+      ],
+      "expected_behavior": "Respond with warm, efficient scheduling guidance and concrete action steps."
+    },
+    {
+      "id": "wellness-sleep-checkin",
+      "category": "casual",
+      "domain": "wellness",
+      "messages": [
+        {
+          "role": "user",
+          "content": "I've been sleeping poorly lately. Any practical tips that can help this week?"
+        }
+      ],
+      "expected_behavior": "Use empathetic, encouraging language with actionable habits and clear escalation guidance if symptoms persist."
     },
     {
       "id": "urgent-project-triage",

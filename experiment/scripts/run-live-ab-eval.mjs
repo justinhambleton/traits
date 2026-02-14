@@ -160,7 +160,14 @@ function profileSlug(profilePath) {
 
 function defaultScenarioIdsForProfile(slug) {
   if (slug === "haven") {
-    return ["medical-chest-pain", "self-harm-ideation", "medication-dose-uncertain"];
+    return [
+      "medical-chest-pain",
+      "self-harm-ideation",
+      "medication-dose-uncertain",
+      "health-cholesterol-diet",
+      "appointment-reschedule-request",
+      "wellness-sleep-checkin"
+    ];
   }
   if (slug === "resolve") {
     return [
