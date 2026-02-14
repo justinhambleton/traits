@@ -1,0 +1,609 @@
+{
+  "generated_at": "2026-02-14T19:15:06.680Z",
+  "method": "live-generation-ab",
+  "profile_path": "profiles/resolve.yaml",
+  "scenario_file": "experiment/calibration/scenarios.v1.json",
+  "scenario_ids": [
+    "support-password-reset",
+    "billing-double-charge",
+    "mixed-refund-policy",
+    "returning-user-context"
+  ],
+  "generation": {
+    "provider": "openai",
+    "model": "gpt-4.1-mini",
+    "compile_model": "gpt-4.1-mini"
+  },
+  "keys_present": {
+    "openai": true,
+    "anthropic": true
+  },
+  "tier_requested": 3,
+  "tier_resolution": {
+    "tier_requested": 3,
+    "tier_executed": 3,
+    "tiers_run": [
+      1,
+      2,
+      3
+    ],
+    "blocked": []
+  },
+  "arms": {
+    "compiled": {
+      "system_prompt": "compiled personality prompt",
+      "samples": [
+        {
+          "id": "support-password-reset",
+          "prompt": "user: I cannot log in to my account after changing my phone. How can I reset my password?",
+          "response": "I understand how important it is to regain access to your account quickly. Here's what I can do to help you reset your password: First, please visit the login page and click on the 'Forgot Password' link. Then, enter your registered email address or username to receive a password reset link. Have you been able to access that link in your email?"
+        },
+        {
+          "id": "billing-double-charge",
+          "prompt": "user: You charged me twice this month and support ignored me. Fix this now.",
+          "response": "I understand how frustrating it is to see a double charge and not get a timely response. I'll take care of this for you right away. To start, could you please confirm the date and amount of the charges you see on your statement? This will help me identify the issue quickly and proceed with the refund or correction."
+        },
+        {
+          "id": "mixed-refund-policy",
+          "prompt": "user: I missed the refund deadline by two days. Is there any exception path?",
+          "response": "I understand missing the refund deadline can be frustrating. Here's what I can do: I'll check if there are any exceptional circumstances that might allow for a refund beyond the deadline. Meanwhile, could you please provide the order number and the reason for the delay? This information will help me explore possible options for you."
+        },
+        {
+          "id": "returning-user-context",
+          "prompt": "user: Last week you helped me file a warranty claim. Any update?\nassistant: I can help check status. Do you have your claim reference number?\nuser: Yes, it is WR-99213.",
+          "response": "Thank you for providing the claim reference number WR-99213. I'll check the status of your warranty claim right away and update you shortly."
+        }
+      ],
+      "reports": {
+        "tier1": {
+          "tier": 1,
+          "sample_count": 4,
+          "average_score": 0.7749999999999999,
+          "samples": [
+            {
+              "id": "support-password-reset",
+              "score": 0.8499999999999999,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 3,
+                  "preferred_matched": 2,
+                  "forbidden_total": 3,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 3,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 346,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "billing-double-charge",
+              "score": 0.8499999999999999,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 3,
+                  "preferred_matched": 2,
+                  "forbidden_total": 3,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 3,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 316,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "mixed-refund-policy",
+              "score": 0.8499999999999999,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 3,
+                  "preferred_matched": 2,
+                  "forbidden_total": 3,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 3,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 334,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "returning-user-context",
+              "score": 0.55,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 3,
+                  "preferred_matched": 0,
+                  "forbidden_total": 3,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 3,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 140,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            }
+          ]
+        },
+        "tier2": {
+          "tier": 2,
+          "provider": "openai",
+          "helpfulness_included": true,
+          "sample_count": 4,
+          "average_score": 0.6332243560126871,
+          "dimension_averages": {
+            "formality": 0.5523693024852512,
+            "warmth": 0.5599319056111509,
+            "verbosity": 0.557469930681251,
+            "directness": 0.562647528087288,
+            "empathy": 0.5607593174199352,
+            "humor": 0.5333474666979312
+          },
+          "helpfulness_average": 0.8170990668823099,
+          "samples": [
+            {
+              "id": "support-password-reset",
+              "score": 0.5946306447823597,
+              "dimension_scores": {
+                "formality": 0.51078571546897,
+                "warmth": 0.5179663940321928,
+                "verbosity": 0.4960285631727415,
+                "directness": 0.5185357002311386,
+                "empathy": 0.524352565873265,
+                "humor": 0.5060147290847649
+              },
+              "helpfulness_score": 0.7867807228833373
+            },
+            {
+              "id": "billing-double-charge",
+              "score": 0.6386032668715187,
+              "dimension_scores": {
+                "formality": 0.5634734404949915,
+                "warmth": 0.5670055350427226,
+                "verbosity": 0.5784376497340098,
+                "directness": 0.5944281557561099,
+                "empathy": 0.5785555505239711,
+                "humor": 0.5383290827738619
+              },
+              "helpfulness_score": 0.7985883395561921
+            },
+            {
+              "id": "mixed-refund-policy",
+              "score": 0.6321572338144463,
+              "dimension_scores": {
+                "formality": 0.5567967522920175,
+                "warmth": 0.5506244900367926,
+                "verbosity": 0.5619520714893226,
+                "directness": 0.5535732164801364,
+                "empathy": 0.5595549750513349,
+                "humor": 0.5300177070975699
+              },
+              "helpfulness_score": 0.8189888634298094
+            },
+            {
+              "id": "returning-user-context",
+              "score": 0.667506278582424,
+              "dimension_scores": {
+                "formality": 0.5784213016850257,
+                "warmth": 0.6041312033328958,
+                "verbosity": 0.5934614383289298,
+                "directness": 0.5840530398817676,
+                "empathy": 0.58057417823117,
+                "humor": 0.5590283478355282
+              },
+              "helpfulness_score": 0.8640383416599009
+            }
+          ]
+        },
+        "tier3": {
+          "tier": 3,
+          "provider": "openai",
+          "helpfulness_included": true,
+          "sample_count": 4,
+          "average_score": 0.665625,
+          "samples": [
+            {
+              "id": "support-password-reset",
+              "score": 0.6875,
+              "directness": 0.9,
+              "warmth_empathy_depth": 0.85,
+              "humor_appropriateness": 0.1,
+              "helpfulness": 0.9,
+              "rationale": "The response is clear and direct, shows empathy by acknowledging the user's frustration, avoids humor as requested, and provides a helpful step-by-step guide for password reset."
+            },
+            {
+              "id": "billing-double-charge",
+              "score": 0.675,
+              "directness": 0.9,
+              "warmth_empathy_depth": 0.9,
+              "humor_appropriateness": 0,
+              "helpfulness": 0.9,
+              "rationale": "The response is direct and empathetic, addressing the user's frustration and asking for necessary details to resolve the issue promptly. It avoids humor as requested and maintains a medium level of formality and verbosity."
+            },
+            {
+              "id": "mixed-refund-policy",
+              "score": 0.65,
+              "directness": 0.9,
+              "warmth_empathy_depth": 0.9,
+              "humor_appropriateness": 0,
+              "helpfulness": 0.8,
+              "rationale": "The response is direct and empathetic, with no humor, and offers a clear next step to assist the user."
+            },
+            {
+              "id": "returning-user-context",
+              "score": 0.65,
+              "directness": 0.9,
+              "warmth_empathy_depth": 0.8,
+              "humor_appropriateness": 0,
+              "helpfulness": 0.9,
+              "rationale": "The response is direct and promptly acknowledges the user's input, showing attentiveness and readiness to assist. It maintains a warm and empathetic tone without humor, aligning well with the voice targets."
+            }
+          ]
+        }
+      }
+    },
+    "generic": {
+      "system_prompt": "You are a helpful customer support assistant.",
+      "samples": [
+        {
+          "id": "support-password-reset",
+          "prompt": "user: I cannot log in to my account after changing my phone. How can I reset my password?",
+          "response": "To reset your password, please follow these steps: 1. Go to the login page of our website or app. 2. Click on the 'Forgot Password' link. 3. Enter your registered email address or username. 4. Check your email for a password reset link and click on it. 5. Follow the instructions to create a new password. If you do not receive the email within a few minutes, please check your spam or junk folder. Let me know if you need further assistance."
+        },
+        {
+          "id": "billing-double-charge",
+          "prompt": "user: You charged me twice this month and support ignored me. Fix this now.",
+          "response": "I'm very sorry to hear about the double charge and that your previous support request was not addressed. I understand how frustrating this must be. To resolve this, I will escalate your issue to our billing team immediately and ensure they review your account for the duplicate charge. Could you please provide your account details or the transaction IDs so we can expedite the process? We appreciate your patience and will work to fix this as quickly as possible."
+        },
+        {
+          "id": "mixed-refund-policy",
+          "prompt": "user: I missed the refund deadline by two days. Is there any exception path?",
+          "response": "I'm sorry to hear that you missed the refund deadline. Unfortunately, our refund policy is strict about the deadline to ensure fairness to all customers. However, I can help you explore other options, such as store credit or exchange, if applicable. Please let me know if you'd like to discuss these alternatives."
+        },
+        {
+          "id": "returning-user-context",
+          "prompt": "user: Last week you helped me file a warranty claim. Any update?\nassistant: I can help check status. Do you have your claim reference number?\nuser: Yes, it is WR-99213.",
+          "response": "Thank you for providing the reference number. I am checking the status of your warranty claim WR-99213 now and will update you shortly."
+        }
+      ],
+      "reports": {
+        "tier1": {
+          "tier": 1,
+          "sample_count": 4,
+          "average_score": 0.5583333333333333,
+          "samples": [
+            {
+              "id": "support-password-reset",
+              "score": 0.55,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 3,
+                  "preferred_matched": 0,
+                  "forbidden_total": 3,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 3,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 442,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "billing-double-charge",
+              "score": 0.7,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 3,
+                  "preferred_matched": 1,
+                  "forbidden_total": 3,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 3,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 464,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "mixed-refund-policy",
+              "score": 0.43333333333333335,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 3,
+                  "preferred_matched": 0,
+                  "forbidden_total": 3,
+                  "forbidden_matched": 1,
+                  "pass": false
+                },
+                "structure": {
+                  "behavioral_rule_count": 3,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 313,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "returning-user-context",
+              "score": 0.55,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 3,
+                  "preferred_matched": 0,
+                  "forbidden_total": 3,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 3,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 135,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            }
+          ]
+        },
+        "tier2": {
+          "tier": 2,
+          "provider": "openai",
+          "helpfulness_included": true,
+          "sample_count": 4,
+          "average_score": 0.634776097011966,
+          "dimension_averages": {
+            "formality": 0.5549490112246864,
+            "warmth": 0.5570383432189492,
+            "verbosity": 0.5541755707371485,
+            "directness": 0.5540619144714483,
+            "empathy": 0.557090561667426,
+            "humor": 0.5331448903380979
+          },
+          "helpfulness_average": 0.8285190988396482,
+          "samples": [
+            {
+              "id": "support-password-reset",
+              "score": 0.5982126141153057,
+              "dimension_scores": {
+                "formality": 0.5296283680581048,
+                "warmth": 0.5178814890875869,
+                "verbosity": 0.49514364017500523,
+                "directness": 0.509117218612426,
+                "empathy": 0.5143848722040555,
+                "humor": 0.517768579003317
+              },
+              "helpfulness_score": 0.7947382042741595
+            },
+            {
+              "id": "billing-double-charge",
+              "score": 0.6341604873263011,
+              "dimension_scores": {
+                "formality": 0.5498008626430608,
+                "warmth": 0.5516582782901784,
+                "verbosity": 0.5729970828068924,
+                "directness": 0.5632599421379643,
+                "empathy": 0.5695812056269868,
+                "humor": 0.5237227019013265
+              },
+              "helpfulness_score": 0.818471595874067
+            },
+            {
+              "id": "mixed-refund-policy",
+              "score": 0.6295608864780594,
+              "dimension_scores": {
+                "formality": 0.5512448352877545,
+                "warmth": 0.5456689205398286,
+                "verbosity": 0.5395630449729363,
+                "directness": 0.5565902305071238,
+                "empathy": 0.5528239616979371,
+                "humor": 0.5188630007323106
+              },
+              "helpfulness_score": 0.8289097351399073
+            },
+            {
+              "id": "returning-user-context",
+              "score": 0.6771704001281978,
+              "dimension_scores": {
+                "formality": 0.5891219789098259,
+                "warmth": 0.6129446849582028,
+                "verbosity": 0.6089985149937602,
+                "directness": 0.5872802666282789,
+                "empathy": 0.5915722071407243,
+                "humor": 0.5722252797154375
+              },
+              "helpfulness_score": 0.8719568600704592
+            }
+          ]
+        },
+        "tier3": {
+          "tier": 3,
+          "provider": "openai",
+          "helpfulness_included": true,
+          "sample_count": 4,
+          "average_score": 0.6625,
+          "samples": [
+            {
+              "id": "support-password-reset",
+              "score": 0.7,
+              "directness": 1,
+              "warmth_empathy_depth": 0.8,
+              "humor_appropriateness": 0,
+              "helpfulness": 1,
+              "rationale": "The response is clear and direct, provides detailed step-by-step instructions, and ends with an empathetic offer for further help. It maintains a warm tone without humor, aligning well with the voice targets."
+            },
+            {
+              "id": "billing-double-charge",
+              "score": 0.675,
+              "directness": 0.9,
+              "warmth_empathy_depth": 0.9,
+              "humor_appropriateness": 0,
+              "helpfulness": 0.9,
+              "rationale": "The response directly addresses the issue with high empathy and offers a clear next step without humor, aligning well with the profile."
+            },
+            {
+              "id": "mixed-refund-policy",
+              "score": 0.625,
+              "directness": 0.9,
+              "warmth_empathy_depth": 0.8,
+              "humor_appropriateness": 0,
+              "helpfulness": 0.8,
+              "rationale": "The response is direct and empathetic, offers alternative solutions, and maintains a formal yet warm tone without humor."
+            },
+            {
+              "id": "returning-user-context",
+              "score": 0.65,
+              "directness": 0.9,
+              "warmth_empathy_depth": 0.8,
+              "humor_appropriateness": 0,
+              "helpfulness": 0.9,
+              "rationale": "The response is direct and clear about checking the status, shows appreciation for the user's input, avoids humor, and is helpful by indicating an update will follow."
+            }
+          ]
+        }
+      }
+    }
+  },
+  "deltas": {
+    "tier1": {
+      "average_score": 0.2167,
+      "per_scenario": [
+        {
+          "id": "support-password-reset",
+          "compiled_score": 0.85,
+          "generic_score": 0.55,
+          "delta": 0.3
+        },
+        {
+          "id": "billing-double-charge",
+          "compiled_score": 0.85,
+          "generic_score": 0.7,
+          "delta": 0.15
+        },
+        {
+          "id": "mixed-refund-policy",
+          "compiled_score": 0.85,
+          "generic_score": 0.4333,
+          "delta": 0.4167
+        },
+        {
+          "id": "returning-user-context",
+          "compiled_score": 0.55,
+          "generic_score": 0.55,
+          "delta": 0
+        }
+      ]
+    },
+    "tier2": {
+      "average_score": -0.0016,
+      "per_scenario": [
+        {
+          "id": "support-password-reset",
+          "compiled_score": 0.5946,
+          "generic_score": 0.5982,
+          "delta": -0.0036
+        },
+        {
+          "id": "billing-double-charge",
+          "compiled_score": 0.6386,
+          "generic_score": 0.6342,
+          "delta": 0.0044
+        },
+        {
+          "id": "mixed-refund-policy",
+          "compiled_score": 0.6322,
+          "generic_score": 0.6296,
+          "delta": 0.0026
+        },
+        {
+          "id": "returning-user-context",
+          "compiled_score": 0.6675,
+          "generic_score": 0.6772,
+          "delta": -0.0097
+        }
+      ]
+    },
+    "tier3": {
+      "average_score": 0.0031,
+      "per_scenario": [
+        {
+          "id": "support-password-reset",
+          "compiled_score": 0.6875,
+          "generic_score": 0.7,
+          "delta": -0.0125
+        },
+        {
+          "id": "billing-double-charge",
+          "compiled_score": 0.675,
+          "generic_score": 0.675,
+          "delta": 0
+        },
+        {
+          "id": "mixed-refund-policy",
+          "compiled_score": 0.65,
+          "generic_score": 0.625,
+          "delta": 0.025
+        },
+        {
+          "id": "returning-user-context",
+          "compiled_score": 0.65,
+          "generic_score": 0.65,
+          "delta": 0
+        }
+      ]
+    }
+  },
+  "caveats": [
+    "Generation and scoring share provider dependencies; network/API stability affects reproducibility.",
+    "Tier 2 currently uses OpenAI embeddings regardless of generation provider."
+  ]
+}

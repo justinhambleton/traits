@@ -221,3 +221,15 @@ Decision log for implementation-critical choices. Keep entries brief and factual
 - Why: Validate that compiled-personality adherence lift generalizes beyond haven before investing in higher-cost/live Tier 2/3 implementation work.
 - Files: `experiment/scripts/run-resolve-ab-tier1.mjs`, `experiment/evaluation/runs/2026-02-14-resolve-ab-tier1.json`, `docs/planning/development-memory.md`
 - Follow-up: Begin Tier 2/3 live implementation and then rerun haven+resolve A/B with model-generated responses to close the live-evidence gap.
+
+- Date: 2026-02-14
+- Decision: Add a live-generation A/B evaluation runner that compiles profile prompts, generates both compiled-arm and generic-arm responses via OpenAI/Anthropic, and scores both arms through Tier 1/2/3 with tier-availability gating.
+- Why: Close the gap between deterministic template A/B checks and live-model evidence by evaluating generated responses under the same tiered scoring pipeline.
+- Files: `experiment/scripts/run-live-ab-eval.mjs`, `experiment/evaluation/README.md`, `docs/planning/development-memory.md`
+- Follow-up: Execute live A/B runs for `haven` and `resolve` once provider keys are configured, then compare Tier 2/3 deltas to deterministic baselines.
+
+- Date: 2026-02-14
+- Decision: Execute live A/B evaluations for `haven` and `resolve` using OpenAI generation (`gpt-4.1-mini`) and OpenAI Tier 3 judging at Tier 1/2/3.
+- Why: Convert deterministic template evidence into live-model evidence for compiled-vs-generic system prompt impact under the existing tiered scoring pipeline.
+- Files: `experiment/evaluation/runs/2026-02-14-live-ab-haven.json`, `experiment/evaluation/runs/2026-02-14-live-ab-resolve.json`, `docs/planning/development-memory.md`
+- Follow-up: Improve Tier 2/3 discrimination (currently near-zero deltas) by strengthening reference texts/judge rubric and rerun live A/B for haven+resolve.
