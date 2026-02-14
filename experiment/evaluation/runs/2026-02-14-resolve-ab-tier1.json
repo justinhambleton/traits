@@ -1,0 +1,253 @@
+{
+  "generated_at": "2026-02-14T18:51:38.426Z",
+  "method": "deterministic-tier1-template-ab",
+  "profile_path": "profiles/resolve.yaml",
+  "scenario_file": "experiment/calibration/scenarios.v1.json",
+  "scenario_ids": [
+    "support-password-reset",
+    "billing-double-charge",
+    "mixed-refund-policy",
+    "returning-user-context"
+  ],
+  "arms": {
+    "compiled": {
+      "system_prompt": "compiled resolve personality block",
+      "average_score": 0.9625,
+      "report": {
+        "tier": 1,
+        "sample_count": 4,
+        "average_score": 0.9624999999999999,
+        "samples": [
+          {
+            "id": "support-password-reset",
+            "score": 1,
+            "checks": {
+              "vocabulary": {
+                "preferred_total": 3,
+                "preferred_matched": 3,
+                "forbidden_total": 3,
+                "forbidden_matched": 0,
+                "pass": true
+              },
+              "structure": {
+                "behavioral_rule_count": 3,
+                "response_non_empty": true,
+                "pass": true
+              },
+              "helpfulness": {
+                "char_count": 277,
+                "pass": true,
+                "skipped": false
+              }
+            }
+          },
+          {
+            "id": "billing-double-charge",
+            "score": 1,
+            "checks": {
+              "vocabulary": {
+                "preferred_total": 3,
+                "preferred_matched": 3,
+                "forbidden_total": 3,
+                "forbidden_matched": 0,
+                "pass": true
+              },
+              "structure": {
+                "behavioral_rule_count": 3,
+                "response_non_empty": true,
+                "pass": true
+              },
+              "helpfulness": {
+                "char_count": 269,
+                "pass": true,
+                "skipped": false
+              }
+            }
+          },
+          {
+            "id": "mixed-refund-policy",
+            "score": 0.8499999999999999,
+            "checks": {
+              "vocabulary": {
+                "preferred_total": 3,
+                "preferred_matched": 2,
+                "forbidden_total": 3,
+                "forbidden_matched": 0,
+                "pass": true
+              },
+              "structure": {
+                "behavioral_rule_count": 3,
+                "response_non_empty": true,
+                "pass": true
+              },
+              "helpfulness": {
+                "char_count": 269,
+                "pass": true,
+                "skipped": false
+              }
+            }
+          },
+          {
+            "id": "returning-user-context",
+            "score": 1,
+            "checks": {
+              "vocabulary": {
+                "preferred_total": 3,
+                "preferred_matched": 3,
+                "forbidden_total": 3,
+                "forbidden_matched": 0,
+                "pass": true
+              },
+              "structure": {
+                "behavioral_rule_count": 3,
+                "response_non_empty": true,
+                "pass": true
+              },
+              "helpfulness": {
+                "char_count": 189,
+                "pass": true,
+                "skipped": false
+              }
+            }
+          }
+        ]
+      }
+    },
+    "generic": {
+      "system_prompt": "You are a helpful customer support assistant.",
+      "average_score": 0.55,
+      "report": {
+        "tier": 1,
+        "sample_count": 4,
+        "average_score": 0.55,
+        "samples": [
+          {
+            "id": "support-password-reset",
+            "score": 0.55,
+            "checks": {
+              "vocabulary": {
+                "preferred_total": 3,
+                "preferred_matched": 0,
+                "forbidden_total": 3,
+                "forbidden_matched": 0,
+                "pass": true
+              },
+              "structure": {
+                "behavioral_rule_count": 3,
+                "response_non_empty": true,
+                "pass": true
+              },
+              "helpfulness": {
+                "char_count": 172,
+                "pass": true,
+                "skipped": false
+              }
+            }
+          },
+          {
+            "id": "billing-double-charge",
+            "score": 0.55,
+            "checks": {
+              "vocabulary": {
+                "preferred_total": 3,
+                "preferred_matched": 0,
+                "forbidden_total": 3,
+                "forbidden_matched": 0,
+                "pass": true
+              },
+              "structure": {
+                "behavioral_rule_count": 3,
+                "response_non_empty": true,
+                "pass": true
+              },
+              "helpfulness": {
+                "char_count": 154,
+                "pass": true,
+                "skipped": false
+              }
+            }
+          },
+          {
+            "id": "mixed-refund-policy",
+            "score": 0.55,
+            "checks": {
+              "vocabulary": {
+                "preferred_total": 3,
+                "preferred_matched": 0,
+                "forbidden_total": 3,
+                "forbidden_matched": 0,
+                "pass": true
+              },
+              "structure": {
+                "behavioral_rule_count": 3,
+                "response_non_empty": true,
+                "pass": true
+              },
+              "helpfulness": {
+                "char_count": 161,
+                "pass": true,
+                "skipped": false
+              }
+            }
+          },
+          {
+            "id": "returning-user-context",
+            "score": 0.55,
+            "checks": {
+              "vocabulary": {
+                "preferred_total": 3,
+                "preferred_matched": 0,
+                "forbidden_total": 3,
+                "forbidden_matched": 0,
+                "pass": true
+              },
+              "structure": {
+                "behavioral_rule_count": 3,
+                "response_non_empty": true,
+                "pass": true
+              },
+              "helpfulness": {
+                "char_count": 133,
+                "pass": true,
+                "skipped": false
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "delta": {
+    "average_score": 0.4125,
+    "per_scenario": [
+      {
+        "id": "support-password-reset",
+        "compiled_score": 1,
+        "generic_score": 0.55,
+        "delta": 0.45
+      },
+      {
+        "id": "billing-double-charge",
+        "compiled_score": 1,
+        "generic_score": 0.55,
+        "delta": 0.45
+      },
+      {
+        "id": "mixed-refund-policy",
+        "compiled_score": 0.85,
+        "generic_score": 0.55,
+        "delta": 0.3
+      },
+      {
+        "id": "returning-user-context",
+        "compiled_score": 1,
+        "generic_score": 0.55,
+        "delta": 0.45
+      }
+    ]
+  },
+  "caveats": [
+    "Responses are deterministic templates, not live model generations.",
+    "Tier 1 scores vocabulary/helpfulness structure and does not directly measure full conversational quality."
+  ]
+}

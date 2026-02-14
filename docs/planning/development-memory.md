@@ -215,3 +215,9 @@ Decision log for implementation-critical choices. Keep entries brief and factual
 - Why: The next quality gate requires directional evidence that compiled personality guidance improves measurable adherence before investing in higher-tier/live-provider evaluation.
 - Files: `experiment/scripts/run-haven-ab-tier1.mjs`, `experiment/evaluation/runs/2026-02-14-haven-ab-tier1.json`, `docs/planning/development-memory.md`
 - Follow-up: Expand A/B to model-generated responses (Tier 2/3 with provider-backed inference) so lift reflects real generation behavior, not deterministic response templates.
+
+- Date: 2026-02-14
+- Decision: Broaden deterministic Tier 1 A/B coverage with a resolve-focused script and report across four customer-support scenarios.
+- Why: Validate that compiled-personality adherence lift generalizes beyond haven before investing in higher-cost/live Tier 2/3 implementation work.
+- Files: `experiment/scripts/run-resolve-ab-tier1.mjs`, `experiment/evaluation/runs/2026-02-14-resolve-ab-tier1.json`, `docs/planning/development-memory.md`
+- Follow-up: Begin Tier 2/3 live implementation and then rerun haven+resolve A/B with model-generated responses to close the live-evidence gap.
