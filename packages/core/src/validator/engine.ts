@@ -1,7 +1,8 @@
-import { resolveExtends } from "../profile.js";
+import { loadProfileFile, resolveExtends } from "../profile.js";
 import { checkOverspec } from "./overspec.js";
 import { validateSchema } from "./schema.js";
 import { checkS001, checkS002, checkS003, checkS005 } from "./safety.js";
+import { checkS006, checkS007 } from "./inheritance.js";
 import type {
   PersonalityProfile,
   ValidationCheckSummary,
@@ -84,6 +85,19 @@ function buildCompositionCheck(
   return summarizeCheck([...compositionWarnings, ...compositionErrors]);
 }
 
+function buildInheritanceCheck(
+  warnings: ValidationDiagnostic[],
+  errors: ValidationDiagnostic[]
+): ValidationCheckSummary {
+  const inheritanceWarnings = warnings.filter(
+    (diagnostic) => diagnostic.code === "S006" || diagnostic.code === "S007"
+  );
+  const inheritanceErrors = errors.filter(
+    (diagnostic) => diagnostic.code === "S006" || diagnostic.code === "S007"
+  );
+  return summarizeCheck([...inheritanceWarnings, ...inheritanceErrors]);
+}
+
 export function validateResolvedProfile(
   profile: PersonalityProfile,
   options: { strict?: boolean } = {}
@@ -98,6 +112,7 @@ export function validateResolvedProfile(
     ...checkS002(profile),
     ...checkS003(profile),
     ...checkS005(profile),
+    ...checkS007(profile),
     ...overspec.diagnostics
   ];
 
@@ -117,7 +132,8 @@ export function validateResolvedProfile(
     constraintBreakdown: overspec.breakdown,
     checks: {
       ...schemaValidation.checks,
-      composition: { status: "pass", errors: 0, warnings: 0 }
+      composition: { status: "pass", errors: 0, warnings: 0 },
+      inheritance: buildInheritanceCheck(warnings, errors)
     },
     isValid: effectiveErrors.length === 0,
     exitCode: computeExitCode(warnings, effectiveErrors)
@@ -174,15 +190,38 @@ export function validateProfile(
     normalizeDiagnosticSeverity(diagnostic, "error")
   );
 
+  let s006Diagnostics: ValidationDiagnostic[] = [];
+  if (resolvedErrors.length === 0 && resolved.parentPath) {
+    try {
+      const childProfile = loadProfileFile(profilePath);
+      const parentProfile = loadProfileFile(resolved.parentPath);
+      s006Diagnostics = checkS006(parentProfile, childProfile, resolved.profile);
+    } catch (error) {
+      s006Diagnostics = [
+        {
+          code: "E_INHERITANCE_VALIDATION",
+          severity: "error",
+          message: `Failed to evaluate inheritance checks: ${error instanceof Error ? error.message : String(error)}`
+        }
+      ];
+    }
+  }
+
+  const normalizedS006Diagnostics = s006Diagnostics.map((diagnostic) =>
+    normalizeDiagnosticSeverity(diagnostic, diagnostic.severity ?? "warning")
+  );
+  const s006Partition = partitionDiagnostics(normalizedS006Diagnostics);
+
   const profileValidation = validateResolvedProfile(resolved.profile, {
     strict: false
   });
 
-  const warnings = [...resolvedWarnings, ...profileValidation.warnings];
-  const errors = [...resolvedErrors, ...profileValidation.errors];
+  const warnings = [...resolvedWarnings, ...profileValidation.warnings, ...s006Partition.warnings];
+  const errors = [...resolvedErrors, ...profileValidation.errors, ...s006Partition.errors];
   const promotedWarnings = promoteWarningsForStrictMode(warnings, strict);
   const effectiveErrors = [...errors, ...promotedWarnings];
   const compositionCheck = buildCompositionCheck(resolvedWarnings, resolvedErrors);
+  const inheritanceCheck = buildInheritanceCheck(warnings, errors);
 
   return {
     profilePath,
@@ -197,7 +236,8 @@ export function validateProfile(
     constraintBreakdown: profileValidation.constraintBreakdown,
     checks: {
       ...profileValidation.checks,
-      composition: compositionCheck
+      composition: compositionCheck,
+      inheritance: inheritanceCheck
     },
     isValid: effectiveErrors.length === 0,
     exitCode: computeExitCode(warnings, effectiveErrors)

@@ -269,3 +269,51 @@ context_adaptations:
     }
   );
 });
+
+test("validateProfile: S006 warns on _remove and errors on inheritance regression", () => {
+  const result = validateProfile(profileFile("test-fixtures/_extends-removal-test.yaml"), {
+    bundledProfilesDir: PROFILES_DIR
+  });
+
+  const s006Warnings = result.warnings.filter((diagnostic) => diagnostic.code === "S006");
+  const s006Errors = result.errors.filter((diagnostic) => diagnostic.code === "S006");
+
+  assert.equal(s006Warnings.length, 2);
+  assert.equal(s006Errors.length, 1);
+  assert.equal(result.exitCode, 2);
+});
+
+test("validateProfile: S007 warns when safety adaptation has missing/zero priority", () => {
+  withTempProfile(
+    `
+schema: "v1.4"
+meta:
+  name: "s007-check"
+  version: "1.0.0"
+  description: "synthetic"
+identity:
+  role: "synthetic"
+voice:
+  formality: "medium"
+  warmth: "medium"
+  verbosity: "medium"
+  directness: "medium"
+  empathy: "medium"
+  humor: "low"
+context_adaptations:
+  - when: "crisis_indicators"
+    inject:
+      - "Do crisis flow now"
+  - when: "emergency_path"
+    priority: 0
+    inject:
+      - "Call emergency services"
+`,
+    (filePath) => {
+      const result = validateProfile(filePath, { bundledProfilesDir: PROFILES_DIR });
+      const s007Warnings = result.warnings.filter((diagnostic) => diagnostic.code === "S007");
+      assert.equal(s007Warnings.length, 2);
+      assert.equal(result.errors.length, 0);
+    }
+  );
+});

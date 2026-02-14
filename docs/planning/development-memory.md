@@ -149,3 +149,15 @@ Decision log for implementation-critical choices. Keep entries brief and factual
 - Why: Enforce typed API artifacts (`index.d.ts`) as the runtime contract, eliminate source/import drift during tests, and ensure CLI consumes core via package exports rather than source internals.
 - Files: `packages/core/src/**/*.ts`, `packages/core/package.json`, `packages/core/tsconfig.json`, `packages/core/tsup.config.ts`, `packages/core/test/*.test.js`, `packages/cli/package.json`, `package.json`, `docs/planning/pre-push-checklist.md`
 - Follow-up: Split `profile.ts` into schema-focused modules and begin calibration quality pass before CLI TypeScript migration.
+
+- Date: 2026-02-14
+- Decision: Split `profile.ts` into focused modules (`profile/load.ts`, `profile/merge.ts`, `profile/extends.ts`, `profile/context.ts`, `profile/normalize.ts`) and keep `profile.ts` as a stable re-export facade.
+- Why: Reduce module-boundary debt and isolate loading, inheritance merge, context resolution, and normalization concerns without changing runtime behavior or public API imports.
+- Files: `packages/core/src/profile.ts`, `packages/core/src/profile/load.ts`, `packages/core/src/profile/merge.ts`, `packages/core/src/profile/extends.ts`, `packages/core/src/profile/context.ts`, `packages/core/src/profile/normalize.ts`, `packages/core/src/profile/types.ts`, `docs/planning/development-memory.md`
+- Follow-up: Move S006/S007 policy checks into validator flow (inheritance validator stage) while keeping `resolveExtends` focused on data resolution.
+
+- Date: 2026-02-14
+- Decision: Move S006/S007 policy diagnostics into validator flow via `validator/inheritance.ts`; keep `resolveExtends`/merge focused on resolution + merge semantics and composition errors only.
+- Why: Close validator ownership gap so safety inheritance diagnostics are emitted by validation engine rather than by profile resolution internals, while preserving merged profile behavior.
+- Files: `packages/core/src/validator/inheritance.ts`, `packages/core/src/validator/engine.ts`, `packages/core/src/profile/merge.ts`, `packages/core/src/profile/extends.ts`, `packages/core/test/extends.test.js`, `packages/core/test/validator.test.js`, `docs/planning/development-memory.md`
+- Follow-up: Optionally add inheritance check line to CLI formatter output and then tackle remaining open remediation items (#4 knowledge-base calibration, #7 .gitignore hardening).
