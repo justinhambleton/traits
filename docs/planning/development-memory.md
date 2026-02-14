@@ -161,3 +161,9 @@ Decision log for implementation-critical choices. Keep entries brief and factual
 - Why: Close validator ownership gap so safety inheritance diagnostics are emitted by validation engine rather than by profile resolution internals, while preserving merged profile behavior.
 - Files: `packages/core/src/validator/inheritance.ts`, `packages/core/src/validator/engine.ts`, `packages/core/src/profile/merge.ts`, `packages/core/src/profile/extends.ts`, `packages/core/test/extends.test.js`, `packages/core/test/validator.test.js`, `docs/planning/development-memory.md`
 - Follow-up: Optionally add inheritance check line to CLI formatter output and then tackle remaining open remediation items (#4 knowledge-base calibration, #7 .gitignore hardening).
+
+- Date: 2026-02-14
+- Decision: Harden `.gitignore` coverage for editor and transient artifacts and open a concrete execution directive for knowledge-base calibration remediation.
+- Why: Close the final housekeeping gap from the initial assessment (#7) and create an implementation-ready plan for the remaining high-severity quality item (#4) without mixing it into unrelated feature work.
+- Files: `.gitignore`, `docs/plans/2026-02-14-remediation-knowledge-base-calibration-directive.md`, `docs/planning/development-memory.md`
+- Follow-up: Execute the #4 directive in sequence (status script -> authoring pass -> calibration harness -> apply updates -> calibration guard).

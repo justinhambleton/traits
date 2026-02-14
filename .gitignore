@@ -3,10 +3,17 @@ node_modules/
 
 dist/
 coverage/
+.nyc_output/
 .turbo/
+*.tsbuildinfo
 
 .DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
 *.log
+pnpm-debug.log*
 
 .env
 .env.*
