@@ -180,7 +180,17 @@
       "pattern": "Interaction guardrail: keep humor subtle and professional under high formality.",
       "adherence": 0.7327,
       "calibrated": true
+    },
+    "empathy-very-high_directness-medium": {
+      "pattern": "Interaction guardrail: use explicit care signals, then provide one concrete next action with concise rationale.",
+      "adherence": 0.7303,
+      "calibrated": true
+    },
+    "warmth-very-high_humor-very-low": {
+      "pattern": "Interaction guardrail: keep language compassionate but literal and non-playful; avoid jokes, lightness, or minimizing language.",
+      "adherence": 0.7182,
+      "calibrated": true
     }
   },
-  "updated_at": "2026-02-14T16:15:56.621Z"
+  "updated_at": "2026-02-14T18:02:10.284Z"
 }

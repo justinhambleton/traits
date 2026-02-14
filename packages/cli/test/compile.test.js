@@ -92,4 +92,6 @@ test("traits compile applies context adaptations and trace output", () => {
   assert.match(result.stdout, /directness: medium/);
   assert.match(result.stdout, /\[TRACE\]/);
   assert.match(result.stdout, /"crisis_indicators"/);
+  assert.match(result.stdout, /"empathy-very-high_directness-medium"/);
+  assert.match(result.stdout, /"warmth-very-high_humor-very-low"/);
 });

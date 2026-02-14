@@ -6,10 +6,10 @@
 - Method: deterministic-offline baseline (`calibrate-patterns.mjs` with deterministic embedding mode)
 - Scenario set: `experiment/calibration/scenarios.v1.json` (20 scenarios)
 - Run artifacts:
-  - `experiment/calibration/runs/claude-step3`
-  - `experiment/calibration/runs/gpt-step3`
-- Entries evaluated per model: 33 (30 dimensions + 3 interactions)
-- Raw score records per model: 660 (33 entries x 20 scenarios)
+  - `experiment/calibration/runs/claude-step3b-haven-interactions`
+  - `experiment/calibration/runs/gpt-step3b-haven-interactions`
+- Entries evaluated per model: 35 (30 dimensions + 5 interactions)
+- Raw score records per model: 700 (35 entries x 20 scenarios)
 
 ## Per-Dimension Adherence (Mean / Min / Max)
 
@@ -42,16 +42,20 @@
 | Interaction ID | Adherence |
 |---|---:|
 | warmth-high_directness-high | 0.7282 |
-| empathy-very-high_directness-low | 0.7287 |
+| empathy-very-high_directness-low | 0.7288 |
 | formality-high_humor-medium-plus | 0.7327 |
+| empathy-very-high_directness-medium | 0.7269 |
+| warmth-very-high_humor-very-low | 0.7350 |
 
 ### GPT interactions
 
 | Interaction ID | Adherence |
 |---|---:|
 | warmth-high_directness-high | 0.7288 |
-| empathy-very-high_directness-low | 0.7326 |
-| formality-high_humor-medium-plus | 0.7328 |
+| empathy-very-high_directness-low | 0.7288 |
+| formality-high_humor-medium-plus | 0.7327 |
+| empathy-very-high_directness-medium | 0.7303 |
+| warmth-very-high_humor-very-low | 0.7182 |
 
 ## Threshold Review
 
@@ -73,7 +77,7 @@ Observed outcomes:
   - Calibration metadata and provenance are recorded.
 - Deferred for next pass:
   - Raise sub-0.75 base dimension entries using live embedding mode (`--embedding-mode openai`) and iterative pattern tuning.
-  - Improve interaction differentiation (especially non-`warmth-high_directness-high` pairs) with richer scenario pressure-testing.
+  - Improve interaction differentiation (especially `warmth-very-high_humor-very-low`) with richer healthcare scenario pressure-testing.
 
 ## Notes
 

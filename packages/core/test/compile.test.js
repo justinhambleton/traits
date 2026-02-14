@@ -47,6 +47,16 @@ test("compileProfile: context adaptations affect compiled voice and trace", () =
 
   assert.ok(compiled.text.includes("directness: medium"));
   assert.deepEqual(compiled.trace.context_matches, ["newly_diagnosed", "crisis_indicators"]);
+  assert.ok(
+    compiled.trace.interaction_patterns.some(
+      (interaction) => interaction.id === "empathy-very-high_directness-medium"
+    )
+  );
+  assert.ok(
+    compiled.trace.interaction_patterns.some(
+      (interaction) => interaction.id === "warmth-very-high_humor-very-low"
+    )
+  );
 });
 
 test("compileProfile: pattern selections and interactions are included in explain trace", () => {

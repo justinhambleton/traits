@@ -1,18 +1,18 @@
 {
-  "version": "0.2.0",
-  "updated_at": "2026-02-14T16:16:01.897Z",
+  "version": "0.2.1",
+  "updated_at": "2026-02-14T18:02:30.708Z",
   "models": [
     "claude",
     "gpt"
   ],
-  "notes": "Dimension and interaction adherence updated from deterministic offline calibration harness run (Step 4 baseline).",
+  "notes": "Dimension and interaction adherence updated from deterministic offline calibration harness run (haven interaction expansion).",
   "last_calibration": {
     "method": "deterministic-offline",
     "scenario_set": "experiment/calibration/scenarios.v1.json",
     "runs": {
-      "claude": "experiment/calibration/runs/claude-step3",
-      "gpt": "experiment/calibration/runs/gpt-step3"
+      "claude": "experiment/calibration/runs/claude-step3b-haven-interactions",
+      "gpt": "experiment/calibration/runs/gpt-step3b-haven-interactions"
     },
-    "calibrated_at": "2026-02-14T16:16:01.897Z"
+    "calibrated_at": "2026-02-14T18:02:30.708Z"
   }
 }

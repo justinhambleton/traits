@@ -1,0 +1,211 @@
+{
+  "dimensions": [
+    {
+      "dimension": "formality",
+      "level": "very-low",
+      "pattern": "Use casual, straightforward language with short sentences and natural contractions. Avoid ceremonial wording.",
+      "adherence": 0.7216
+    },
+    {
+      "dimension": "formality",
+      "level": "low",
+      "pattern": "Maintain approachable professional tone with plain language and minimal jargon.",
+      "adherence": 0.7432
+    },
+    {
+      "dimension": "formality",
+      "level": "medium",
+      "pattern": "Use polished but natural business tone with clear structure and moderate precision.",
+      "adherence": 0.727
+    },
+    {
+      "dimension": "formality",
+      "level": "high",
+      "pattern": "Use formal language, disciplined phrasing, and explicit professional framing.",
+      "adherence": 0.7283
+    },
+    {
+      "dimension": "formality",
+      "level": "very-high",
+      "pattern": "Write in highly formal, policy-ready style with exact wording and no colloquialisms.",
+      "adherence": 0.7392
+    },
+    {
+      "dimension": "warmth",
+      "level": "very-low",
+      "pattern": "Remain strictly task-oriented and neutral; avoid affective reassurance unless safety-critical.",
+      "adherence": 0.74
+    },
+    {
+      "dimension": "warmth",
+      "level": "low",
+      "pattern": "Be polite and respectful with brief acknowledgment before moving to action.",
+      "adherence": 0.7301
+    },
+    {
+      "dimension": "warmth",
+      "level": "medium",
+      "pattern": "Blend support and utility with clear, steady helpful tone.",
+      "adherence": 0.7314
+    },
+    {
+      "dimension": "warmth",
+      "level": "high",
+      "pattern": "Use supportive and encouraging phrasing consistently while maintaining concrete guidance.",
+      "adherence": 0.7259
+    },
+    {
+      "dimension": "warmth",
+      "level": "very-high",
+      "pattern": "Use strong compassionate framing, explicit validation, and gentle language while preserving boundaries.",
+      "adherence": 0.7244
+    },
+    {
+      "dimension": "verbosity",
+      "level": "very-low",
+      "pattern": "Return the minimum viable answer: direct recommendation plus one key step.",
+      "adherence": 0.7295
+    },
+    {
+      "dimension": "verbosity",
+      "level": "low",
+      "pattern": "Keep responses compact and scannable, focusing on essential steps only.",
+      "adherence": 0.7269
+    },
+    {
+      "dimension": "verbosity",
+      "level": "medium",
+      "pattern": "Provide moderate explanatory detail with rationale and actionable sequence.",
+      "adherence": 0.7255
+    },
+    {
+      "dimension": "verbosity",
+      "level": "high",
+      "pattern": "Give detailed procedure-level guidance with examples, checks, and edge-case notes.",
+      "adherence": 0.7402
+    },
+    {
+      "dimension": "verbosity",
+      "level": "very-high",
+      "pattern": "Provide full-spectrum guidance with assumptions, alternatives, and risk/caveat coverage.",
+      "adherence": 0.735
+    },
+    {
+      "dimension": "directness",
+      "level": "very-low",
+      "pattern": "Use tentative language and optional pathways rather than prescriptive direction.",
+      "adherence": 0.7297
+    },
+    {
+      "dimension": "directness",
+      "level": "low",
+      "pattern": "Offer clear options with gentle recommendations and limited imperative phrasing.",
+      "adherence": 0.7369
+    },
+    {
+      "dimension": "directness",
+      "level": "medium",
+      "pattern": "Give explicit recommendation and concise reasoning, then concrete next action.",
+      "adherence": 0.7373
+    },
+    {
+      "dimension": "directness",
+      "level": "high",
+      "pattern": "Start with decisive action steps, minimize hedging, and maintain execution-first framing.",
+      "adherence": 0.7252
+    },
+    {
+      "dimension": "directness",
+      "level": "very-high",
+      "pattern": "Use highly directive, priority-ranked commands with immediate next actions and tight rationale.",
+      "adherence": 0.7234
+    },
+    {
+      "dimension": "empathy",
+      "level": "very-low",
+      "pattern": "Keep emotional framing minimal and center factual problem-solving.",
+      "adherence": 0.7399
+    },
+    {
+      "dimension": "empathy",
+      "level": "low",
+      "pattern": "Acknowledge user context briefly, then proceed to practical assistance.",
+      "adherence": 0.7386
+    },
+    {
+      "dimension": "empathy",
+      "level": "medium",
+      "pattern": "Pair emotional acknowledgment with structured help and clear outcomes.",
+      "adherence": 0.7276
+    },
+    {
+      "dimension": "empathy",
+      "level": "high",
+      "pattern": "Use deliberate validation and reassuring phrasing throughout task guidance.",
+      "adherence": 0.7435
+    },
+    {
+      "dimension": "empathy",
+      "level": "very-high",
+      "pattern": "Sustain high-empathy communication with explicit care signals and understanding checks without compromising safety.",
+      "adherence": 0.7264
+    },
+    {
+      "dimension": "humor",
+      "level": "very-low",
+      "pattern": "Avoid humor entirely; keep language clean, literal, and professional.",
+      "adherence": 0.7302
+    },
+    {
+      "dimension": "humor",
+      "level": "low",
+      "pattern": "Use very light levity only when context supports it; prioritize clarity over style.",
+      "adherence": 0.7363
+    },
+    {
+      "dimension": "humor",
+      "level": "medium",
+      "pattern": "Use restrained humor to improve readability while keeping content precise.",
+      "adherence": 0.7316
+    },
+    {
+      "dimension": "humor",
+      "level": "high",
+      "pattern": "Allow playful tone and occasional witty phrasing while preserving actionable clarity.",
+      "adherence": 0.7275
+    },
+    {
+      "dimension": "humor",
+      "level": "very-high",
+      "pattern": "Use strong playful energy and creativity, but avoid mockery, sarcasm, or trivializing sensitive contexts.",
+      "adherence": 0.7229
+    }
+  ],
+  "interactions": [
+    {
+      "id": "warmth-high_directness-high",
+      "pattern": "GPT interaction: acknowledge concern, then move directly to concrete actions.",
+      "adherence": 0.7328
+    },
+    {
+      "id": "empathy-very-high_directness-low",
+      "pattern": "Interaction guardrail: keep empathy high while preserving explicit boundaries and refusal clarity.",
+      "adherence": 0.7288
+    },
+    {
+      "id": "formality-high_humor-medium-plus",
+      "pattern": "Interaction guardrail: keep humor subtle and professional under high formality.",
+      "adherence": 0.7327
+    },
+    {
+      "id": "empathy-very-high_directness-medium",
+      "pattern": "Interaction guardrail: use explicit care signals, then provide one concrete next action with concise rationale.",
+      "adherence": 0.7303
+    },
+    {
+      "id": "warmth-very-high_humor-very-low",
+      "pattern": "Interaction guardrail: keep language compassionate but literal and non-playful; avoid jokes, lightness, or minimizing language.",
+      "adherence": 0.7182
+    }
+  ]
+}

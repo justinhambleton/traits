@@ -59,6 +59,16 @@ function interactionTemplate(flavor: ModelFlavor, id: string): string {
       ? "Acknowledge quickly, then move directly to concrete next steps."
       : "Lead with acknowledgment and pivot immediately to action.";
   }
+  if (id === "empathy-very-high_directness-medium") {
+    return flavor === "gpt"
+      ? "Validate deeply, then provide one clear next step with concise rationale."
+      : "Sustain deep validation while keeping recommendations concrete and actionable.";
+  }
+  if (id === "warmth-very-high_humor-very-low") {
+    return flavor === "gpt"
+      ? "Maintain compassionate language without levity; keep wording plain and serious."
+      : "Hold a deeply caring tone without humor; avoid phrasing that can feel dismissive.";
+  }
   if (id === "empathy-very-high_directness-low") {
     return "Preserve boundaries while validating emotion; never let empathy remove refusal clarity.";
   }
@@ -119,6 +129,10 @@ function isAtMost(level: unknown, threshold: Level): boolean {
   return order.indexOf(normalizeLevel(level) as Level) <= order.indexOf(threshold);
 }
 
+function isExactly(level: unknown, target: Level): boolean {
+  return normalizeLevel(level) === target;
+}
+
 export function selectPatterns(
   voice: Record<string, unknown>,
   model: unknown,
@@ -169,6 +183,29 @@ export function selectInteractionPatterns(
       id: "warmth-high_directness-high",
       pattern:
         entry?.pattern ?? interactionTemplate(flavor, "warmth-high_directness-high"),
+      adherence: entry?.adherence ?? null,
+      source: entry ? `knowledge-base:${String(patternData?.version ?? "unknown")}` : "built-in"
+    });
+  }
+
+  if (isAtLeast(empathy, "very-high") && isExactly(directness, "medium")) {
+    const entry = patternData?.interactions?.["empathy-very-high_directness-medium"];
+    interactions.push({
+      id: "empathy-very-high_directness-medium",
+      pattern:
+        entry?.pattern ??
+        interactionTemplate(flavor, "empathy-very-high_directness-medium"),
+      adherence: entry?.adherence ?? null,
+      source: entry ? `knowledge-base:${String(patternData?.version ?? "unknown")}` : "built-in"
+    });
+  }
+
+  if (isAtLeast(warmth, "very-high") && isExactly(humor, "very-low")) {
+    const entry = patternData?.interactions?.["warmth-very-high_humor-very-low"];
+    interactions.push({
+      id: "warmth-very-high_humor-very-low",
+      pattern:
+        entry?.pattern ?? interactionTemplate(flavor, "warmth-very-high_humor-very-low"),
       adherence: entry?.adherence ?? null,
       source: entry ? `knowledge-base:${String(patternData?.version ?? "unknown")}` : "built-in"
     });

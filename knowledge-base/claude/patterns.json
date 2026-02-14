@@ -180,7 +180,17 @@
       "pattern": "Interaction guardrail: keep humor subtle and professional under high formality.",
       "adherence": 0.7327,
       "calibrated": true
+    },
+    "empathy-very-high_directness-medium": {
+      "pattern": "Interaction guardrail: validate emotion explicitly, then provide one clear next step and confirm understanding before continuing.",
+      "adherence": 0.7269,
+      "calibrated": true
+    },
+    "warmth-very-high_humor-very-low": {
+      "pattern": "Interaction guardrail: keep tone deeply compassionate and serious; avoid levity, banter, or reassuring phrasing that can minimize risk.",
+      "adherence": 0.735,
+      "calibrated": true
     }
   },
-  "updated_at": "2026-02-14T16:15:56.621Z"
+  "updated_at": "2026-02-14T18:02:10.282Z"
 }
