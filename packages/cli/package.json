@@ -1,6 +1,31 @@
 {
   "name": "@traits-dev/cli",
   "version": "0.1.0",
+  "description": "traits.dev command-line interface for profile init, validate, compile, eval, and import workflows.",
+  "keywords": [
+    "traits-dev",
+    "cli",
+    "llm",
+    "prompt-engineering",
+    "evaluation"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/justinhambleton/traits.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://github.com/justinhambleton/traits#readme",
+  "author": {
+    "name": "Justin Hambleton",
+    "url": "https://github.com/justinhambleton"
+  },
+  "contributors": [
+    {
+      "name": "Justin Hambleton",
+      "url": "https://github.com/justinhambleton"
+    }
+  ],
   "type": "module",
   "main": "./dist/traits.js",
   "files": [

@@ -1,6 +1,31 @@
 {
   "name": "@traits-dev/core",
   "version": "0.1.0",
+  "description": "Core traits.dev SDK for personality profile validation, compilation, and evaluation.",
+  "keywords": [
+    "traits-dev",
+    "llm",
+    "personality",
+    "prompt-engineering",
+    "evaluation"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/justinhambleton/traits.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/justinhambleton/traits#readme",
+  "author": {
+    "name": "Justin Hambleton",
+    "url": "https://github.com/justinhambleton"
+  },
+  "contributors": [
+    {
+      "name": "Justin Hambleton",
+      "url": "https://github.com/justinhambleton"
+    }
+  ],
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
