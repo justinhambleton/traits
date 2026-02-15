@@ -3,11 +3,16 @@ title: Showcase
 ---
 
 <script setup>
-import ShowcasePage from "./components/ShowcasePage.vue";
+import { onMounted } from "vue";
+import { useRouter } from "vitepress";
+
+const router = useRouter();
+
+onMounted(() => {
+  router.go("/playground");
+});
 </script>
 
-# Interactive Showcase
+# Showcase moved
 
-Same prompt. Three profiles. Instantly different behavior.
-
-<ShowcasePage />
+The showcase now lives at [Playground](/playground).

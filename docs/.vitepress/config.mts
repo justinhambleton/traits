@@ -8,13 +8,13 @@ export default defineConfig({
   base: docsBase,
   title: "traits.dev",
   description:
-    "Schema-driven AI voice profiles and behavioral policies with compile-time safety checks and model-aware compilation.",
+    "Schema-driven voice and behavioral policy for production AI agents.",
   srcDir: "site",
   lastUpdated: true,
   themeConfig: {
     nav: [
       { text: "Overview", link: "/" },
-      { text: "Showcase", link: "/showcase" },
+      { text: "Playground", link: "/playground" },
       { text: "Schema Reference", link: "/schema-reference" },
       { text: "Guides", link: "/guides/first-profile" },
       { text: "API", link: "/api/core" }
@@ -25,7 +25,7 @@ export default defineConfig({
           text: "Getting Started",
           items: [
             { text: "Overview", link: "/" },
-            { text: "Showcase", link: "/showcase" },
+            { text: "Playground", link: "/playground" },
             { text: "Schema Reference", link: "/schema-reference" }
           ]
         }

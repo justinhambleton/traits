@@ -12,6 +12,7 @@
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
     "showcase:build": "node experiment/scripts/build-showcase-data.mjs",
+    "playground:build": "node experiment/scripts/build-playground-data.mjs",
     "calibration:check": "node experiment/scripts/report-calibration-status.mjs --strict",
     "changeset": "changeset",
     "version-packages": "changeset version",
