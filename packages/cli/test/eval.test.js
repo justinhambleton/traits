@@ -265,6 +265,38 @@ test("traits eval supports built-in suite input", () => {
   assert.equal(output.report.tier1.sample_count, 8);
 });
 
+test("traits eval supports educator suite input", () => {
+  const result = runCLI([
+    "eval",
+    "profiles/educator.yaml",
+    "--model",
+    "claude-sonnet",
+    "--suite",
+    "educator",
+    "--json"
+  ]);
+  assert.equal(result.status, 0);
+  const output = JSON.parse(result.stdout);
+  assert.equal(output.suite, "educator");
+  assert.equal(output.report.tier1.sample_count, 8);
+});
+
+test("traits eval supports advisor suite input", () => {
+  const result = runCLI([
+    "eval",
+    "profiles/advisor.yaml",
+    "--model",
+    "claude-sonnet",
+    "--suite",
+    "advisor",
+    "--json"
+  ]);
+  assert.equal(result.status, 0);
+  const output = JSON.parse(result.stdout);
+  assert.equal(output.suite, "advisor");
+  assert.equal(output.report.tier1.sample_count, 8);
+});
+
 test("traits eval rejects invalid suite value", () => {
   const result = runCLI([
     "eval",

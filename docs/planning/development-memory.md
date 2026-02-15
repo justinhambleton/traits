@@ -401,3 +401,15 @@ Decision log for implementation-critical choices. Keep entries brief and factual
 - Why: The previous playground only rewrote `[VOICE TARGETS]` text while leaving `[PATTERN GUIDANCE]` static, which broke the core demonstration value. Real compilation now updates guidance and interactions as dimensions change, with validation diagnostics shown beside compiled output.
 - Files: `docs/site/components/PlaygroundPage.vue`, `experiment/scripts/build-playground-data.mjs`, `docs/site/data/playground.json`, `packages/core/src/compiler/patterns.ts`, `package.json`, `docs/planning/development-memory.md`
 - Follow-up: Create a browser-optimized core entrypoint (without Node fs/path warnings) for docs/playground usage so Vite builds no longer emit Node externalization notices.
+
+- Date: 2026-02-15
+- Decision: Add a new `educator` starter profile (`v1.6`) and expose `educator` as a built-in eval suite in CLI parsing/help/error paths.
+- Why: The next profile expansion phase starts with education use cases; adding the profile and suite wiring enables immediate Tier 1 scoring and keeps core/CLI suite behavior aligned.
+- Files: `profiles/educator.yaml`, `packages/cli/src/commands/eval.ts`, `packages/core/test/eval-suites.test.js`, `packages/cli/test/eval.test.js`, `docs/planning/development-memory.md`
+- Follow-up: Implement the `advisor` profile and add advisor suite coverage, then regenerate playground data so profile selector and landing cards include both new archetypes.
+
+- Date: 2026-02-15
+- Decision: Add a new `advisor` starter profile (`v1.6`) and extend built-in suite support with `advisor` across core suite registry, CLI parsing/help paths, and test coverage.
+- Why: Regulated advisory is a distinct policy archetype needed for profile breadth and evaluation workflows; bundling an advisor suite enables immediate Tier 1 baseline runs with no external scenario files.
+- Files: `profiles/advisor.yaml`, `packages/core/src/eval/scenarios/suites.ts`, `packages/cli/src/commands/eval.ts`, `packages/core/test/eval-suites.test.js`, `packages/cli/test/eval.test.js`, `docs/planning/development-memory.md`
+- Follow-up: Regenerate playground data and docs landing/profile cards so educator and advisor appear in interactive docs flows.

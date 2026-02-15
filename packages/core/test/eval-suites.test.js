@@ -3,11 +3,11 @@ import assert from "node:assert/strict";
 
 import { listBuiltInEvalSuites, loadBuiltInEvalSuite } from "../dist/internal.js";
 
-test("built-in eval suites expose support/healthcare/developer with 8-10 scenarios", () => {
+test("built-in eval suites expose support/healthcare/developer/educator/advisor with 8-10 scenarios", () => {
   const suites = listBuiltInEvalSuites();
   const byId = new Map(suites.map((suite) => [suite.id, suite]));
 
-  for (const id of ["support", "healthcare", "developer"]) {
+  for (const id of ["support", "healthcare", "developer", "educator", "advisor"]) {
     assert.ok(byId.has(id));
     const summary = byId.get(id);
     assert.ok(summary.scenarioCount >= 8);
@@ -16,7 +16,7 @@ test("built-in eval suites expose support/healthcare/developer with 8-10 scenari
 });
 
 test("loadBuiltInEvalSuite returns valid scenario contracts", () => {
-  for (const id of ["support", "healthcare", "developer"]) {
+  for (const id of ["support", "healthcare", "developer", "educator", "advisor"]) {
     const suite = loadBuiltInEvalSuite(id);
     assert.ok(suite);
     assert.ok(suite.scenarios.length >= 8);

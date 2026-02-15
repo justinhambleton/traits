@@ -86,7 +86,7 @@ function printEvalUsage(out: OutputWriter = process.stderr): void {
       "Options:",
       "  --model <model>           Model target (required)",
       "  --tier <1|2|3>            Highest tier to run (default: highest available)",
-      "  --suite <name>            Built-in baseline suite: support|healthcare|developer",
+      "  --suite <name>            Built-in baseline suite: support|healthcare|developer|educator|advisor",
       "  --provider <name>         Judge provider for Tier 3: auto|openai|anthropic",
       "  --embedding-model <name>  Embedding model for Tier 2 (OpenAI)",
       "  --judge-model <name>      Judge model for Tier 3 provider",
@@ -249,11 +249,14 @@ function parseEvalArgs(args: string[]): ParsedEvalArgs {
   }
   if (
     result.suite != null &&
-    !(["support", "healthcare", "developer"] as const).includes(
-      result.suite as "support" | "healthcare" | "developer"
+    !(["support", "healthcare", "developer", "educator", "advisor"] as const).includes(
+      result.suite as "support" | "healthcare" | "developer" | "educator" | "advisor"
     )
   ) {
-    return { error: 'Invalid "--suite" value. Expected support, healthcare, or developer.' };
+    return {
+      error:
+        'Invalid "--suite" value. Expected support, healthcare, developer, educator, or advisor.'
+    };
   }
   if (result.suite != null && result.samplesPath != null) {
     return { error: 'Use either "--suite" or "--samples/--scenarios", not both.' };
@@ -299,7 +302,7 @@ function loadSamples(options: EvalArgs, cwd: string): EvalSample[] {
     const suite = loadBuiltInEvalSuite(options.suite);
     if (!suite) {
       throw new Error(
-        `Unknown suite "${options.suite}". Expected support, healthcare, or developer.`
+        `Unknown suite "${options.suite}". Expected support, healthcare, developer, educator, or advisor.`
       );
     }
     return suite.scenarios.map((scenario) => ({
