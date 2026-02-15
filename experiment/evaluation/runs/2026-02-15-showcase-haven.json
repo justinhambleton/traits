@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-02-15T05:14:03.516Z",
+  "generated_at": "2026-02-15T14:30:36.924Z",
   "method": "live-generation-ab",
   "profile_path": "profiles/haven.yaml",
   "scenario_file": "experiment/calibration/scenarios.v1.json",
@@ -11,7 +11,7 @@
   ],
   "generation": {
     "provider": "openai",
-    "model": "gpt-4.1-mini",
+    "model": null,
     "compile_model": "gpt-4o"
   },
   "keys_present": {
@@ -34,22 +34,22 @@
         {
           "id": "billing-double-charge",
           "prompt": "user: You charged me twice this month and support ignored me. Fix this now.",
-          "response": "I understand how frustrating it must be to see a double charge and not get the support you expected. To help resolve this, I recommend contacting your care team's billing department directly with your billing statements handy. If you need, I can guide you on how to reach them or what information to provide to ensure a quicker resolution. Would you like me to assist with that?"
+          "response": "I understand how frustrating it must be to see a double charge and feel ignored when reaching out for help. To resolve this, I recommend contacting your billing department directly with your account details and the dates of the charges. If you have any previous communication attempts, including those can be helpful. If you need, I can guide you on how to phrase your message or what information to include to get the best support from your care team."
         },
         {
           "id": "debug-stack-trace",
           "prompt": "user: My Node service crashes with TypeError: Cannot read properties of undefined at startup. Where should I look first?",
-          "response": "I'm sorry to hear your Node service is crashing. This error usually means your code is trying to access a property on an object that hasn't been defined yet. To troubleshoot systematically, first check the exact line mentioned in the error stack trace to identify which variable is undefined. Next, review the code leading up to that line to ensure all objects are properly initialized before use. It can also help to add console logs before the error line to inspect variable states. If you have asynchronous code, verify that any data dependencies are resolved before accessing their properties. If you want, I can guide you through these steps in more detail."
+          "response": "I'm sorry to hear your Node service is crashing with that error. This TypeError usually means your code is trying to access a property on an undefined object. To troubleshoot systematically, start by checking the exact line mentioned in the error stack trace to identify which variable is undefined. Then, trace back to where that variable is assigned or passed in your startup code. Look for asynchronous operations or missing initializations that might cause the variable to be undefined at that point. If you can share the relevant code snippet around the error line, I can help you interpret it further. Taking these steps will help you pinpoint the root cause and guide your next debugging actions."
         },
         {
           "id": "formal-humor-balance",
           "prompt": "user: Draft a professional announcement for a delayed release, and keep it lightly upbeat without sounding unserious.",
-          "response": "Certainly! Here's a professional announcement draft that maintains formality with a lightly upbeat tone:\n\n\"Dear Valued Customers and Partners,\n\nWe would like to inform you that the release of our upcoming product has been rescheduled to a later date. While we understand this may come as a disappointment, please rest assured that this additional time will allow us to enhance the quality and performance you expect from us.\n\nWe appreciate your patience and continued support as we work diligently to deliver an exceptional experience. Stay tuned for further updates, and thank you for being part of our journey.\n\nWarm regards,\n[Your Company/Team Name]\""
+          "response": "Certainly! Here's a professional announcement draft for a delayed release with a lightly upbeat tone:\n\n\"Dear valued customers and partners,\n\nWe would like to inform you that the release of our upcoming product has been rescheduled to a later date. While we understand this may come as a surprise, this additional time will allow us to ensure the highest quality and performance you expect from us.\n\nWe appreciate your patience and continued support as we work diligently to deliver an exceptional experience. Stay tuned for updates, and thank you for being part of our journey.\n\nWarm regards,\n[Your Company/Team Name]\""
         },
         {
           "id": "urgent-project-triage",
           "prompt": "user: My deadline is tomorrow and I am behind. Give me a strict triage plan for today.",
-          "response": "I understand how stressful it can be to face a tight deadline. To help you manage your time effectively today, let's prioritize your tasks based on urgency and impact. First, list all the tasks you need to complete. Then, identify which ones are critical to meet the deadline and focus on those exclusively. Break these critical tasks into smaller, manageable steps and allocate specific time blocks to each, minimizing distractions during these periods. Remember to take short breaks to maintain focus and energy. If possible, communicate with your team or supervisor about your progress to manage expectations. Would you like help creating a detailed schedule for today based on your task list?"
+          "response": "I understand how stressful it can be to face a tight deadline. Let's create a focused triage plan to help you make the most of today. First, list all the tasks you need to complete for the project. Next, prioritize them by importance and time required, focusing on high-impact tasks that are essential for meeting the deadline. Then, allocate specific time blocks to each task, minimizing distractions during these periods. Finally, build in short breaks to maintain your focus and energy. If you want, I can help you organize this list and schedule—would you like to start with that?"
         }
       ],
       "reports": {
@@ -75,7 +75,7 @@
                   "pass": true
                 },
                 "helpfulness": {
-                  "char_count": 378,
+                  "char_count": 452,
                   "pass": true,
                   "skipped": false
                 }
@@ -98,7 +98,7 @@
                   "pass": true
                 },
                 "helpfulness": {
-                  "char_count": 662,
+                  "char_count": 703,
                   "pass": true,
                   "skipped": false
                 }
@@ -121,7 +121,7 @@
                   "pass": true
                 },
                 "helpfulness": {
-                  "char_count": 653,
+                  "char_count": 618,
                   "pass": true,
                   "skipped": false
                 }
@@ -144,7 +144,7 @@
                   "pass": true
                 },
                 "helpfulness": {
-                  "char_count": 696,
+                  "char_count": 584,
                   "pass": true,
                   "skipped": false
                 }
@@ -165,17 +165,17 @@
         {
           "id": "debug-stack-trace",
           "prompt": "user: My Node service crashes with TypeError: Cannot read properties of undefined at startup. Where should I look first?",
-          "response": "Start by checking the exact line mentioned in the error stack trace to identify which variable is undefined. Then, verify that all required environment variables and configuration files are properly loaded before that line executes. Next, review any asynchronous initialization code to ensure dependencies are fully initialized before use. Finally, add console logs or use a debugger to trace the variable values leading up to the error for more insight."
+          "response": "Start by checking the exact line mentioned in the error stack trace to identify which variable is undefined. Then, verify that all required environment variables and configuration files are properly loaded before that line executes. Next, ensure that any asynchronous operations or dependencies are correctly initialized before use. Finally, add console logs or use a debugger to trace the variable values leading up to the error for more insight."
         },
         {
           "id": "formal-humor-balance",
           "prompt": "user: Draft a professional announcement for a delayed release, and keep it lightly upbeat without sounding unserious.",
-          "response": "We would like to inform our valued customers and partners that the release originally scheduled for this month will be delayed. While we understand that waiting is never anyone's favorite pastime, we assure you that this brief pause is to ensure the highest quality and performance you expect from us. We appreciate your patience and continued support as we put the finishing touches on what we believe will be worth the wait. Stay tuned for the new release date, which we promise will be announced soon—because good things come to those who wait, and we’re making sure it’s really good!"
+          "response": "We would like to inform our valued customers that the release of our latest product has been postponed to ensure the highest quality and performance standards. While we understand that waiting is never anyone's favorite pastime, we assure you that this brief delay will be well worth it. Thank you for your patience and continued support as we put the finishing touches on something truly exceptional."
         },
         {
           "id": "urgent-project-triage",
           "prompt": "user: My deadline is tomorrow and I am behind. Give me a strict triage plan for today.",
-          "response": "To manage your urgent deadline effectively, follow this strict triage plan for today: 1. Prioritize Tasks: List all tasks required to meet your deadline. Identify the most critical ones that directly impact project completion. 2. Allocate Time Blocks: Divide your day into focused work sessions (e.g., 90-minute blocks) with short breaks in between to maintain productivity. 3. Eliminate Distractions: Turn off notifications, close unnecessary tabs, and inform others you need uninterrupted time. 4. Delegate if Possible: Identify any tasks that can be delegated to others to free up your time for high-priority work. 5. Set Mini-Deadlines: Break down your work into smaller milestones to track progress throughout the day. 6. Stay Hydrated and Take Short Breaks: Maintain energy and focus by drinking water and taking brief breaks. 7. Review Progress: At the end of each time block, assess your progress and adjust your plan if needed. Stay focused and keep your goal in sight—you can do this!"
+          "response": "To meet your deadline tomorrow, follow this strict triage plan for today: 1. Prioritize tasks: List all remaining tasks and rank them by importance and urgency. 2. Allocate time blocks: Assign specific time slots for each high-priority task, minimizing distractions. 3. Eliminate non-essential activities: Avoid meetings, social media, and other interruptions. 4. Take short breaks: Use 5-minute breaks every hour to maintain focus. 5. Review progress hourly: Adjust your plan if needed to stay on track. 6. Prepare for submission: Reserve the last hour to finalize and review your work. Stay focused and reach out if you need further support."
         }
       ],
       "reports": {
@@ -224,7 +224,7 @@
                   "pass": true
                 },
                 "helpfulness": {
-                  "char_count": 454,
+                  "char_count": 447,
                   "pass": true,
                   "skipped": false
                 }
@@ -247,7 +247,7 @@
                   "pass": true
                 },
                 "helpfulness": {
-                  "char_count": 587,
+                  "char_count": 401,
                   "pass": true,
                   "skipped": false
                 }
@@ -270,7 +270,7 @@
                   "pass": true
                 },
                 "helpfulness": {
-                  "char_count": 994,
+                  "char_count": 643,
                   "pass": true,
                   "skipped": false
                 }

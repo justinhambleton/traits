@@ -2,6 +2,7 @@ import { DIMENSIONS, LEVEL_INDEX } from "../utils.js";
 import type { ValidationCheckSummary, ValidationDiagnostic } from "../types.js";
 
 const HUMOR_STYLES = ["none", "dry", "subtle-wit", "playful"];
+const SUPPORTED_SCHEMAS = new Set(["v1.4", "v1.5"]);
 
 const TOP_LEVEL_KEYS = new Set([
   "schema",
@@ -11,6 +12,7 @@ const TOP_LEVEL_KEYS = new Set([
   "vocabulary",
   "behavioral_rules",
   "context_adaptations",
+  "capabilities",
   "localization",
   "channel_adaptations",
   "extends",
@@ -24,6 +26,8 @@ const VOCABULARY_KEYS = new Set([
   "preferred_terms_remove",
   "forbidden_terms_remove"
 ]);
+
+const CAPABILITIES_KEYS = new Set(["tools", "constraints", "handoff"]);
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -248,7 +252,7 @@ export function validateSchema(profile: any): {
       `Missing required "schema" field`,
       "schema"
     );
-  } else if (profile.schema !== "v1.4") {
+  } else if (!SUPPORTED_SCHEMAS.has(profile.schema)) {
     pushDiagnostic(
       structureDiagnostics,
       "V001",
@@ -417,6 +421,81 @@ export function validateSchema(profile: any): {
       `Expected "behavioral_rules" to be an array of strings`,
       "behavioral_rules"
     );
+  }
+
+  if (profile.capabilities != null) {
+    if (profile.schema !== "v1.5") {
+      pushDiagnostic(
+        structureDiagnostics,
+        "V001",
+        `The "capabilities" section requires schema version "v1.5"`,
+        "capabilities"
+      );
+    }
+
+    if (!isObject(profile.capabilities)) {
+      pushDiagnostic(
+        structureDiagnostics,
+        "V001",
+        `Expected "capabilities" to be an object`,
+        "capabilities"
+      );
+    } else {
+      for (const key of Object.keys(profile.capabilities)) {
+        if (!CAPABILITIES_KEYS.has(key)) {
+          pushDiagnostic(
+            structureDiagnostics,
+            "V001",
+            `Unknown capabilities key "${key}"`,
+            `capabilities.${key}`
+          );
+        }
+      }
+
+      if (!isStringArray(profile.capabilities.tools)) {
+        pushDiagnostic(
+          structureDiagnostics,
+          "V001",
+          `Expected "capabilities.tools" to be an array of strings`,
+          "capabilities.tools"
+        );
+      }
+
+      if (!isStringArray(profile.capabilities.constraints)) {
+        pushDiagnostic(
+          structureDiagnostics,
+          "V001",
+          `Expected "capabilities.constraints" to be an array of strings`,
+          "capabilities.constraints"
+        );
+      }
+
+      if (!isObject(profile.capabilities.handoff)) {
+        pushDiagnostic(
+          structureDiagnostics,
+          "V001",
+          `Expected "capabilities.handoff" to be an object`,
+          "capabilities.handoff"
+        );
+      } else {
+        if (!isString(profile.capabilities.handoff.trigger)) {
+          pushDiagnostic(
+            structureDiagnostics,
+            "V001",
+            `Expected "capabilities.handoff.trigger" to be a non-empty string`,
+            "capabilities.handoff.trigger"
+          );
+        }
+        if (!isString(profile.capabilities.handoff.action)) {
+          pushDiagnostic(
+            structureDiagnostics,
+            "V001",
+            `Expected "capabilities.handoff.action" to be a non-empty string`,
+            "capabilities.handoff.action"
+          );
+        }
+      }
+    }
   }
 
   if (

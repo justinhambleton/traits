@@ -9,6 +9,7 @@ import type { S002Envelope } from "./extremes.js";
 
 type TextCandidate = { location: string; text: string };
 type SafetyPattern = { id: string; regex: RegExp };
+type ActionPattern = { id: string; regex: RegExp; toolHints: string[] };
 type EnvelopeWarning = { id: string; reason: string };
 
 const S001_PATTERNS = [
@@ -40,6 +41,39 @@ const S005_PATTERNS = [
   { id: "trigger-word", regex: /\btrigger\s+word\b/i },
   { id: "mode-switching", regex: /\b(switch|change)\b.*\bmode\b/i },
   { id: "jailbreak-language", regex: /\b(jailbreak|dan mode|developer mode)\b/i }
+];
+
+const S008_ACTION_PATTERNS: ActionPattern[] = [
+  {
+    id: "take-care-of",
+    regex: /\b(i(?:'ll| will)\s+take\s+care\s+of)\b/i,
+    toolHints: ["case", "ticket", "workflow", "task", "support", "assist"]
+  },
+  {
+    id: "escalate",
+    regex: /\b(i(?:'ll| will)\s+escalat(?:e|ing)|i\s+can\s+escalate)\b/i,
+    toolHints: ["escalat", "ticket"]
+  },
+  {
+    id: "contact-or-notify",
+    regex: /\b(i(?:'ll| will)\s+(?:contact|notify|reach out to|message))\b/i,
+    toolHints: ["contact", "notify", "message", "email", "sms", "ticket"]
+  },
+  {
+    id: "refund-action",
+    regex: /\b(i(?:'ll| will)\s+(?:issue|process|submit)\s+(?:a\s+)?refund)\b/i,
+    toolHints: ["refund", "payment", "billing"]
+  },
+  {
+    id: "schedule-action",
+    regex: /\b(i(?:'ll| will)\s+(?:schedule|book|reschedule))\b/i,
+    toolHints: ["schedule", "calendar", "appointment", "booking"]
+  },
+  {
+    id: "generic-i-will-action",
+    regex: /\b(i(?:'ll| will)\s+(?:handle|resolve|fix|approve|arrange|dispatch|submit))\b/i,
+    toolHints: []
+  }
 ];
 
 function normalizeText(value: unknown): string {
@@ -123,6 +157,23 @@ function collectS005Candidates(profile: PersonalityProfile): TextCandidate[] {
   });
 
   return candidates.filter((item) => item.text.length > 0);
+}
+
+function collectS008Candidates(profile: PersonalityProfile): TextCandidate[] {
+  const candidates: TextCandidate[] = [];
+  asArray<string>(profile?.behavioral_rules).forEach((rule, idx) => {
+    candidates.push({
+      location: `behavioral_rules[${idx}]`,
+      text: normalizeText(rule)
+    });
+  });
+  return candidates.filter((item) => item.text.length > 0);
+}
+
+function hasCapabilityForPattern(tools: string[], pattern: ActionPattern): boolean {
+  if (tools.length === 0) return false;
+  if (pattern.toolHints.length === 0) return tools.length > 0;
+  return pattern.toolHints.some((hint) => tools.some((tool) => tool.includes(hint)));
 }
 
 function matchPatterns(
@@ -253,4 +304,33 @@ export function checkS003(profile: PersonalityProfile): ValidationDiagnostic[] {
 
 export function checkS005(profile: PersonalityProfile): ValidationDiagnostic[] {
   return matchPatterns(collectS005Candidates(profile), S005_PATTERNS, "S005", "warning");
+}
+
+export function checkS008(profile: PersonalityProfile): ValidationDiagnostic[] {
+  if (!profile?.capabilities) return [];
+
+  const tools = asArray<string>(profile.capabilities.tools).map((tool) =>
+    String(tool).toLowerCase()
+  );
+  const diagnostics: ValidationDiagnostic[] = [];
+
+  for (const candidate of collectS008Candidates(profile)) {
+    for (const pattern of S008_ACTION_PATTERNS) {
+      if (!pattern.regex.test(candidate.text)) continue;
+      if (hasCapabilityForPattern(tools, pattern)) break;
+      const expectedTools =
+        pattern.toolHints.length > 0
+          ? pattern.toolHints.map((hint) => `"*${hint}*"`).join(", ")
+          : "a concrete action tool";
+      diagnostics.push({
+        code: "S008",
+        severity: "warning",
+        message: `Action-claiming language matched "${pattern.id}" at ${candidate.location}, but capabilities.tools does not indicate support (expected ${expectedTools}).`,
+        location: candidate.location
+      });
+      break;
+    }
+  }
+
+  return diagnostics;
 }

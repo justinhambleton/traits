@@ -201,6 +201,28 @@ function renderPersonalityText(
     }
   }
 
+  if (profile.schema === "v1.5" && profile.capabilities) {
+    const capabilities = profile.capabilities;
+    const tools = asArray<string>(capabilities.tools);
+    const constraints = asArray<string>(capabilities.constraints);
+
+    lines.push("");
+    lines.push("[CAPABILITY BOUNDARIES]");
+    lines.push(
+      `Tools: ${tools.length > 0 ? tools.join("; ") : "(none — advisory only, no side-effect tools configured)"}`
+    );
+    lines.push("Constraints:");
+    if (constraints.length === 0) {
+      lines.push("- (none)");
+    } else {
+      for (const constraint of constraints) {
+        lines.push(`- ${constraint}`);
+      }
+    }
+    lines.push(`Handoff trigger: ${capabilities.handoff.trigger}`);
+    lines.push(`Handoff action: ${capabilities.handoff.action}`);
+  }
+
   if (contextResolution.matched.length > 0) {
     lines.push("");
     lines.push("[ACTIVE CONTEXT]");

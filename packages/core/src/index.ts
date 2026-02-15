@@ -6,6 +6,7 @@ export {
 } from "./profile.js";
 
 export type {
+  CapabilityHandoff,
   CompiledPersonality,
   ContextAdaptation,
   ContextResolution,
@@ -20,6 +21,7 @@ export type {
   HumorStyle,
   Level,
   PersonalityProfile,
+  ProfileCapabilities,
   ValidationDiagnostic,
   ValidationResult,
   VocabularyConstraints

@@ -40,6 +40,17 @@ export interface ContextAdaptation {
   priority?: number;
 }
 
+export interface CapabilityHandoff {
+  trigger: string;
+  action: string;
+}
+
+export interface ProfileCapabilities {
+  tools: string[];
+  constraints: string[];
+  handoff: CapabilityHandoff;
+}
+
 export interface PersonalityProfile {
   schema: string;
   meta: {
@@ -68,6 +79,7 @@ export interface PersonalityProfile {
   vocabulary?: VocabularyConstraints;
   behavioral_rules?: string[];
   context_adaptations?: ContextAdaptation[];
+  capabilities?: ProfileCapabilities;
   localization?: Record<string, unknown>;
   channel_adaptations?: Record<string, unknown>;
   extends?: string;

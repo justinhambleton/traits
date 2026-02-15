@@ -1,7 +1,8 @@
 import { asArray, clone } from "../utils.js";
 import type {
   ContextAdaptation,
-  PersonalityProfile
+  PersonalityProfile,
+  ProfileCapabilities
 } from "../types.js";
 import { type GenericObject } from "./types.js";
 
@@ -13,6 +14,7 @@ const PASS_THROUGH_FIELDS = new Set([
   "vocabulary",
   "behavioral_rules",
   "context_adaptations",
+  "capabilities",
   "extends",
   "behavioral_rules_remove",
   "context_adaptations_remove"
@@ -123,6 +125,39 @@ function mergeContextAdaptations(
   return out;
 }
 
+function mergeCapabilities(
+  parentCapabilities: ProfileCapabilities | undefined,
+  childCapabilities: ProfileCapabilities | undefined
+): ProfileCapabilities | undefined {
+  if (!parentCapabilities && !childCapabilities) return undefined;
+  if (!parentCapabilities) return clone(childCapabilities);
+  if (!childCapabilities) return clone(parentCapabilities);
+
+  const mergedTools = dedupCaseInsensitive([
+    ...asArray<string>(parentCapabilities.tools),
+    ...asArray<string>(childCapabilities.tools)
+  ]);
+  const mergedConstraints = dedupCaseInsensitive([
+    ...asArray<string>(parentCapabilities.constraints),
+    ...asArray<string>(childCapabilities.constraints)
+  ]);
+
+  return {
+    tools: mergedTools,
+    constraints: mergedConstraints,
+    handoff: {
+      trigger:
+        childCapabilities.handoff?.trigger ??
+        parentCapabilities.handoff?.trigger ??
+        "",
+      action:
+        childCapabilities.handoff?.action ??
+        parentCapabilities.handoff?.action ??
+        ""
+    }
+  };
+}
+
 function removeCaseInsensitive(items: unknown, removals: unknown): string[] {
   const removalSet = new Set(
     asArray<string>(removals).map((item) => String(item).toLowerCase())
@@ -194,6 +229,10 @@ export function mergeProfiles(
   merged.context_adaptations = mergeContextAdaptations(
     parentProfile.context_adaptations,
     childProfile.context_adaptations
+  );
+  merged.capabilities = mergeCapabilities(
+    parentProfile.capabilities,
+    childProfile.capabilities
   );
 
   // Preserve additional child fields not explicitly merged above.

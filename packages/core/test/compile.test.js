@@ -21,6 +21,7 @@ test("compileProfile: claude placement and safety floor are included", () => {
 
   assert.equal(compiled.placement.recommended_position, "start");
   assert.ok(compiled.text.includes("<safety_floor>"));
+  assert.ok(compiled.text.includes("[CAPABILITY BOUNDARIES]"));
   assert.equal(compiled.metadata.safety_floor_included, true);
 });
 

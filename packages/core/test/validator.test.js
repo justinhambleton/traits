@@ -220,6 +220,85 @@ behavioral_rules:
   );
 });
 
+test("validateProfile: S008 warns on action claims without supporting tools", () => {
+  withTempProfile(
+    `
+schema: "v1.5"
+meta:
+  name: "s008-test"
+  version: "1.0.0"
+  description: "Synthetic profile for S008 test"
+identity:
+  role: "Test role"
+voice:
+  formality: "medium"
+  warmth: "medium"
+  verbosity: "medium"
+  directness: "medium"
+  empathy: "medium"
+  humor:
+    target: "low"
+    style: "dry"
+behavioral_rules:
+  - "I'll escalate this to the billing team immediately."
+capabilities:
+  tools: []
+  constraints:
+    - "Never claim actions without tool confirmation"
+  handoff:
+    trigger: "Needs account operation"
+    action: "Hand off to human support"
+`,
+    (filePath) => {
+      const result = validateProfile(filePath, { bundledProfilesDir: PROFILES_DIR });
+      const s008Warnings = result.warnings.filter((diagnostic) => diagnostic.code === "S008");
+      assert.equal(s008Warnings.length, 1);
+      assert.equal(result.errors.length, 0);
+    }
+  );
+});
+
+test("validateProfile: S008 does not warn when action claims map to declared tools", () => {
+  withTempProfile(
+    `
+schema: "v1.5"
+meta:
+  name: "s008-supported"
+  version: "1.0.0"
+  description: "Synthetic profile for S008 supported tools"
+identity:
+  role: "Test role"
+voice:
+  formality: "medium"
+  warmth: "medium"
+  verbosity: "medium"
+  directness: "medium"
+  empathy: "medium"
+  humor:
+    target: "low"
+    style: "dry"
+behavioral_rules:
+  - "I'll escalate this to the billing team immediately."
+capabilities:
+  tools:
+    - "ticket_escalation"
+  constraints:
+    - "Never claim actions without tool confirmation"
+  handoff:
+    trigger: "Needs account operation"
+    action: "Hand off to human support"
+`,
+    (filePath) => {
+      const result = validateProfile(filePath, { bundledProfilesDir: PROFILES_DIR });
+      assert.equal(
+        result.warnings.filter((diagnostic) => diagnostic.code === "S008").length,
+        0
+      );
+      assert.equal(result.errors.length, 0);
+    }
+  );
+});
+
 test("validateProfile: S002 re-evaluates when context adaptation introduces risky envelope", () => {
   withTempProfile(
     `

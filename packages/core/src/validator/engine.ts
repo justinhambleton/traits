@@ -1,7 +1,7 @@
 import { loadProfileFile, resolveExtends } from "../profile.js";
 import { checkOverspec } from "./overspec.js";
 import { validateSchema } from "./schema.js";
-import { checkS001, checkS002, checkS003, checkS005 } from "./safety.js";
+import { checkS001, checkS002, checkS003, checkS005, checkS008 } from "./safety.js";
 import { checkS006, checkS007 } from "./inheritance.js";
 import type {
   PersonalityProfile,
@@ -112,6 +112,7 @@ export function validateResolvedProfile(
     ...checkS002(profile),
     ...checkS003(profile),
     ...checkS005(profile),
+    ...checkS008(profile),
     ...checkS007(profile),
     ...overspec.diagnostics
   ];

@@ -37,7 +37,7 @@ function formatDiagnostic(diagnostic: ValidationDiagnostic): string {
 }
 
 function countSafetyDiagnostics(diagnostics: ValidationDiagnostic[]): number {
-  return diagnostics.filter((diagnostic) => /^S00[1-7]$/.test(String(diagnostic.code))).length;
+  return diagnostics.filter((diagnostic) => /^S00[1-8]$/.test(String(diagnostic.code))).length;
 }
 
 export function toValidationResultObject(result: Partial<ValidationResult>): ValidationResultObject {

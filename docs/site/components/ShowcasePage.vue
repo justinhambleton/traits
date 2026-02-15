@@ -7,6 +7,10 @@
         These responses are sourced from live generation runs and rendered statically for docs.
         No backend, no runtime API calls.
       </p>
+      <p class="showcase-disclaimer">
+        Responses are voice demonstrations. In production, tool-grounding constraints are
+        required before treating action claims as completed operations.
+      </p>
     </section>
 
     <section class="scenario-picker">
@@ -141,6 +145,16 @@ function scoreClass(score) {
 .lede {
   margin: 0;
   color: var(--muted);
+}
+
+.showcase-disclaimer {
+  margin: 0.6rem 0 0;
+  border: 1px solid #f8d58c;
+  background: #fff8e8;
+  color: #92400e;
+  border-radius: 0.65rem;
+  padding: 0.55rem 0.65rem;
+  font-size: 0.84rem;
 }
 
 .scenario-picker {
@@ -422,6 +436,12 @@ function scoreClass(score) {
   border-left-color: #60a5fa;
   background: #13233a;
   color: #e5edff;
+}
+
+:global(.dark) .showcase-disclaimer {
+  border-color: #6b4c19;
+  background: #2b210f;
+  color: #f7d8a8;
 }
 
 :global(.dark) .prompt-expectation {

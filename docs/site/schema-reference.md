@@ -1,11 +1,12 @@
-# Voice Profile & Behavioral Policy Schema Reference (`v1.4`)
+# Voice Profile & Behavioral Policy Schema Reference (`v1.5`)
 
 This page documents the implemented voice profile and behavioral policy schema used by `@traits-dev/core`.
 
 ## Schema version
 
-- Required: `schema: "v1.4"`
+- Supported: `schema: "v1.4"` and `schema: "v1.5"`.
 - Any other schema value fails validation (`V001`).
+- `capabilities` is available only in `v1.5`.
 
 ## Top-level structure
 
@@ -21,6 +22,7 @@ Optional sections:
 - `vocabulary`
 - `behavioral_rules`
 - `context_adaptations`
+- `capabilities` (`v1.5` only)
 - `localization`
 - `channel_adaptations`
 - `extends`
@@ -122,6 +124,32 @@ Optional object with:
 - Optional `string[]`
 - Rules are included in compile output and safety-scanned.
 
+## `capabilities` (`v1.5`)
+
+Optional object (only valid when `schema: "v1.5"`):
+
+```yaml
+capabilities:
+  tools:
+    - "account_lookup"
+  constraints:
+    - "Never claim actions without tool confirmation."
+  handoff:
+    trigger: "Request exceeds defined capabilities"
+    action: "Acknowledge limitation and offer human handoff"
+```
+
+Fields:
+
+- `tools: string[]`
+- `constraints: string[]`
+- `handoff.trigger: string`
+- `handoff.action: string`
+
+Compiler behavior:
+
+- When present, compile output includes a `[CAPABILITY BOUNDARIES]` section with tools, constraints, and handoff policy.
+
 ## `context_adaptations`
 
 Optional array of:
@@ -199,6 +227,7 @@ Safety checks:
   - warning on removal of safety-relevant arrays
   - error if merged profile has fewer safety constraints than parent
 - `S007` (warning): safety-named context adaptations should use `priority: 100`
+- `S008` (warning): action-claiming language in `behavioral_rules` without matching tools in `capabilities.tools`
 
 `S004` thresholds:
 
@@ -221,7 +250,7 @@ Constraint count includes:
 ## Minimal valid profile
 
 ```yaml
-schema: "v1.4"
+schema: "v1.5"
 meta:
   name: "example"
   version: "0.1.0"
@@ -237,6 +266,13 @@ voice:
   humor:
     target: very-low
     style: none
+capabilities:
+  tools: []
+  constraints:
+    - "Never claim actions without tool confirmation."
+  handoff:
+    trigger: "Action requires unavailable tools"
+    action: "Offer to escalate to a human operator"
 ```
 
 ## Reference implementation

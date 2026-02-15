@@ -133,6 +133,44 @@ test("schema validation catches invalid adaptation range ordering", () => {
   );
 });
 
+test("schema validation accepts v1.5 capabilities block", () => {
+  const profile = baseProfile();
+  profile.schema = "v1.5";
+  profile.capabilities = {
+    tools: [],
+    constraints: ["Never claim actions without tool confirmation"],
+    handoff: {
+      trigger: "Needs unavailable operation",
+      action: "Offer human handoff"
+    }
+  };
+
+  const result = validateResolvedProfile(profile);
+  assert.equal(result.errors.length, 0);
+  assert.equal(result.checks.schema_structure.status, "pass");
+});
+
+test("schema validation rejects capabilities on v1.4 profiles", () => {
+  const profile = baseProfile();
+  profile.capabilities = {
+    tools: [],
+    constraints: ["Never claim actions without tool confirmation"],
+    handoff: {
+      trigger: "Needs unavailable operation",
+      action: "Offer human handoff"
+    }
+  };
+
+  const result = validateResolvedProfile(profile);
+  assert.ok(
+    result.errors.some(
+      (diagnostic) =>
+        diagnostic.code === "V001" &&
+        String(diagnostic.message).includes('requires schema version "v1.5"')
+    )
+  );
+});
+
 test("validation formatter provides CLI-ready text and structured object", () => {
   const result = validateProfile(path.join(PROFILES_DIR, "resolve.yaml"), {
     bundledProfilesDir: PROFILES_DIR
@@ -140,7 +178,7 @@ test("validation formatter provides CLI-ready text and structured object", () =>
   const text = formatValidationResult(result);
   const json = toValidationResultObject(result);
 
-  assert.ok(text.includes("✓ Schema valid (v1.4)"));
+  assert.ok(text.includes("✓ Schema valid (v1.5)"));
   assert.ok(text.includes("✓ Composition references resolved"));
   assert.ok(text.includes("Profile is valid."));
 

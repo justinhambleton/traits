@@ -14,7 +14,7 @@ Start with the [Interactive Showcase](/showcase): one prompt, three profiles, si
 ## What traits.dev does
 
 - Defines voice and behavioral policy as versioned YAML rather than ad hoc prompt strings
-- Validates safety and structure before compile (`S001` to `S007`)
+- Validates safety and structure before compile (`S001` to `S008`)
 - Compiles model-aware prompt blocks for Claude and GPT placement
 - Evaluates response adherence with reproducible tiered scoring
 
@@ -30,6 +30,6 @@ pnpm exec traits eval my-profile.yaml --tier 1
 ## Learn Fast
 
 1. [Interactive Showcase](/showcase)
-2. [Schema Reference (`v1.4`)](/schema-reference)
+2. [Schema Reference (`v1.5`)](/schema-reference)
 3. [Write Your First Profile](/guides/first-profile)
 4. [API Reference (`@traits-dev/core`)](/api/core)
