@@ -1,6 +1,6 @@
 # @traits-dev/cli
 
-CLI for traits.dev voice profile workflows: init, validate, compile, eval, and import.
+CLI for traits.dev voice profile workflows: init, validate, compile, eval, import, and migrate.
 
 ## Install
 
@@ -13,7 +13,9 @@ pnpm add -D @traits-dev/cli
 ```bash
 traits init --template resolve profiles/resolve.yaml
 traits validate profiles/resolve.yaml
+traits validate profiles/resolve.yaml --format sarif
 traits compile profiles/resolve.yaml --model gpt-4o
+traits migrate profiles/legacy-v1-4.yaml
 traits eval profiles/resolve.yaml --tier 1
 ```
 

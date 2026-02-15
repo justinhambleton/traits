@@ -52,6 +52,17 @@ test("traits --json validate supports global json flag", () => {
   assert.equal(output.isValid, true);
 });
 
+test("traits validate --format sarif emits SARIF output", () => {
+  const result = runCLI(["validate", "profiles/haven.yaml", "--format", "sarif"]);
+  assert.equal(result.status, 1);
+  const output = JSON.parse(result.stdout);
+  assert.equal(output.version, "2.1.0");
+  assert.ok(Array.isArray(output.runs));
+  assert.equal(output.runs[0].tool.driver.name, "traits.dev");
+  assert.ok(Array.isArray(output.runs[0].results));
+  assert.ok(output.runs[0].results.some((entry) => entry.ruleId === "S002"));
+});
+
 test("traits --version prints CLI package version", () => {
   const result = runCLI(["--version"]);
   assert.equal(result.status, 0);
@@ -77,4 +88,10 @@ test("traits validate fails on unknown option", () => {
   const result = runCLI(["validate", "profiles/resolve.yaml", "--unknown"]);
   assert.equal(result.status, 1);
   assert.match(result.stderr, /Unknown option "--unknown"/);
+});
+
+test("traits validate rejects invalid --format value", () => {
+  const result = runCLI(["validate", "profiles/resolve.yaml", "--format", "yaml"]);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /Invalid "--format" value/);
 });

@@ -371,3 +371,9 @@ Decision log for implementation-critical choices. Keep entries brief and factual
 - Why: Teams need quick prompt-size awareness without introducing tokenizer dependencies or altering compile output semantics.
 - Files: `packages/cli/src/commands/compile.ts`, `packages/cli/test/compile.test.js`, `docs/planning/development-memory.md`
 - Follow-up: If users request tighter budgeting, add provider-specific tokenizer mode as an optional advanced path while keeping current estimator as deterministic default.
+
+- Date: 2026-02-15
+- Decision: Start Phase 5 by adding `traits migrate` for non-destructive schema upgrade (`v1.4 -> v1.5`) and adding `--format sarif` to `traits validate` for CI code-scanning integration.
+- Why: Migration tooling reduces adoption friction for legacy profiles, while SARIF output enables native GitHub Code Scanning and other CI systems to consume validation findings programmatically.
+- Files: `packages/cli/src/commands/migrate.ts`, `packages/cli/src/commands/validate.ts`, `packages/cli/src/bin/traits.ts`, `packages/cli/test/migrate.test.js`, `packages/cli/test/validate.test.js`, `packages/cli/README.md`, `docs/planning/development-memory.md`
+- Follow-up: Add `traits migrate` docs/examples in site guides and consider future `--to v1.6` migration path once v1.5-to-v1.6 defaults are finalized.

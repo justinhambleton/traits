@@ -7,6 +7,7 @@ import { compileHelp, runCompile } from "../commands/compile.js";
 import { evalHelp, runEval } from "../commands/eval.js";
 import { initHelp, runInit } from "../commands/init.js";
 import { importHelp, runImport } from "../commands/import.js";
+import { migrateHelp, runMigrate } from "../commands/migrate.js";
 import { runValidate, validateHelp } from "../commands/validate.js";
 import type { CommandIO, OutputWriter } from "../types.js";
 
@@ -52,6 +53,7 @@ function printRootUsage(out: OutputWriter = process.stdout): void {
       "  compile <profile-path>    Compile a profile for a target model",
       "  eval <profile-path>       Evaluate profile responses (Tier 1 scaffold)",
       "  import [prompt-path]      Import a profile from an existing system prompt",
+      "  migrate <profile-path>    Migrate profile schema (v1.4 -> v1.5)",
       "  validate <profile-path>   Validate a voice profile",
       "",
       "Global flags:",
@@ -127,7 +129,8 @@ function withGlobalFlags(command: string, commandArgs: string[], flags: GlobalFl
     (command === "validate" ||
       command === "compile" ||
       command === "eval" ||
-      command === "import") &&
+      command === "import" ||
+      command === "migrate") &&
     flags.json &&
     !args.includes("--json")
   ) {
@@ -202,6 +205,14 @@ async function run(argv: string[], io: CommandIO = process): Promise<number> {
       return 0;
     }
     return runImport(commandArgs, io);
+  }
+
+  if (command === "migrate") {
+    if (commandArgs.includes("--help") || commandArgs.includes("-h")) {
+      migrateHelp(io.stdout);
+      return 0;
+    }
+    return runMigrate(commandArgs, io);
   }
 
   io.stderr.write(`Error: Unknown command "${command}"\n\n`);
