@@ -3,7 +3,7 @@ title: Playground
 ---
 
 <script setup>
-import PlaygroundPage from "./components/PlaygroundPage.vue";
+import PlaygroundPage from "../components/PlaygroundPage.vue";
 </script>
 
 # Playground

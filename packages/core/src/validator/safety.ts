@@ -165,6 +165,20 @@ function collectS005Candidates(profile: PersonalityProfile): TextCandidate[] {
 
 function collectS008Candidates(profile: PersonalityProfile): TextCandidate[] {
   const candidates: TextCandidate[] = [];
+
+  if (profile?.identity?.role) {
+    candidates.push({
+      location: "identity.role",
+      text: normalizeText(profile.identity.role)
+    });
+  }
+  if (profile?.identity?.backstory) {
+    candidates.push({
+      location: "identity.backstory",
+      text: normalizeText(profile.identity.backstory)
+    });
+  }
+
   asArray(profile?.behavioral_rules).forEach((ruleEntry, idx) => {
     const rule = ruleConstraintText(ruleEntry);
     if (!rule) return;
@@ -173,6 +187,18 @@ function collectS008Candidates(profile: PersonalityProfile): TextCandidate[] {
       text: normalizeText(rule)
     });
   });
+
+  asArray<ContextAdaptation>(profile?.context_adaptations).forEach(
+    (adaptation, adaptationIdx) => {
+      asArray<string>(adaptation?.inject).forEach((rule, injectIdx) => {
+        candidates.push({
+          location: `context_adaptations[${adaptationIdx}].inject[${injectIdx}]`,
+          text: normalizeText(rule)
+        });
+      });
+    }
+  );
+
   return candidates.filter((item) => item.text.length > 0);
 }
 

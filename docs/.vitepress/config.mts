@@ -6,6 +6,7 @@ const docsBase =
 
 export default defineConfig({
   base: docsBase,
+  cleanUrls: true,
   title: "traits.dev",
   description:
     "Schema-driven voice and behavioral policy for production AI agents.",
@@ -14,7 +15,7 @@ export default defineConfig({
   themeConfig: {
     nav: [
       { text: "Overview", link: "/" },
-      { text: "Playground", link: "/playground" },
+      { text: "Playground", link: "/playground/" },
       { text: "Schema Reference", link: "/schema-reference" },
       { text: "Guides", link: "/guides/first-profile" },
       { text: "API", link: "/api/core" }
@@ -25,7 +26,7 @@ export default defineConfig({
           text: "Getting Started",
           items: [
             { text: "Overview", link: "/" },
-            { text: "Playground", link: "/playground" },
+            { text: "Playground", link: "/playground/" },
             { text: "Schema Reference", link: "/schema-reference" }
           ]
         }

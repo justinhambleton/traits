@@ -299,6 +299,97 @@ capabilities:
   );
 });
 
+test("validateProfile: S008 warns on action claims in identity.backstory", () => {
+  withTempProfile(
+    `
+schema: "v1.5"
+meta:
+  name: "s008-backstory"
+  version: "1.0.0"
+  description: "Synthetic profile for S008 backstory coverage"
+identity:
+  role: "Test role"
+  backstory: "I will escalate every unresolved issue for the user."
+voice:
+  formality: "medium"
+  warmth: "medium"
+  verbosity: "medium"
+  directness: "medium"
+  empathy: "medium"
+  humor:
+    target: "low"
+    style: "dry"
+behavioral_rules:
+  - "Keep responses clear."
+capabilities:
+  tools: []
+  constraints:
+    - "Never claim actions without tool confirmation"
+  handoff:
+    trigger: "Needs account operation"
+    action: "Hand off to human support"
+`,
+    (filePath) => {
+      const result = validateProfile(filePath, { bundledProfilesDir: PROFILES_DIR });
+      const s008Warnings = result.warnings.filter((diagnostic) => diagnostic.code === "S008");
+      assert.equal(s008Warnings.length, 1);
+      assert.ok(
+        s008Warnings.some((diagnostic) =>
+          String(diagnostic.location).startsWith("identity.backstory")
+        )
+      );
+      assert.equal(result.errors.length, 0);
+    }
+  );
+});
+
+test("validateProfile: S008 warns on action claims in context_adaptations.inject", () => {
+  withTempProfile(
+    `
+schema: "v1.5"
+meta:
+  name: "s008-context-inject"
+  version: "1.0.0"
+  description: "Synthetic profile for S008 context inject coverage"
+identity:
+  role: "Test role"
+voice:
+  formality: "medium"
+  warmth: "medium"
+  verbosity: "medium"
+  directness: "medium"
+  empathy: "medium"
+  humor:
+    target: "low"
+    style: "dry"
+behavioral_rules:
+  - "Keep responses clear."
+context_adaptations:
+  - when: "vip_user"
+    inject:
+      - "I will schedule this appointment immediately."
+capabilities:
+  tools: []
+  constraints:
+    - "Never claim actions without tool confirmation"
+  handoff:
+    trigger: "Needs account operation"
+    action: "Hand off to human support"
+`,
+    (filePath) => {
+      const result = validateProfile(filePath, { bundledProfilesDir: PROFILES_DIR });
+      const s008Warnings = result.warnings.filter((diagnostic) => diagnostic.code === "S008");
+      assert.equal(s008Warnings.length, 1);
+      assert.ok(
+        s008Warnings.some((diagnostic) =>
+          String(diagnostic.location).startsWith("context_adaptations[0].inject[0]")
+        )
+      );
+      assert.equal(result.errors.length, 0);
+    }
+  );
+});
+
 test("validateProfile: S002 re-evaluates when context adaptation introduces risky envelope", () => {
   withTempProfile(
     `

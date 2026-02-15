@@ -248,7 +248,7 @@ Safety checks:
   - error on attempted removal of locked inherited behavioral rules
   - error if merged profile has fewer safety constraints than the fully merged parent chain
 - `S007` (warning): safety-named context adaptations should use `priority: 100`
-- `S008` (warning): action-claiming language in `behavioral_rules` without matching tools in `capabilities.tools`
+- `S008` (warning): action-claiming language in `identity.backstory`, `behavioral_rules`, or `context_adaptations[].inject` without matching tools in `capabilities.tools`
 
 `S004` thresholds:
 

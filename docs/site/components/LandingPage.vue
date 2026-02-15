@@ -157,7 +157,7 @@ const snippetCopied = ref(false);
 
 const links = {
   home: withBase("/"),
-  playground: withBase("/playground"),
+  playground: withBase("/playground/"),
   schema: withBase("/schema-reference"),
   guides: withBase("/guides/first-profile"),
   api: withBase("/api/core")
