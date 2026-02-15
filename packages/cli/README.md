@@ -15,7 +15,7 @@ traits init --template resolve profiles/resolve.yaml
 traits validate profiles/resolve.yaml
 traits validate profiles/resolve.yaml --format sarif
 traits compile profiles/resolve.yaml --model gpt-4o
-traits migrate profiles/legacy-v1-4.yaml
+traits migrate profiles/legacy-v1-5.yaml --to v1.6 --normalize-extends
 traits eval profiles/resolve.yaml --tier 1
 ```
 

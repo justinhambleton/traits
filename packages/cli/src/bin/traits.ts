@@ -53,7 +53,7 @@ function printRootUsage(out: OutputWriter = process.stdout): void {
       "  compile <profile-path>    Compile a profile for a target model",
       "  eval <profile-path>       Evaluate profile responses (Tier 1 scaffold)",
       "  import [prompt-path]      Import a profile from an existing system prompt",
-      "  migrate <profile-path>    Migrate profile schema (v1.4 -> v1.5)",
+      "  migrate <profile-path>    Migrate profile schema (up to v1.6)",
       "  validate <profile-path>   Validate a voice profile",
       "",
       "Global flags:",

@@ -377,3 +377,9 @@ Decision log for implementation-critical choices. Keep entries brief and factual
 - Why: Migration tooling reduces adoption friction for legacy profiles, while SARIF output enables native GitHub Code Scanning and other CI systems to consume validation findings programmatically.
 - Files: `packages/cli/src/commands/migrate.ts`, `packages/cli/src/commands/validate.ts`, `packages/cli/src/bin/traits.ts`, `packages/cli/test/migrate.test.js`, `packages/cli/test/validate.test.js`, `packages/cli/README.md`, `docs/planning/development-memory.md`
 - Follow-up: Add `traits migrate` docs/examples in site guides and consider future `--to v1.6` migration path once v1.5-to-v1.6 defaults are finalized.
+
+- Date: 2026-02-15
+- Decision: Extend `traits migrate` to support schema upgrade paths through `v1.6` (default target), including direct `v1.5 -> v1.6`, optional `--normalize-extends` for single-string `extends`, and explicit source/target guardrails.
+- Why: Adoption feedback showed teams already on `v1.5` lacked an automated path to `v1.6` composition features (array `extends`, locked constraints). Making `v1.6` the default target removes manual YAML edits while keeping `v1.4 -> v1.5` available via `--to v1.5`.
+- Files: `packages/cli/src/commands/migrate.ts`, `packages/cli/src/bin/traits.ts`, `packages/cli/test/migrate.test.js`, `packages/cli/README.md`, `docs/planning/development-memory.md`
+- Follow-up: Add site docs for migration pathways (`v1.4 -> v1.5`, `v1.5 -> v1.6`, `--normalize-extends`) in guides so users discover upgrade options outside CLI help.
