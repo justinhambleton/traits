@@ -1,5 +1,5 @@
 import { validateProfile } from "../validator/engine.js";
-import { asArray, DIMENSIONS } from "../utils.js";
+import { asArray, DIMENSIONS, normalizeRuleConstraints } from "../utils.js";
 import { anthropicJudge } from "./providers/anthropic.js";
 import { openAIJudge } from "./providers/openai.js";
 import type { PersonalityProfile, ValidationResult } from "../types.js";
@@ -198,7 +198,9 @@ function buildJudgeUserPrompt(profile: PersonalityProfile, sample: EvalSample): 
   const targets = collectVoiceTargets(profile);
   const preferredTerms = asArray<string>(profile?.vocabulary?.preferred_terms);
   const forbiddenTerms = asArray<string>(profile?.vocabulary?.forbidden_terms);
-  const behavioralRules = asArray<string>(profile?.behavioral_rules);
+  const behavioralRules = normalizeRuleConstraints(profile?.behavioral_rules).map(
+    (entry) => entry.rule
+  );
 
   return [
     `Profile: ${profile?.meta?.name ?? "unknown"}`,

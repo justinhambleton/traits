@@ -63,6 +63,62 @@ test("context adaptation merge fixture replaces same when and appends new keys",
   assert.ok(vip.inject.some((line) => line.includes("dedicated account manager")));
 });
 
+test("array extends fixture merges parents left-to-right before child overlay", () => {
+  const result = resolveExtends(fixture("_extends-array-child.yaml"), {
+    bundledProfilesDir: PROFILES_DIR
+  });
+
+  assert.equal(result.diagnostics.errors.length, 0);
+  assert.equal(result.diagnostics.warnings.length, 0);
+  assert.equal(result.parentPaths.length, 3);
+  assert.equal(path.basename(result.parentPaths[0]), "_extends-array-base.yaml");
+  assert.equal(path.basename(result.parentPaths[1]), "_extends-array-domain.yaml");
+  assert.equal(path.basename(result.parentPaths[2]), "_extends-array-channel.yaml");
+
+  assert.equal(result.profile.voice.formality, "low");
+  assert.equal(result.profile.voice.warmth, "very-high");
+  assert.deepEqual(result.profile.behavioral_rules, [
+    "Rule base safety",
+    "Rule shared guidance",
+    "Rule domain guardrails",
+    "Rule channel delivery",
+    "Rule child addition"
+  ]);
+  assert.deepEqual(result.profile.vocabulary.preferred_terms, [
+    "base-term",
+    "domain-term",
+    "channel-term",
+    "child-term"
+  ]);
+  assert.deepEqual(result.profile.vocabulary.forbidden_terms, [
+    "base-forbidden",
+    "domain-forbidden",
+    "channel-forbidden",
+    "child-forbidden"
+  ]);
+
+  const adaptationWhenKeys = result.profile.context_adaptations.map((adaptation) => adaptation.when);
+  assert.deepEqual(adaptationWhenKeys, ["shared", "base_only", "domain_only", "child_only"]);
+  const shared = result.profile.context_adaptations.find((adaptation) => adaptation.when === "shared");
+  assert.deepEqual(shared.inject, ["shared inject from child"]);
+});
+
+test("locked behavioral rules survive explicit child removals during merge", () => {
+  const result = resolveExtends(fixture("_extends-locked-removal-test.yaml"), {
+    bundledProfilesDir: PROFILES_DIR
+  });
+
+  assert.equal(result.diagnostics.errors.length, 0);
+  assert.equal(result.diagnostics.warnings.length, 0);
+
+  const rules = result.profile.behavioral_rules;
+  assert.equal(rules.length, 1);
+  assert.deepEqual(rules[0], {
+    rule: "Never claim actions without tool confirmation",
+    locked: true
+  });
+});
+
 test("context conflict semantics apply priority then array-order with deterministic output", () => {
   const haven = resolveExtends(path.join(PROFILES_DIR, "haven.yaml"), {
     bundledProfilesDir: PROFILES_DIR

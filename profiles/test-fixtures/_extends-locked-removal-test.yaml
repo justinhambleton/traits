@@ -1,0 +1,14 @@
+schema: "v1.6"
+extends: "_extends-locked-parent"
+
+meta:
+  name: "_extends-locked-removal-test"
+  version: "1.0.0"
+  description: "Child fixture that attempts to remove locked inherited behavioral rule"
+
+voice:
+  directness: "high"
+
+behavioral_rules_remove:
+  - "Never claim actions without tool confirmation"
+  - "Ask one question at a time"

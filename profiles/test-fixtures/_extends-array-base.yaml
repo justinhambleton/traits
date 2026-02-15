@@ -1,0 +1,41 @@
+# Test fixture parent A for array extends ordering.
+# This file is the left-most parent in the chain.
+
+schema: "v1.6"
+
+meta:
+  name: "_extends-array-base"
+  version: "1.0.0"
+  description: "Array extends base parent fixture"
+
+identity:
+  role: "Base role"
+  backstory: "Base profile for extends array ordering tests."
+
+voice:
+  formality: "high"
+  warmth: "medium"
+  verbosity: "medium"
+  directness: "medium"
+  empathy: "medium"
+  humor:
+    target: "low"
+    style: "dry"
+
+vocabulary:
+  preferred_terms:
+    - "base-term"
+  forbidden_terms:
+    - "base-forbidden"
+
+behavioral_rules:
+  - "Rule base safety"
+  - "Rule shared guidance"
+
+context_adaptations:
+  - when: "shared"
+    inject:
+      - "shared inject from base"
+  - when: "base_only"
+    inject:
+      - "base only inject"

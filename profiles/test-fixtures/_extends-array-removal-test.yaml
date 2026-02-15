@@ -1,0 +1,23 @@
+# Test fixture: S006 should validate against the fully merged parent chain
+# when extends uses an array.
+
+schema: "v1.6"
+extends:
+  - "_extends-array-base"
+  - "_extends-array-domain"
+  - "_extends-array-channel"
+
+meta:
+  name: "_extends-array-removal-test"
+  version: "1.0.0"
+  description: "Test fixture — validates S006 against merged parent chain"
+
+voice:
+  empathy: "high"
+
+behavioral_rules_remove:
+  - "Rule domain guardrails"
+
+vocabulary:
+  forbidden_terms_remove:
+    - "domain-forbidden"

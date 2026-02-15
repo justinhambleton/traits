@@ -1,0 +1,35 @@
+# Test fixture parent B for array extends ordering.
+# This file overlays the base parent.
+
+schema: "v1.6"
+
+meta:
+  name: "_extends-array-domain"
+  version: "1.0.0"
+  description: "Array extends domain parent fixture"
+
+identity:
+  backstory: "Domain overlay profile for extends array ordering tests."
+
+voice:
+  formality: "medium"
+  directness: "high"
+
+vocabulary:
+  preferred_terms:
+    - "domain-term"
+    - "BASE-TERM"
+  forbidden_terms:
+    - "domain-forbidden"
+
+behavioral_rules:
+  - "Rule domain guardrails"
+  - "Rule shared guidance"
+
+context_adaptations:
+  - when: "shared"
+    inject:
+      - "shared inject from domain"
+  - when: "domain_only"
+    inject:
+      - "domain only inject"

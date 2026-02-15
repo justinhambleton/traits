@@ -1,12 +1,12 @@
-# Voice Profile & Behavioral Policy Schema Reference (`v1.5`)
+# Voice Profile & Behavioral Policy Schema Reference (`v1.6`)
 
 This page documents the implemented voice profile and behavioral policy schema used by `@traits-dev/core`.
 
 ## Schema version
 
-- Supported: `schema: "v1.4"` and `schema: "v1.5"`.
+- Supported: `schema: "v1.4"`, `schema: "v1.5"`, and `schema: "v1.6"`.
 - Any other schema value fails validation (`V001`).
-- `capabilities` is available only in `v1.5`.
+- `capabilities` is available in `v1.5` and `v1.6`.
 
 ## Top-level structure
 
@@ -22,7 +22,7 @@ Optional sections:
 - `vocabulary`
 - `behavioral_rules`
 - `context_adaptations`
-- `capabilities` (`v1.5` only)
+- `capabilities` (`v1.5+`)
 - `localization`
 - `channel_adaptations`
 - `extends`
@@ -121,12 +121,15 @@ Optional object with:
 
 ## `behavioral_rules`
 
-- Optional `string[]`
+- Optional array of:
+  - `string` (existing)
+  - `{ rule: string, locked?: boolean }` (`v1.6`)
 - Rules are included in compile output and safety-scanned.
+- Locked rules are preserved during `extends` merge and cannot be removed by child profiles.
 
-## `capabilities` (`v1.5`)
+## `capabilities` (`v1.5+`)
 
-Optional object (only valid when `schema: "v1.5"`):
+Optional object (valid when `schema: "v1.5"` or `schema: "v1.6"`):
 
 ```yaml
 capabilities:
@@ -142,7 +145,7 @@ capabilities:
 Fields:
 
 - `tools: string[]`
-- `constraints: string[]`
+- `constraints: Array<string | { rule: string, locked?: boolean }>`
 - `handoff.trigger: string`
 - `handoff.action: string`
 
@@ -186,10 +189,22 @@ Net effect: higher priority overrides lower priority deterministically.
 
 ## `extends` and merge semantics
 
-`extends` is single-inheritance. Child resolution order is:
+`extends` accepts either:
+
+- `extends: "parent-name"` (single parent)
+- `extends: ["parent-a", "parent-b", "parent-c"]` (multi-parent chain; `v1.6` only)
+
+Resolution search order for each parent name:
 
 1. Sibling directory of the child profile.
 2. Bundled starter profiles (`profiles/` in the SDK package).
+
+For array form, parent profiles are merged left to right before the child is applied:
+
+1. Start with the first parent as base.
+2. Merge the second parent on top.
+3. Merge each next parent in sequence.
+4. Merge the child last.
 
 Merge rules:
 
@@ -208,6 +223,11 @@ Escape hatches:
 - `vocabulary.forbidden_terms_remove`
 - `context_adaptations_remove`
 
+Locked rule behavior (`v1.6`):
+
+- Locked behavioral rules are preserved during merge, even if listed in `behavioral_rules_remove`.
+- Attempting to remove a locked inherited behavioral rule triggers `S006` error.
+
 ## Safety and validation checks
 
 Schema checks:
@@ -225,7 +245,8 @@ Safety checks:
 - `S005` (warning): prompt-injection-like language in rule text
 - `S006` (warning/error): extends safety regression
   - warning on removal of safety-relevant arrays
-  - error if merged profile has fewer safety constraints than parent
+  - error on attempted removal of locked inherited behavioral rules
+  - error if merged profile has fewer safety constraints than the fully merged parent chain
 - `S007` (warning): safety-named context adaptations should use `priority: 100`
 - `S008` (warning): action-claiming language in `behavioral_rules` without matching tools in `capabilities.tools`
 
@@ -250,7 +271,7 @@ Constraint count includes:
 ## Minimal valid profile
 
 ```yaml
-schema: "v1.5"
+schema: "v1.6"
 meta:
   name: "example"
   version: "0.1.0"

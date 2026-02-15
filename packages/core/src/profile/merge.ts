@@ -1,8 +1,14 @@
-import { asArray, clone } from "../utils.js";
+import {
+  asArray,
+  clone,
+  normalizeRuleConstraints,
+  ruleConstraintText
+} from "../utils.js";
 import type {
   ContextAdaptation,
   PersonalityProfile,
-  ProfileCapabilities
+  ProfileCapabilities,
+  RuleConstraint
 } from "../types.js";
 import { type GenericObject } from "./types.js";
 
@@ -19,18 +25,6 @@ const PASS_THROUGH_FIELDS = new Set([
   "behavioral_rules_remove",
   "context_adaptations_remove"
 ]);
-
-function dedupExact<T>(items: T[]): T[] {
-  const seen = new Set<string>();
-  const out: T[] = [];
-  for (const item of items) {
-    const key = String(item);
-    if (seen.has(key)) continue;
-    seen.add(key);
-    out.push(item);
-  }
-  return out;
-}
 
 function dedupCaseInsensitive(items: string[]): string[] {
   const seen = new Set<string>();
@@ -93,8 +87,36 @@ function mergeVocabulary(
   return merged as NonNullable<PersonalityProfile["vocabulary"]>;
 }
 
-function mergeBehavioralRules(parentRules: unknown = [], childRules: unknown = []): string[] {
-  return dedupExact([...asArray<string>(parentRules), ...asArray<string>(childRules)]);
+function mergeRuleConstraints(
+  parentRules: unknown = [],
+  childRules: unknown = [],
+  options: { caseInsensitive: boolean }
+): RuleConstraint[] {
+  const out: Array<{ rule: string; locked: boolean }> = [];
+  const byKey = new Map<string, number>();
+  const combined = [
+    ...normalizeRuleConstraints(parentRules),
+    ...normalizeRuleConstraints(childRules)
+  ];
+
+  for (const entry of combined) {
+    const key = options.caseInsensitive ? entry.rule.toLowerCase() : entry.rule;
+    const existingIndex = byKey.get(key);
+    if (existingIndex == null) {
+      byKey.set(key, out.length);
+      out.push({ rule: entry.rule, locked: entry.locked });
+      continue;
+    }
+    out[existingIndex].locked = out[existingIndex].locked || entry.locked;
+  }
+
+  return out.map((entry) =>
+    entry.locked ? { rule: entry.rule, locked: true } : entry.rule
+  );
+}
+
+function mergeBehavioralRules(parentRules: unknown = [], childRules: unknown = []): RuleConstraint[] {
+  return mergeRuleConstraints(parentRules, childRules, { caseInsensitive: false });
 }
 
 function mergeContextAdaptations(
@@ -137,14 +159,13 @@ function mergeCapabilities(
     ...asArray<string>(parentCapabilities.tools),
     ...asArray<string>(childCapabilities.tools)
   ]);
-  const mergedConstraints = dedupCaseInsensitive([
-    ...asArray<string>(parentCapabilities.constraints),
-    ...asArray<string>(childCapabilities.constraints)
-  ]);
-
   return {
     tools: mergedTools,
-    constraints: mergedConstraints,
+    constraints: mergeRuleConstraints(
+      parentCapabilities.constraints,
+      childCapabilities.constraints,
+      { caseInsensitive: true }
+    ),
     handoff: {
       trigger:
         childCapabilities.handoff?.trigger ??
@@ -179,9 +200,15 @@ function applyExplicitRemovals(
   const childAdaptationRemovals = asArray<string>(childProfile.context_adaptations_remove);
 
   if (childBehavioralRemovals.length) {
-    mergedProfile.behavioral_rules = asArray<string>(mergedProfile.behavioral_rules).filter(
-      (rule) => !childBehavioralRemovals.includes(rule)
-    );
+    mergedProfile.behavioral_rules = asArray<RuleConstraint>(
+      mergedProfile.behavioral_rules
+    ).filter((ruleEntry) => {
+      const ruleText = ruleConstraintText(ruleEntry);
+      if (!ruleText) return false;
+      if (!childBehavioralRemovals.includes(ruleText)) return true;
+      if (typeof ruleEntry === "object" && ruleEntry.locked === true) return true;
+      return false;
+    });
   }
 
   if (childForbiddenRemovals.length) {

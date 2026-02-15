@@ -362,6 +362,33 @@ test("validateProfile: S006 warns on _remove and errors on inheritance regressio
   assert.equal(result.exitCode, 2);
 });
 
+test("validateProfile: S006 uses fully merged parent chain for array extends", () => {
+  const result = validateProfile(profileFile("test-fixtures/_extends-array-removal-test.yaml"), {
+    bundledProfilesDir: PROFILES_DIR
+  });
+
+  const s006Warnings = result.warnings.filter((diagnostic) => diagnostic.code === "S006");
+  const s006Errors = result.errors.filter((diagnostic) => diagnostic.code === "S006");
+
+  assert.equal(s006Warnings.length, 2);
+  assert.equal(s006Errors.length, 1);
+  assert.equal(result.exitCode, 2);
+});
+
+test("validateProfile: S006 errors when child removes locked inherited behavioral rule", () => {
+  const result = validateProfile(profileFile("test-fixtures/_extends-locked-removal-test.yaml"), {
+    bundledProfilesDir: PROFILES_DIR
+  });
+
+  const s006Warnings = result.warnings.filter((diagnostic) => diagnostic.code === "S006");
+  const s006Errors = result.errors.filter((diagnostic) => diagnostic.code === "S006");
+
+  assert.equal(s006Warnings.length, 1);
+  assert.equal(s006Errors.length, 2);
+  assert.ok(s006Errors.some((diagnostic) => diagnostic.message.includes("locked inherited rules")));
+  assert.equal(result.exitCode, 2);
+});
+
 test("validateProfile: S007 warns when safety adaptation has missing/zero priority", () => {
   withTempProfile(
     `

@@ -214,7 +214,7 @@ type ImportOptions = {
 
 ## Public schema/result types
 
-`Level`, `DimensionName`, `HumorStyle`, `DimensionShorthand`, `DimensionObject`, `HumorDimensionObject`, `DimensionValue`, `HumorDimensionValue`, `VocabularyConstraints`, `ContextAdaptation`, `CapabilityHandoff`, `ProfileCapabilities`, `PersonalityProfile`, `ValidationDiagnostic`, `ValidationResult`, `CompiledPersonality`, `ExtendsDiagnostics`, `ExtendsResult`, `ContextResolution`.
+`Level`, `DimensionName`, `HumorStyle`, `DimensionShorthand`, `DimensionObject`, `HumorDimensionObject`, `DimensionValue`, `HumorDimensionValue`, `VocabularyConstraints`, `ContextAdaptation`, `LockedRule`, `RuleConstraint`, `CapabilityHandoff`, `ProfileCapabilities`, `PersonalityProfile`, `ValidationDiagnostic`, `ValidationResult`, `CompiledPersonality`, `ExtendsDiagnostics`, `ExtendsResult`, `ContextResolution`.
 
 ## Internal boundary
 

@@ -1,4 +1,4 @@
-import type { DimensionName, Level } from "./types.js";
+import type { DimensionName, Level, LockedRule, RuleConstraint } from "./types.js";
 
 export const LEVELS: Level[] = ["very-low", "low", "medium", "high", "very-high"];
 export const LEVEL_ORDER: Level[] = LEVELS;
@@ -37,4 +37,38 @@ export function isClaudeModel(model: unknown): boolean {
 
 export function isGptModel(model: unknown): boolean {
   return /gpt/i.test(String(model ?? ""));
+}
+
+export function isLockedRule(value: unknown): value is LockedRule {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  const candidate = value as Record<string, unknown>;
+  if (typeof candidate.rule !== "string" || candidate.rule.trim().length === 0) return false;
+  if (candidate.locked != null && typeof candidate.locked !== "boolean") return false;
+  return true;
+}
+
+export function ruleConstraintText(entry: unknown): string | null {
+  if (typeof entry === "string") {
+    const text = entry.trim();
+    return text.length > 0 ? text : null;
+  }
+  if (isLockedRule(entry)) {
+    return entry.rule.trim();
+  }
+  return null;
+}
+
+export function normalizeRuleConstraints(value: unknown): Array<{ rule: string; locked: boolean }> {
+  const out: Array<{ rule: string; locked: boolean }> = [];
+  for (const entry of asArray<RuleConstraint>(value)) {
+    if (typeof entry === "string") {
+      const text = entry.trim();
+      if (!text) continue;
+      out.push({ rule: text, locked: false });
+      continue;
+    }
+    if (!isLockedRule(entry)) continue;
+    out.push({ rule: entry.rule.trim(), locked: Boolean(entry.locked) });
+  }
+  return out;
 }

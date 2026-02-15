@@ -2,6 +2,11 @@
 
 Use `extends` when you want controlled reuse without copy-pasting full YAML.
 
+`extends` supports:
+
+- `extends: "brand-base"` (single parent)
+- `extends: ["brand-base", "domain-health", "channel-chat"]` (`v1.6`; merged left to right, then child)
+
 ## Example: `brand-base` -> `domain-health`
 
 Parent (`brand-base.yaml`):
@@ -74,6 +79,9 @@ Use removals only when there is an explicit policy reason:
 - `vocabulary.preferred_terms_remove`
 - `vocabulary.forbidden_terms_remove`
 - `context_adaptations_remove`
+
+For `schema: "v1.6"`, behavioral rules can use object entries with `locked: true`.
+Locked inherited rules cannot be removed by `behavioral_rules_remove`; validator emits `S006` error.
 
 ## Safety diagnostics in inheritance
 

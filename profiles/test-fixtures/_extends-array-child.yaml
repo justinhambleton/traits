@@ -1,0 +1,45 @@
+# Test fixture: left-to-right multi-parent extends merge.
+#
+# Extends order:
+#   1. _extends-array-base
+#   2. _extends-array-domain
+#   3. _extends-array-channel
+#
+# Expected behavior:
+# - Later parents override earlier for dimension-level replacements.
+# - Array fields append with dedup.
+# - Context adaptation with same `when` is replaced at each merge step.
+
+schema: "v1.6"
+extends:
+  - "_extends-array-base"
+  - "_extends-array-domain"
+  - "_extends-array-channel"
+
+meta:
+  name: "_extends-array-child"
+  version: "1.0.0"
+  description: "Test fixture — validates left-to-right array extends merge order"
+
+identity:
+  backstory: "Child overlay for multi-parent extends."
+
+voice:
+  warmth: "very-high"
+
+vocabulary:
+  preferred_terms:
+    - "child-term"
+  forbidden_terms:
+    - "child-forbidden"
+
+behavioral_rules:
+  - "Rule child addition"
+
+context_adaptations:
+  - when: "shared"
+    inject:
+      - "shared inject from child"
+  - when: "child_only"
+    inject:
+      - "child only inject"

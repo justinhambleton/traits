@@ -4,6 +4,7 @@ import {
   clone,
   isClaudeModel,
   isGptModel,
+  normalizeRuleConstraints,
   PROTECTED_REFUSAL_TERMS
 } from "../utils.js";
 import { validateProfile } from "../validator/engine.js";
@@ -13,7 +14,8 @@ import type {
   CompiledPersonality,
   ContextResolution,
   DimensionValue,
-  PersonalityProfile
+  PersonalityProfile,
+  RuleConstraint
 } from "../types.js";
 
 export type CompileOptions = {
@@ -70,7 +72,7 @@ function applyContextAdjustments(
   }
 
   const behavioralRules = [
-    ...asArray<string>(effective.behavioral_rules),
+    ...asArray<RuleConstraint>(effective.behavioral_rules),
     ...resolved.injectRules
   ];
   effective.behavioral_rules = behavioralRules;
@@ -192,7 +194,7 @@ function renderPersonalityText(
   lines.push(`Protected refusal terms (always available): ${PROTECTED_REFUSAL_TERMS.join("; ")}`);
   lines.push("");
   lines.push("[BEHAVIORAL RULES]");
-  const rules = asArray<string>(profile.behavioral_rules);
+  const rules = normalizeRuleConstraints(profile.behavioral_rules).map((entry) => entry.rule);
   if (rules.length === 0) {
     lines.push("- (none)");
   } else {
@@ -201,10 +203,12 @@ function renderPersonalityText(
     }
   }
 
-  if (profile.schema === "v1.5" && profile.capabilities) {
+  if ((profile.schema === "v1.5" || profile.schema === "v1.6") && profile.capabilities) {
     const capabilities = profile.capabilities;
     const tools = asArray<string>(capabilities.tools);
-    const constraints = asArray<string>(capabilities.constraints);
+    const constraints = normalizeRuleConstraints(capabilities.constraints).map(
+      (entry) => entry.rule
+    );
 
     lines.push("");
     lines.push("[CAPABILITY BOUNDARIES]");

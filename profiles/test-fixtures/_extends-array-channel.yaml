@@ -1,0 +1,30 @@
+# Test fixture parent C for array extends ordering.
+# This file overlays base+domain.
+
+schema: "v1.6"
+
+meta:
+  name: "_extends-array-channel"
+  version: "1.0.0"
+  description: "Array extends channel parent fixture"
+
+identity:
+  role: "Channel role"
+
+voice:
+  formality: "low"
+  verbosity: "low"
+
+vocabulary:
+  preferred_terms:
+    - "channel-term"
+  forbidden_terms:
+    - "channel-forbidden"
+
+behavioral_rules:
+  - "Rule channel delivery"
+
+context_adaptations:
+  - when: "shared"
+    inject:
+      - "shared inject from channel"

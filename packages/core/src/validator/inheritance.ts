@@ -1,4 +1,4 @@
-import { asArray } from "../utils.js";
+import { asArray, normalizeRuleConstraints } from "../utils.js";
 import type {
   ContextAdaptation,
   PersonalityProfile,
@@ -25,6 +25,22 @@ export function checkS006(
       message:
         "Explicit behavioral_rules_remove detected. Behavioral rules are safety-relevant."
     });
+
+    const lockedParentRules = new Set(
+      normalizeRuleConstraints(parentProfile.behavioral_rules)
+        .filter((rule) => rule.locked)
+        .map((rule) => rule.rule)
+    );
+    const lockedRemovals = childBehavioralRemovals.filter((rule) =>
+      lockedParentRules.has(rule)
+    );
+    if (lockedRemovals.length > 0) {
+      diagnostics.push({
+        code: "S006",
+        severity: "error",
+        message: `behavioral_rules_remove attempted to remove locked inherited rules: ${lockedRemovals.join("; ")}`
+      });
+    }
   }
 
   if (childForbiddenRemovals.length) {
@@ -36,9 +52,9 @@ export function checkS006(
     });
   }
 
-  const parentBehavioralCount = asArray<string>(parentProfile.behavioral_rules).length;
+  const parentBehavioralCount = normalizeRuleConstraints(parentProfile.behavioral_rules).length;
   const parentForbiddenCount = asArray<string>(parentProfile?.vocabulary?.forbidden_terms).length;
-  const mergedBehavioralCount = asArray<string>(mergedProfile.behavioral_rules).length;
+  const mergedBehavioralCount = normalizeRuleConstraints(mergedProfile.behavioral_rules).length;
   const mergedForbiddenCount = asArray<string>(mergedProfile?.vocabulary?.forbidden_terms).length;
 
   if (mergedBehavioralCount < parentBehavioralCount || mergedForbiddenCount < parentForbiddenCount) {

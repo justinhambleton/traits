@@ -1,5 +1,5 @@
 import { validateProfile } from "../validator/engine.js";
-import { asArray } from "../utils.js";
+import { asArray, normalizeRuleConstraints } from "../utils.js";
 import type { PersonalityProfile, ValidationResult } from "../types.js";
 import type { EvalSample } from "./types.js";
 
@@ -65,7 +65,7 @@ export function evaluateTier1Response(
     pass: forbiddenMatches === 0
   };
 
-  const behavioralRules = asArray<string>(profile?.behavioral_rules);
+  const behavioralRules = normalizeRuleConstraints(profile?.behavioral_rules);
   const structureCheck = {
     behavioral_rule_count: behavioralRules.length,
     response_non_empty: response.trim().length > 0,

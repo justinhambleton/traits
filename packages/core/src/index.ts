@@ -20,8 +20,10 @@ export type {
   HumorDimensionValue,
   HumorStyle,
   Level,
+  LockedRule,
   PersonalityProfile,
   ProfileCapabilities,
+  RuleConstraint,
   ValidationDiagnostic,
   ValidationResult,
   VocabularyConstraints

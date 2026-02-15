@@ -2,7 +2,7 @@ import { DIMENSIONS, LEVEL_INDEX } from "../utils.js";
 import type { ValidationCheckSummary, ValidationDiagnostic } from "../types.js";
 
 const HUMOR_STYLES = ["none", "dry", "subtle-wit", "playful"];
-const SUPPORTED_SCHEMAS = new Set(["v1.4", "v1.5"]);
+const SUPPORTED_SCHEMAS = new Set(["v1.4", "v1.5", "v1.6"]);
 
 const TOP_LEVEL_KEYS = new Set([
   "schema",
@@ -41,6 +41,14 @@ function isStringArray(value: unknown): value is string[] {
   return Array.isArray(value) && value.every((item) => typeof item === "string");
 }
 
+function isNonEmptyStringArray(value: unknown): value is string[] {
+  return (
+    Array.isArray(value) &&
+    value.length > 0 &&
+    value.every((item) => typeof item === "string" && item.trim().length > 0)
+  );
+}
+
 function pushDiagnostic(
   target: ValidationDiagnostic[],
   code: string,
@@ -77,6 +85,76 @@ function validateScalarField(
       `${location}.${key}`
     );
   }
+}
+
+function validateRuleConstraintArray(
+  value: unknown,
+  field: string,
+  diagnostics: ValidationDiagnostic[],
+  options: { allowObjects: boolean }
+): void {
+  if (!Array.isArray(value)) {
+    pushDiagnostic(
+      diagnostics,
+      "V001",
+      `Expected "${field}" to be an array`,
+      field
+    );
+    return;
+  }
+
+  value.forEach((entry, idx) => {
+    const location = `${field}[${idx}]`;
+    if (typeof entry === "string") return;
+    if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
+      pushDiagnostic(
+        diagnostics,
+        "V001",
+        `Expected "${location}" to be a string or { rule, locked? } object`,
+        location
+      );
+      return;
+    }
+
+    if (!options.allowObjects) {
+      pushDiagnostic(
+        diagnostics,
+        "V001",
+        `Object rule entries in "${field}" require schema version "v1.6"`,
+        location
+      );
+      return;
+    }
+
+    const ruleObject = entry as Record<string, unknown>;
+    for (const key of Object.keys(ruleObject)) {
+      if (key !== "rule" && key !== "locked") {
+        pushDiagnostic(
+          diagnostics,
+          "V001",
+          `Unknown key "${key}" in ${location}`,
+          `${location}.${key}`
+        );
+      }
+    }
+
+    if (!isString(ruleObject.rule)) {
+      pushDiagnostic(
+        diagnostics,
+        "V001",
+        `Expected "${location}.rule" to be a non-empty string`,
+        `${location}.rule`
+      );
+    }
+    if (ruleObject.locked != null && typeof ruleObject.locked !== "boolean") {
+      pushDiagnostic(
+        diagnostics,
+        "V001",
+        `Expected "${location}.locked" to be a boolean`,
+        `${location}.locked`
+      );
+    }
+  });
 }
 
 function validateDimensionValue(
@@ -261,13 +339,25 @@ export function validateSchema(profile: any): {
     );
   }
 
-  if (profile.extends != null && !isString(profile.extends)) {
-    pushDiagnostic(
-      structureDiagnostics,
-      "V001",
-      `Expected "extends" to be a non-empty string`,
-      "extends"
-    );
+  if (profile.extends != null) {
+    const isStringExtends = isString(profile.extends);
+    const isArrayExtends = isNonEmptyStringArray(profile.extends);
+    if (!isStringExtends && !isArrayExtends) {
+      pushDiagnostic(
+        structureDiagnostics,
+        "V001",
+        `Expected "extends" to be a non-empty string or non-empty array of non-empty strings`,
+        "extends"
+      );
+    }
+    if (Array.isArray(profile.extends) && profile.schema !== "v1.6") {
+      pushDiagnostic(
+        structureDiagnostics,
+        "V001",
+        `Array "extends" requires schema version "v1.6"`,
+        "extends"
+      );
+    }
   }
 
   if (!isObject(profile.meta)) {
@@ -414,21 +504,18 @@ export function validateSchema(profile: any): {
     }
   }
 
-  if (profile.behavioral_rules != null && !isStringArray(profile.behavioral_rules)) {
-    pushDiagnostic(
-      structureDiagnostics,
-      "V001",
-      `Expected "behavioral_rules" to be an array of strings`,
-      "behavioral_rules"
-    );
+  if (profile.behavioral_rules != null) {
+    validateRuleConstraintArray(profile.behavioral_rules, "behavioral_rules", structureDiagnostics, {
+      allowObjects: profile.schema === "v1.6"
+    });
   }
 
   if (profile.capabilities != null) {
-    if (profile.schema !== "v1.5") {
+    if (profile.schema !== "v1.5" && profile.schema !== "v1.6") {
       pushDiagnostic(
         structureDiagnostics,
         "V001",
-        `The "capabilities" section requires schema version "v1.5"`,
+        `The "capabilities" section requires schema version "v1.5" or "v1.6"`,
         "capabilities"
       );
     }
@@ -461,12 +548,19 @@ export function validateSchema(profile: any): {
         );
       }
 
-      if (!isStringArray(profile.capabilities.constraints)) {
+      if (profile.capabilities.constraints == null) {
         pushDiagnostic(
           structureDiagnostics,
           "V001",
-          `Expected "capabilities.constraints" to be an array of strings`,
+          `Expected "capabilities.constraints" to be an array`,
           "capabilities.constraints"
+        );
+      } else {
+        validateRuleConstraintArray(
+          profile.capabilities.constraints,
+          "capabilities.constraints",
+          structureDiagnostics,
+          { allowObjects: profile.schema === "v1.6" }
         );
       }
 

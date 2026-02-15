@@ -1,5 +1,5 @@
 import { buildS002Envelopes, gteLevel, lteLevel } from "./extremes.js";
-import { asArray, PROTECTED_REFUSAL_TERMS } from "../utils.js";
+import { asArray, PROTECTED_REFUSAL_TERMS, ruleConstraintText } from "../utils.js";
 import type {
   ContextAdaptation,
   PersonalityProfile,
@@ -100,7 +100,9 @@ function collectS001Candidates(profile: PersonalityProfile): TextCandidate[] {
     });
   }
 
-  asArray<string>(profile?.behavioral_rules).forEach((rule, idx) => {
+  asArray(profile?.behavioral_rules).forEach((ruleEntry, idx) => {
+    const rule = ruleConstraintText(ruleEntry);
+    if (!rule) return;
     candidates.push({
       location: `behavioral_rules[${idx}]`,
       text: normalizeText(rule)
@@ -124,7 +126,9 @@ function collectS001Candidates(profile: PersonalityProfile): TextCandidate[] {
 function collectS005Candidates(profile: PersonalityProfile): TextCandidate[] {
   const candidates: TextCandidate[] = [];
 
-  asArray<string>(profile?.behavioral_rules).forEach((rule, idx) => {
+  asArray(profile?.behavioral_rules).forEach((ruleEntry, idx) => {
+    const rule = ruleConstraintText(ruleEntry);
+    if (!rule) return;
     candidates.push({
       location: `behavioral_rules[${idx}]`,
       text: normalizeText(rule)
@@ -161,7 +165,9 @@ function collectS005Candidates(profile: PersonalityProfile): TextCandidate[] {
 
 function collectS008Candidates(profile: PersonalityProfile): TextCandidate[] {
   const candidates: TextCandidate[] = [];
-  asArray<string>(profile?.behavioral_rules).forEach((rule, idx) => {
+  asArray(profile?.behavioral_rules).forEach((ruleEntry, idx) => {
+    const rule = ruleConstraintText(ruleEntry);
+    if (!rule) return;
     candidates.push({
       location: `behavioral_rules[${idx}]`,
       text: normalizeText(rule)

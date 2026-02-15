@@ -192,11 +192,10 @@ export function validateProfile(
   );
 
   let s006Diagnostics: ValidationDiagnostic[] = [];
-  if (resolvedErrors.length === 0 && resolved.parentPath) {
+  if (resolvedErrors.length === 0 && resolved.parentProfile) {
     try {
       const childProfile = loadProfileFile(profilePath);
-      const parentProfile = loadProfileFile(resolved.parentPath);
-      s006Diagnostics = checkS006(parentProfile, childProfile, resolved.profile);
+      s006Diagnostics = checkS006(resolved.parentProfile, childProfile, resolved.profile);
     } catch (error) {
       s006Diagnostics = [
         {

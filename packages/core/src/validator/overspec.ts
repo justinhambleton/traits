@@ -1,4 +1,4 @@
-import { asArray } from "../utils.js";
+import { asArray, normalizeRuleConstraints } from "../utils.js";
 import type { PersonalityProfile, ValidationDiagnostic } from "../types.js";
 
 export function computeConstraintCount(profile: PersonalityProfile): {
@@ -10,7 +10,7 @@ export function computeConstraintCount(profile: PersonalityProfile): {
     context_adaptations: number;
   };
 } {
-  const behavioralRules = asArray<string>(profile?.behavioral_rules).length;
+  const behavioralRules = normalizeRuleConstraints(profile?.behavioral_rules).length;
   const preferredTerms = asArray<string>(profile?.vocabulary?.preferred_terms).length;
   const forbiddenTerms = asArray<string>(profile?.vocabulary?.forbidden_terms).length;
   const contextAdaptations = asArray(profile?.context_adaptations).length;

@@ -150,6 +150,105 @@ test("schema validation accepts v1.5 capabilities block", () => {
   assert.equal(result.checks.schema_structure.status, "pass");
 });
 
+test("schema validation accepts v1.6 array extends", () => {
+  const profile = baseProfile();
+  profile.schema = "v1.6";
+  profile.extends = ["brand-base", "domain-support", "channel-chat"];
+
+  const result = validateResolvedProfile(profile);
+  assert.equal(result.errors.length, 0);
+  assert.equal(result.checks.schema_structure.status, "pass");
+});
+
+test("schema validation rejects array extends before v1.6", () => {
+  const profile = baseProfile();
+  profile.schema = "v1.5";
+  profile.extends = ["brand-base", "domain-support"];
+
+  const result = validateResolvedProfile(profile);
+  assert.ok(
+    result.errors.some(
+      (diagnostic) =>
+        diagnostic.code === "V001" &&
+        String(diagnostic.message).includes('Array "extends" requires schema version "v1.6"')
+    )
+  );
+});
+
+test("schema validation accepts locked rule objects on v1.6", () => {
+  const profile = baseProfile();
+  profile.schema = "v1.6";
+  profile.behavioral_rules = [
+    {
+      rule: "Never claim actions without tool confirmation",
+      locked: true
+    }
+  ];
+  profile.capabilities = {
+    tools: [],
+    constraints: [
+      {
+        rule: "Never claim completed account operations without tool confirmation.",
+        locked: true
+      }
+    ],
+    handoff: {
+      trigger: "Needs unavailable operation",
+      action: "Offer human handoff"
+    }
+  };
+
+  const result = validateResolvedProfile(profile);
+  assert.equal(result.errors.length, 0);
+});
+
+test("schema validation rejects locked behavioral rule objects before v1.6", () => {
+  const profile = baseProfile();
+  profile.schema = "v1.5";
+  profile.behavioral_rules = [
+    {
+      rule: "Never claim actions without tool confirmation",
+      locked: true
+    }
+  ];
+
+  const result = validateResolvedProfile(profile);
+  assert.ok(
+    result.errors.some(
+      (diagnostic) =>
+        diagnostic.code === "V001" &&
+        String(diagnostic.message).includes('Object rule entries in "behavioral_rules" require schema version "v1.6"')
+    )
+  );
+});
+
+test("schema validation rejects locked capabilities constraints objects before v1.6", () => {
+  const profile = baseProfile();
+  profile.schema = "v1.5";
+  profile.capabilities = {
+    tools: [],
+    constraints: [
+      {
+        rule: "Never claim completed account operations without tool confirmation.",
+        locked: true
+      }
+    ],
+    handoff: {
+      trigger: "Needs unavailable operation",
+      action: "Offer human handoff"
+    }
+  };
+
+  const result = validateResolvedProfile(profile);
+  assert.ok(
+    result.errors.some(
+      (diagnostic) =>
+        diagnostic.code === "V001" &&
+        String(diagnostic.message).includes('Object rule entries in "capabilities.constraints" require schema version "v1.6"')
+    )
+  );
+});
+
 test("schema validation rejects capabilities on v1.4 profiles", () => {
   const profile = baseProfile();
   profile.capabilities = {
@@ -166,7 +265,7 @@ test("schema validation rejects capabilities on v1.4 profiles", () => {
     result.errors.some(
       (diagnostic) =>
         diagnostic.code === "V001" &&
-        String(diagnostic.message).includes('requires schema version "v1.5"')
+        String(diagnostic.message).includes('requires schema version "v1.5" or "v1.6"')
     )
   );
 });

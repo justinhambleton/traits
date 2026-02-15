@@ -40,6 +40,13 @@ export interface ContextAdaptation {
   priority?: number;
 }
 
+export interface LockedRule {
+  rule: string;
+  locked?: boolean;
+}
+
+export type RuleConstraint = string | LockedRule;
+
 export interface CapabilityHandoff {
   trigger: string;
   action: string;
@@ -47,7 +54,7 @@ export interface CapabilityHandoff {
 
 export interface ProfileCapabilities {
   tools: string[];
-  constraints: string[];
+  constraints: RuleConstraint[];
   handoff: CapabilityHandoff;
 }
 
@@ -77,12 +84,12 @@ export interface PersonalityProfile {
     [key: string]: DimensionValue | HumorDimensionValue | undefined;
   };
   vocabulary?: VocabularyConstraints;
-  behavioral_rules?: string[];
+  behavioral_rules?: RuleConstraint[];
   context_adaptations?: ContextAdaptation[];
   capabilities?: ProfileCapabilities;
   localization?: Record<string, unknown>;
   channel_adaptations?: Record<string, unknown>;
-  extends?: string;
+  extends?: string | string[];
   behavioral_rules_remove?: string[];
   context_adaptations_remove?: string[];
   [key: string]: unknown;
@@ -166,6 +173,8 @@ export interface ExtendsDiagnostics {
 export interface ExtendsResult {
   profile: PersonalityProfile;
   parentPath: string | null;
+  parentPaths: string[];
+  parentProfile: PersonalityProfile | null;
   diagnostics: ExtendsDiagnostics;
 }
 
