@@ -14,6 +14,8 @@ type CompileArgs = {
   model: string | null;
   strict: boolean;
   json: boolean;
+  budget: boolean;
+  budgetLimit: number | null;
   explain: boolean;
   verbose: boolean;
   noColor: boolean;
@@ -45,6 +47,8 @@ function printCompileUsage(out: OutputWriter = process.stderr): void {
       "  --model <model>           Model target (required)",
       "  --json                    Output structured JSON",
       "  --strict                  Treat warnings as compile-blocking",
+      "  --budget                  Print estimated token count (chars/4)",
+      "  --budget-limit <tokens>   Warn to stderr if estimate exceeds limit",
       "  --explain                 Include compilation trace output",
       "  --context key=value       Activate context adaptation (repeatable)",
       "  --knowledge-base-dir      Directory containing compiler pattern files",
@@ -78,6 +82,8 @@ function parseCompileArgs(args: string[]): ParsedCompileArgs {
     model: null,
     strict: false,
     json: false,
+    budget: false,
+    budgetLimit: null,
     explain: false,
     verbose: false,
     noColor: false,
@@ -97,6 +103,10 @@ function parseCompileArgs(args: string[]): ParsedCompileArgs {
       result.json = true;
       continue;
     }
+    if (arg === "--budget") {
+      result.budget = true;
+      continue;
+    }
     if (arg === "--explain") {
       result.explain = true;
       continue;
@@ -113,7 +123,8 @@ function parseCompileArgs(args: string[]): ParsedCompileArgs {
       arg === "--model" ||
       arg === "--bundled-profiles-dir" ||
       arg === "--context" ||
-      arg === "--knowledge-base-dir"
+      arg === "--knowledge-base-dir" ||
+      arg === "--budget-limit"
     ) {
       const value = args[index + 1];
       if (!value) return { error: `Missing value for "${arg}"` };
@@ -123,6 +134,12 @@ function parseCompileArgs(args: string[]): ParsedCompileArgs {
         result.bundledProfilesDir = value;
       } else if (arg === "--knowledge-base-dir") {
         result.knowledgeBaseDir = value;
+      } else if (arg === "--budget-limit") {
+        const parsedBudgetLimit = Number(value);
+        if (!Number.isFinite(parsedBudgetLimit) || parsedBudgetLimit <= 0) {
+          return { error: `Invalid value for "--budget-limit": "${value}"` };
+        }
+        result.budgetLimit = Math.round(parsedBudgetLimit);
       } else {
         const parsedContext = parseContextArg(value);
         if ("error" in parsedContext) return { error: parsedContext.error };
@@ -146,7 +163,15 @@ function parseCompileArgs(args: string[]): ParsedCompileArgs {
     return { error: 'Missing required option "--model"' };
   }
 
+  if (result.budgetLimit != null) {
+    result.budget = true;
+  }
+
   return { value: result };
+}
+
+function estimateBudgetTokens(text: string): number {
+  return Math.ceil(String(text ?? "").length / 4);
 }
 
 export function runCompile(args: string[], io: CommandIO = process): number {
@@ -195,10 +220,28 @@ export function runCompile(args: string[], io: CommandIO = process): number {
 
     if (options.json) {
       io.stdout.write(`${JSON.stringify(compiled, null, 2)}\n`);
+      if (options.budget) {
+        const budgetEstimate = estimateBudgetTokens(compiled.text);
+        io.stderr.write(`Estimated token count: ${budgetEstimate}\n`);
+        if (options.budgetLimit != null && budgetEstimate > options.budgetLimit) {
+          io.stderr.write(
+            `Warning: Estimated token count ${budgetEstimate} exceeds budget limit ${options.budgetLimit}\n`
+          );
+        }
+      }
       return 0;
     }
 
     io.stdout.write(`${compiled.text}\n`);
+    if (options.budget) {
+      const budgetEstimate = estimateBudgetTokens(compiled.text);
+      io.stderr.write(`Estimated token count: ${budgetEstimate}\n`);
+      if (options.budgetLimit != null && budgetEstimate > options.budgetLimit) {
+        io.stderr.write(
+          `Warning: Estimated token count ${budgetEstimate} exceeds budget limit ${options.budgetLimit}\n`
+        );
+      }
+    }
     if (options.explain && compiled.trace) {
       io.stdout.write(`\n[TRACE]\n${JSON.stringify(compiled.trace, null, 2)}\n`);
     }

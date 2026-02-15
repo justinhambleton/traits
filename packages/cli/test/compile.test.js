@@ -95,3 +95,43 @@ test("traits compile applies context adaptations and trace output", () => {
   assert.match(result.stdout, /"empathy-very-high_directness-medium"/);
   assert.match(result.stdout, /"warmth-very-high_humor-very-low"/);
 });
+
+test("traits compile --budget prints estimated token count", () => {
+  const result = runCLI([
+    "compile",
+    "profiles/resolve.yaml",
+    "--model",
+    "claude-sonnet",
+    "--budget"
+  ]);
+  assert.equal(result.status, 0);
+  assert.match(result.stderr, /Estimated token count: \d+/);
+});
+
+test("traits compile --budget --budget-limit warns when estimate exceeds limit", () => {
+  const result = runCLI([
+    "compile",
+    "profiles/resolve.yaml",
+    "--model",
+    "claude-sonnet",
+    "--budget",
+    "--budget-limit",
+    "10"
+  ]);
+  assert.equal(result.status, 0);
+  assert.match(result.stderr, /Estimated token count: \d+/);
+  assert.match(result.stderr, /exceeds budget limit 10/);
+});
+
+test("traits compile rejects invalid --budget-limit value", () => {
+  const result = runCLI([
+    "compile",
+    "profiles/resolve.yaml",
+    "--model",
+    "claude-sonnet",
+    "--budget-limit",
+    "not-a-number"
+  ]);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /Invalid value for "--budget-limit"/);
+});

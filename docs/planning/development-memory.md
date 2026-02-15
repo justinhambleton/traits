@@ -365,3 +365,9 @@ Decision log for implementation-critical choices. Keep entries brief and factual
 - Why: Multi-layer profile composition needs non-overridable safety constraints so downstream profiles cannot silently weaken critical action-claiming or safety guardrails.
 - Files: `packages/core/src/types.ts`, `packages/core/src/index.ts`, `packages/core/src/utils.ts`, `packages/core/src/profile/merge.ts`, `packages/core/src/compiler/engine.ts`, `packages/core/src/validator/schema.ts`, `packages/core/src/validator/safety.ts`, `packages/core/src/validator/inheritance.ts`, `packages/core/src/validator/overspec.ts`, `packages/core/src/eval/tier1.ts`, `packages/core/src/eval/tier3.ts`, `packages/core/test/schema-format.test.js`, `packages/core/test/extends.test.js`, `packages/core/test/validator.test.js`, `profiles/test-fixtures/_extends-locked-parent.yaml`, `profiles/test-fixtures/_extends-locked-removal-test.yaml`, `docs/site/schema-reference.md`, `docs/site/guides/extending-profiles.md`, `docs/site/api/core.md`, `docs/planning/development-memory.md`
 - Follow-up: Implement Phase 4c token budgeting in CLI compile output (`--budget`, optional `--budget-limit`) without changing compiled prompt contents.
+
+- Date: 2026-02-15
+- Decision: Implement Phase 4c token budgeting for `traits compile` with `--budget` (char-count/4 estimate) and optional `--budget-limit` warning output to stderr.
+- Why: Teams need quick prompt-size awareness without introducing tokenizer dependencies or altering compile output semantics.
+- Files: `packages/cli/src/commands/compile.ts`, `packages/cli/test/compile.test.js`, `docs/planning/development-memory.md`
+- Follow-up: If users request tighter budgeting, add provider-specific tokenizer mode as an optional advanced path while keeping current estimator as deterministic default.
