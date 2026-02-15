@@ -1,6 +1,6 @@
 # @traits-dev/core
 
-Core SDK for traits.dev personality profiles: validate, compile, inject, and evaluate.
+Core SDK for traits.dev voice profiles and behavioral policies: validate, compile, inject, and evaluate.
 
 ## Install
 

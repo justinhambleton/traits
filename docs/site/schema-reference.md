@@ -1,6 +1,6 @@
-# Schema Reference (`v1.4`)
+# Voice Profile & Behavioral Policy Schema Reference (`v1.4`)
 
-This page documents the implemented profile schema and validator behavior used by `@traits-dev/core`.
+This page documents the implemented voice profile and behavioral policy schema used by `@traits-dev/core`.
 
 ## Schema version
 

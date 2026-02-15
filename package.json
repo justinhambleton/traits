@@ -2,6 +2,7 @@
   "name": "traits-dev",
   "private": true,
   "version": "0.0.0",
+  "description": "Monorepo for traits.dev voice profile and behavioral policy tooling.",
   "packageManager": "pnpm@10.29.1",
   "scripts": {
     "build": "pnpm --filter @traits-dev/core build && pnpm --filter @traits-dev/cli build",

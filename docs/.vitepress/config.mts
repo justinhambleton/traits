@@ -8,7 +8,7 @@ export default defineConfig({
   base: docsBase,
   title: "traits.dev",
   description:
-    "Schema-driven AI personality profiles with compile-time safety checks and model-aware compilation.",
+    "Schema-driven AI voice profiles and behavioral policies with compile-time safety checks and model-aware compilation.",
   srcDir: "site",
   lastUpdated: true,
   themeConfig: {

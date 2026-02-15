@@ -1,6 +1,6 @@
 # @traits-dev/cli
 
-CLI for traits.dev profile workflows: init, validate, compile, eval, and import.
+CLI for traits.dev voice profile workflows: init, validate, compile, eval, and import.
 
 ## Install
 

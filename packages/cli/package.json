@@ -1,10 +1,12 @@
 {
   "name": "@traits-dev/cli",
   "version": "0.1.0",
-  "description": "traits.dev command-line interface for profile init, validate, compile, eval, and import workflows.",
+  "description": "traits.dev command-line interface for voice profile init, validate, compile, eval, and import workflows.",
   "keywords": [
     "traits-dev",
     "cli",
+    "voice-profile",
+    "behavioral-policy",
     "llm",
     "prompt-engineering",
     "evaluation"

@@ -1,6 +1,6 @@
 # traits.dev
 
-Profile-driven personality infrastructure for production AI systems.
+Voice-profile and behavioral-policy governance for production AI systems.
 
 ## Show, Then Explain
 
@@ -13,7 +13,7 @@ Start with the [Interactive Showcase](/showcase): one prompt, three profiles, si
 
 ## What traits.dev does
 
-- Defines personality as versioned YAML rather than ad hoc prompt strings
+- Defines voice and behavioral policy as versioned YAML rather than ad hoc prompt strings
 - Validates safety and structure before compile (`S001` to `S007`)
 - Compiles model-aware prompt blocks for Claude and GPT placement
 - Evaluates response adherence with reproducible tiered scoring

@@ -52,7 +52,7 @@ function printRootUsage(out: OutputWriter = process.stdout): void {
       "  compile <profile-path>    Compile a profile for a target model",
       "  eval <profile-path>       Evaluate profile responses (Tier 1 scaffold)",
       "  import [prompt-path]      Import a profile from an existing system prompt",
-      "  validate <profile-path>   Validate a personality profile",
+      "  validate <profile-path>   Validate a voice profile",
       "",
       "Global flags:",
       "  --json                    Output JSON where supported",

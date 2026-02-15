@@ -1,11 +1,12 @@
 {
   "name": "@traits-dev/core",
   "version": "0.1.0",
-  "description": "Core traits.dev SDK for personality profile validation, compilation, and evaluation.",
+  "description": "Core traits.dev SDK for voice profile validation, behavioral policy compilation, and evaluation.",
   "keywords": [
     "traits-dev",
     "llm",
-    "personality",
+    "voice-profile",
+    "behavioral-policy",
     "prompt-engineering",
     "evaluation"
   ],

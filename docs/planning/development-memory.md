@@ -311,3 +311,9 @@ Decision log for implementation-critical choices. Keep entries brief and factual
 - Why: The initial showcase styles were light-theme-only, and production docs routing needs explicit base handling to avoid broken asset paths when hosted under `/traits/`.
 - Files: `docs/site/components/ShowcasePage.vue`, `docs/.vitepress/config.mts`, `docs/planning/development-memory.md`
 - Follow-up: If deploying to a custom domain, set `DOCS_BASE=/` in the docs deploy workflow (or equivalent environment) to override the `/traits/` production default.
+
+- Date: 2026-02-15
+- Decision: Complete Phase 1a credibility triage by repositioning user-facing language from "personality" framing to "voice profile and behavioral policy" across package metadata, docs shell, landing copy, schema header, and product overview.
+- Why: External feedback identified "personality infrastructure" positioning as credibility-damaging; correcting language first is the fastest risk-reduction step before schema/runtime work in Phase 1b-1d.
+- Files: `package.json`, `packages/core/package.json`, `packages/cli/package.json`, `packages/core/README.md`, `packages/cli/README.md`, `packages/cli/src/bin/traits.ts`, `docs/.vitepress/config.mts`, `docs/site/index.md`, `docs/site/schema-reference.md`, `docs/product/traits-dev-overview.md`, `docs/planning/development-memory.md`
+- Follow-up: Implement Phase 1b (`schema: v1.5` capabilities + grounding + S008) and regenerate showcase artifacts in Phase 1d once profile updates land.
