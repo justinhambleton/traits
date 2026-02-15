@@ -28,6 +28,16 @@ type InteractionSelection = {
 };
 const KB_CACHE = new Map<string, PatternData | null>();
 
+function canLoadKnowledgeBaseFromFs(): boolean {
+  return (
+    typeof process !== "undefined" &&
+    Boolean(process?.versions?.node) &&
+    typeof fs?.existsSync === "function" &&
+    typeof fs?.readFileSync === "function" &&
+    typeof path?.resolve === "function"
+  );
+}
+
 function modelFlavor(model: unknown): ModelFlavor {
   if (/claude/i.test(String(model))) return "claude";
   if (/gpt/i.test(String(model))) return "gpt";
@@ -84,6 +94,7 @@ function resolvePatternFile(
 ): string | null {
   const flavor = modelFlavor(model);
   if (flavor === "generic") return null;
+  if (!canLoadKnowledgeBaseFromFs()) return null;
   const knowledgeBaseDir =
     options.knowledgeBaseDir ?? path.resolve(process.cwd(), "knowledge-base");
   return path.resolve(knowledgeBaseDir, flavor, "patterns.json");

@@ -395,3 +395,9 @@ Decision log for implementation-critical choices. Keep entries brief and factual
 - Why: External review identified a first-impression docs footgun (`/playground` path mismatch) and a real validator blind spot where action-claiming text outside `behavioral_rules` could bypass S008.
 - Files: `docs/.vitepress/config.mts`, `docs/site/playground/index.md`, `docs/site/showcase/index.md`, `docs/site/components/LandingPage.vue`, `packages/core/src/validator/safety.ts`, `packages/core/test/validator.test.js`, `docs/site/schema-reference.md`, `docs/planning/development-memory.md`
 - Follow-up: Extend S008 to optional strict escalation mode (`warning` -> `error`) when `capabilities.tools` is empty and matching action claims are present.
+
+- Date: 2026-02-15
+- Decision: Replace playground prompt label swapping with real debounced `compileResolvedProfile` + `validateResolvedProfile` execution on slider changes, and embed base profile objects in generated playground data for in-browser mutation/compilation.
+- Why: The previous playground only rewrote `[VOICE TARGETS]` text while leaving `[PATTERN GUIDANCE]` static, which broke the core demonstration value. Real compilation now updates guidance and interactions as dimensions change, with validation diagnostics shown beside compiled output.
+- Files: `docs/site/components/PlaygroundPage.vue`, `experiment/scripts/build-playground-data.mjs`, `docs/site/data/playground.json`, `packages/core/src/compiler/patterns.ts`, `package.json`, `docs/planning/development-memory.md`
+- Follow-up: Create a browser-optimized core entrypoint (without Node fs/path warnings) for docs/playground usage so Vite builds no longer emit Node externalization notices.

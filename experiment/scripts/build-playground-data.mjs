@@ -152,6 +152,7 @@ async function main() {
       name: String(profileDoc.meta?.name ?? slug),
       description: String(profileDoc.meta?.description ?? ""),
       profilePath: runData.profile_path,
+      profile: profileDoc,
       baseVoice,
       baseHumorStyle,
       defaultScenarioId: scenarios[0]?.id ?? "",

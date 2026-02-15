@@ -4,8 +4,8 @@
       <p class="eyebrow">Interactive Voice Playground</p>
       <h1>Configure voice policy and inspect compiled prompt output instantly</h1>
       <p>
-        The playground uses precomputed profile responses and in-page prompt rendering. Use it to
-        understand how voice targets and behavioral policy shape output before integrating in code.
+        The playground uses precomputed profile responses and in-browser compilation. Use it to
+        see how voice targets and policy changes alter compiled prompt guidance before integrating.
       </p>
     </section>
 
@@ -69,6 +69,21 @@
         <p class="compiled-note">
           Voice target changes are reflected in the compiled prompt block below.
         </p>
+        <p class="validation-summary" :class="{ error: validationErrors.length > 0 }">
+          Validation:
+          <strong>{{ validationErrors.length }}</strong> error(s),
+          <strong>{{ validationWarnings.length }}</strong> warning(s)
+        </p>
+        <ul v-if="validationErrors.length + validationWarnings.length > 0" class="validation-list">
+          <li
+            v-for="diagnostic in [...validationErrors, ...validationWarnings]"
+            :key="`${diagnostic.code}-${diagnostic.location ?? ''}-${diagnostic.message}`"
+            :class="diagnostic.severity"
+          >
+            <code>{{ diagnostic.code }}</code>
+            <span>{{ diagnostic.message }}</span>
+          </li>
+        </ul>
         <pre><code>{{ compiledPrompt }}</code></pre>
       </article>
     </section>
@@ -123,6 +138,10 @@
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import {
+  compileResolvedProfile,
+  validateResolvedProfile
+} from "../../../packages/core/dist/index.js";
 import playgroundData from "../data/playground.json";
 
 const dimensions = [
@@ -175,7 +194,11 @@ const activeScenario = computed(
 );
 
 const responseTimer = ref(null);
+const compileTimer = ref(null);
 const typedResponse = ref("");
+const compiledPrompt = ref("");
+const validationWarnings = ref([]);
+const validationErrors = ref([]);
 
 function voiceSignature(value, style) {
   return [
@@ -199,31 +222,6 @@ const isDefaultVoiceConfig = computed(
 const activeTier1Score = computed(() =>
   isDefaultVoiceConfig.value ? activeScenario.value.tier1Score : null
 );
-
-function replaceVoiceTargets(prompt, voiceTargets, style) {
-  const lines = String(prompt ?? "").split("\n");
-  const start = lines.findIndex((line) => line.trim() === "[VOICE TARGETS]");
-  if (start === -1) return prompt;
-
-  let end = start + 1;
-  while (end < lines.length && lines[end].trim() !== "") {
-    end += 1;
-  }
-
-  const replacement = [
-    `formality: ${voiceTargets.formality}`,
-    `warmth: ${voiceTargets.warmth}`,
-    `verbosity: ${voiceTargets.verbosity}`,
-    `directness: ${voiceTargets.directness}`,
-    `empathy: ${voiceTargets.empathy}`,
-    `humor: ${voiceTargets.humor}`
-  ];
-  if (voiceTargets.humor !== "very-low") {
-    replacement.push(`humor_style: ${style}`);
-  }
-
-  return [...lines.slice(0, start + 1), ...replacement, ...lines.slice(end)].join("\n");
-}
 
 function replaceVoiceYaml(template, voiceTargets, style) {
   const lines = String(template ?? "").split("\n");
@@ -256,17 +254,79 @@ function replaceVoiceYaml(template, voiceTargets, style) {
   return [...lines.slice(0, start), ...replacement, ...lines.slice(end)].join("\n");
 }
 
-const compiledPrompt = computed(() =>
-  replaceVoiceTargets(activeProfile.value.compiledPrompt, voice.value, humorStyle.value)
-);
 const yamlSource = computed(() =>
   replaceVoiceYaml(activeProfile.value.yamlTemplate, voice.value, humorStyle.value)
 );
+
+function cloneJson(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
+function applyVoiceTarget(existing, nextLevel) {
+  if (existing && typeof existing === "object" && !Array.isArray(existing)) {
+    return { ...existing, target: nextLevel };
+  }
+  return nextLevel;
+}
+
+function buildMutableProfile() {
+  const profile = cloneJson(activeProfile.value.profile);
+  profile.voice = profile.voice ?? {};
+  profile.voice.formality = applyVoiceTarget(profile.voice.formality, voice.value.formality);
+  profile.voice.warmth = applyVoiceTarget(profile.voice.warmth, voice.value.warmth);
+  profile.voice.verbosity = applyVoiceTarget(profile.voice.verbosity, voice.value.verbosity);
+  profile.voice.directness = applyVoiceTarget(profile.voice.directness, voice.value.directness);
+  profile.voice.empathy = applyVoiceTarget(profile.voice.empathy, voice.value.empathy);
+  const nextHumor = applyVoiceTarget(profile.voice.humor, voice.value.humor);
+  profile.voice.humor =
+    nextHumor && typeof nextHumor === "object" && !Array.isArray(nextHumor)
+      ? { ...nextHumor, style: voice.value.humor === "very-low" ? "none" : humorStyle.value }
+      : nextHumor;
+  return profile;
+}
+
+function runCompilationNow() {
+  try {
+    const profile = buildMutableProfile();
+    const compiled = compileResolvedProfile(profile, {
+      model: "gpt-4o"
+    });
+    const validation = validateResolvedProfile(profile, { strict: false });
+    compiledPrompt.value = compiled.text;
+    validationWarnings.value = validation.warnings ?? [];
+    validationErrors.value = validation.errors ?? [];
+  } catch (error) {
+    compiledPrompt.value = `Compilation error: ${error instanceof Error ? error.message : String(error)}`;
+    validationWarnings.value = [];
+    validationErrors.value = [
+      {
+        code: "E_PLAYGROUND_COMPILE",
+        message: error instanceof Error ? error.message : String(error),
+        location: "playground",
+        severity: "error"
+      }
+    ];
+  }
+}
+
+function scheduleCompilation() {
+  if (typeof window === "undefined") return;
+  if (compileTimer.value) {
+    clearTimeout(compileTimer.value);
+  }
+  compileTimer.value = setTimeout(() => {
+    compileTimer.value = null;
+    runCompilationNow();
+  }, 50);
+}
 
 function resetProfileState(profile) {
   voice.value = { ...profile.baseVoice };
   humorStyle.value = profile.baseHumorStyle ?? "none";
   selectedScenarioId.value = profile.defaultScenarioId ?? profile.scenarios?.[0]?.id ?? "";
+  compiledPrompt.value = String(profile.compiledPrompt ?? "");
+  validationWarnings.value = [];
+  validationErrors.value = [];
 }
 
 function typeResponse(text) {
@@ -373,6 +433,20 @@ watch(
 watch(
   () => [
     selectedProfileId.value,
+    voice.value.formality,
+    voice.value.warmth,
+    voice.value.verbosity,
+    voice.value.directness,
+    voice.value.empathy,
+    voice.value.humor,
+    humorStyle.value
+  ],
+  scheduleCompilation
+);
+
+watch(
+  () => [
+    selectedProfileId.value,
     selectedScenarioId.value,
     voice.value.formality,
     voice.value.warmth,
@@ -390,11 +464,15 @@ watch(byokProvider, readByokKey);
 onMounted(() => {
   applyUrlState();
   readByokKey();
+  scheduleCompilation();
 });
 
 onBeforeUnmount(() => {
   if (responseTimer.value) {
     clearInterval(responseTimer.value);
+  }
+  if (compileTimer.value) {
+    clearTimeout(compileTimer.value);
   }
 });
 </script>
@@ -553,6 +631,46 @@ onBeforeUnmount(() => {
   color: #475569;
 }
 
+.validation-summary {
+  margin: 0.5rem 0 0;
+  font-size: 0.84rem;
+  color: #14532d;
+}
+
+.validation-summary.error {
+  color: #991b1b;
+}
+
+.validation-list {
+  margin: 0.45rem 0 0;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid #d6e2f1;
+  border-radius: 0.65rem;
+  background: #f8fbff;
+  list-style: none;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.validation-list li {
+  display: grid;
+  gap: 0.2rem;
+  font-size: 0.78rem;
+  color: #334155;
+}
+
+.validation-list li.warning code {
+  color: #92400e;
+}
+
+.validation-list li.error code {
+  color: #991b1b;
+}
+
+.validation-list code {
+  font-weight: 700;
+}
+
 .compiled pre {
   margin: 0.6rem 0 0;
   border-radius: 0.75rem;
@@ -657,11 +775,33 @@ onBeforeUnmount(() => {
 
 :global(.dark) .field span,
 :global(.dark) .compiled-note,
+:global(.dark) .validation-summary,
 :global(.dark) .score-pill span,
 :global(.dark) .byok p,
 :global(.dark) .tick-row,
 :global(.dark) .yaml-block p {
   color: #9ab0cf;
+}
+
+:global(.dark) .validation-summary.error {
+  color: #fda4af;
+}
+
+:global(.dark) .validation-list {
+  border-color: #324865;
+  background: #0f1b2e;
+}
+
+:global(.dark) .validation-list li {
+  color: #c7d5ec;
+}
+
+:global(.dark) .validation-list li.warning code {
+  color: #fcd34d;
+}
+
+:global(.dark) .validation-list li.error code {
+  color: #fca5a5;
 }
 
 :global(.dark) .field select,
