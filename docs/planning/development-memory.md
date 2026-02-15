@@ -293,3 +293,21 @@ Decision log for implementation-critical choices. Keep entries brief and factual
 - Why: With packages now published and trusted publisher links in place, token-based fallback is no longer needed; removing secret-based auth restores least-privilege CI publishing with provenance.
 - Files: `.github/workflows/release.yml`, `docs/planning/development-memory.md`
 - Follow-up: Execute the next package version publish (0.1.1+) to verify tokenless OIDC publish end-to-end and then permanently remove repository `NPM_TOKEN` secret.
+
+- Date: 2026-02-15
+- Decision: Scaffold a VitePress documentation site under `docs/` and draft the schema reference as the first canonical web doc page.
+- Why: Post-0.1.0 adoption now depends on publish-facing docs; schema reference is the highest-leverage first page for profile authors and must reflect implemented validator/merge behavior in core.
+- Files: `package.json`, `pnpm-lock.yaml`, `docs/.vitepress/config.mts`, `docs/site/index.md`, `docs/site/schema-reference.md`, `docs/site/guides/first-profile.md`, `docs/site/guides/extending-profiles.md`, `docs/site/guides/running-evaluations.md`, `docs/site/api/core.md`, `docs/planning/development-memory.md`
+- Follow-up: Expand guide content depth and add a generated API reference section sourced from the public TypeScript exports before docs-site launch.
+
+- Date: 2026-02-15
+- Decision: Add a static interactive showcase page driven by cross-profile live-run artifacts so docs lead with side-by-side behavioral proof before schema detail.
+- Why: Product comprehension and conversion are strongest when users can compare the same prompt across profiles immediately; static rendering keeps infra cost at zero while preserving real generated responses.
+- Files: `experiment/evaluation/runs/2026-02-15-showcase-haven.json`, `experiment/evaluation/runs/2026-02-15-showcase-resolve.json`, `experiment/evaluation/runs/2026-02-15-showcase-architect.json`, `experiment/scripts/build-showcase-data.mjs`, `docs/site/data/showcase.json`, `docs/site/components/ShowcasePage.vue`, `docs/site/showcase.md`, `docs/site/index.md`, `docs/.vitepress/config.mts`, `package.json`, `.gitignore`, `docs/planning/development-memory.md`
+- Follow-up: Add a lightweight content QA pass for response quality tone on each showcased scenario per profile before external docs launch.
+
+- Date: 2026-02-15
+- Decision: Fix showcase dark-mode rendering and make VitePress base path production-safe for GitHub Pages with an environment override for custom domains.
+- Why: The initial showcase styles were light-theme-only, and production docs routing needs explicit base handling to avoid broken asset paths when hosted under `/traits/`.
+- Files: `docs/site/components/ShowcasePage.vue`, `docs/.vitepress/config.mts`, `docs/planning/development-memory.md`
+- Follow-up: If deploying to a custom domain, set `DOCS_BASE=/` in the docs deploy workflow (or equivalent environment) to override the `/traits/` production default.

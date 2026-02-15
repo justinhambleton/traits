@@ -1,0 +1,320 @@
+{
+  "generated_at": "2026-02-15T05:14:19.963Z",
+  "method": "live-generation-ab",
+  "profile_path": "profiles/resolve.yaml",
+  "scenario_file": "experiment/calibration/scenarios.v1.json",
+  "scenario_ids": [
+    "billing-double-charge",
+    "debug-stack-trace",
+    "formal-humor-balance",
+    "urgent-project-triage"
+  ],
+  "generation": {
+    "provider": "openai",
+    "model": "gpt-4.1-mini",
+    "compile_model": "gpt-4o"
+  },
+  "keys_present": {
+    "openai": true,
+    "anthropic": true
+  },
+  "tier_requested": 1,
+  "tier_resolution": {
+    "tier_requested": 1,
+    "tier_executed": 1,
+    "tiers_run": [
+      1
+    ],
+    "blocked": []
+  },
+  "arms": {
+    "compiled": {
+      "system_prompt": "compiled personality prompt",
+      "samples": [
+        {
+          "id": "billing-double-charge",
+          "prompt": "user: You charged me twice this month and support ignored me. Fix this now.",
+          "response": "I understand how frustrating it is to see a double charge and not get a timely response. I'll take care of this for you right away. To start, could you please confirm the date and amount of the charges you see on your statement? This will help me identify the issue quickly and proceed with the correction."
+        },
+        {
+          "id": "debug-stack-trace",
+          "prompt": "user: My Node service crashes with TypeError: Cannot read properties of undefined at startup. Where should I look first?",
+          "response": "I understand how disruptive a startup crash can be. Here's what I can do: First, check the exact line mentioned in the error stack trace where the TypeError occurs. Identify which variable or object is undefined at that point. Can you share that specific line or snippet? This will help me guide you precisely on what to verify next."
+        },
+        {
+          "id": "formal-humor-balance",
+          "prompt": "user: Draft a professional announcement for a delayed release, and keep it lightly upbeat without sounding unserious.",
+          "response": "I understand the importance of maintaining professionalism while keeping the tone lightly upbeat. Here's a draft for your announcement:\n\n\"Dear Valued Customers,\n\nWe want to inform you that the release of our upcoming product has been delayed. While we share your excitement and anticipation, we are taking a bit more time to ensure everything meets the highest standards of quality you expect from us. Think of it as giving our product a little extra polish — because good things are worth the wait.\n\nWe appreciate your patience and continued support. Stay tuned for the new release date, which we will share with you very soon.\n\nThank you for your understanding and enthusiasm.\n\nBest regards,\n[Your Company Name]\""
+        },
+        {
+          "id": "urgent-project-triage",
+          "prompt": "user: My deadline is tomorrow and I am behind. Give me a strict triage plan for today.",
+          "response": "I understand the urgency of your situation. Here's a strict triage plan to maximize your productivity today:\n\n1. Prioritize Tasks: List all remaining tasks and identify the ones critical to meeting your deadline.\n2. Allocate Time Blocks: Assign fixed time slots to each critical task, minimizing distractions during these periods.\n3. Eliminate Non-Essentials: Postpone or delegate any tasks that are not directly contributing to the deadline.\n4. Focus on Completion: Aim to complete each task fully before moving to the next to avoid partial work.\n5. Schedule Short Breaks: Include brief breaks to maintain focus and prevent burnout.\n\nLet's start by identifying your top three critical tasks. What are they?"
+        }
+      ],
+      "reports": {
+        "tier1": {
+          "tier": 1,
+          "sample_count": 4,
+          "average_score": 0.7749999999999999,
+          "samples": [
+            {
+              "id": "billing-double-charge",
+              "score": 0.8499999999999999,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 3,
+                  "preferred_matched": 2,
+                  "forbidden_total": 3,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 3,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 306,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "debug-stack-trace",
+              "score": 0.8499999999999999,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 3,
+                  "preferred_matched": 2,
+                  "forbidden_total": 3,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 3,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 333,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "formal-humor-balance",
+              "score": 0.7,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 3,
+                  "preferred_matched": 1,
+                  "forbidden_total": 3,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 3,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 714,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "urgent-project-triage",
+              "score": 0.7,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 3,
+                  "preferred_matched": 1,
+                  "forbidden_total": 3,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 3,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 707,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "generic": {
+      "system_prompt": "You are a helpful customer support assistant.",
+      "samples": [
+        {
+          "id": "billing-double-charge",
+          "prompt": "user: You charged me twice this month and support ignored me. Fix this now.",
+          "response": "I'm very sorry to hear about the double charge and that your previous support request was not addressed. I understand how frustrating this must be. Let's get this resolved quickly. Could you please provide your account details or the transaction IDs so I can investigate the charges and arrange a refund if necessary?"
+        },
+        {
+          "id": "debug-stack-trace",
+          "prompt": "user: My Node service crashes with TypeError: Cannot read properties of undefined at startup. Where should I look first?",
+          "response": "Start by identifying the exact line in your startup code where the error occurs. Check the stack trace to find which variable is undefined. Then, verify that all required environment variables, configuration files, and dependencies are properly loaded before that line executes. Add console logs or use a debugger to inspect the values of variables leading up to the error. This systematic approach will help you pinpoint the root cause quickly."
+        },
+        {
+          "id": "formal-humor-balance",
+          "prompt": "user: Draft a professional announcement for a delayed release, and keep it lightly upbeat without sounding unserious.",
+          "response": "Dear Valued Customers and Partners,\n\nWe hope this message finds you well. We would like to inform you that the release of our upcoming product has been delayed. While we understand that waiting is never anyone's favorite pastime, we assure you that this additional time will allow us to deliver a product that meets the highest standards of quality and performance.\n\nWe appreciate your patience and continued support as we work diligently to bring you the best possible experience. Stay tuned for further updates, and thank you for being part of our journey.\n\nWarm regards,\nThe Team"
+        },
+        {
+          "id": "urgent-project-triage",
+          "prompt": "user: My deadline is tomorrow and I am behind. Give me a strict triage plan for today.",
+          "response": "To meet your deadline tomorrow, let's prioritize your tasks strictly. 1. List all remaining tasks and estimate the time needed for each. 2. Identify critical tasks that directly impact the project's completion and focus on those first. 3. Eliminate or postpone any non-essential tasks. 4. Allocate focused work blocks with short breaks to maintain productivity. 5. Avoid multitasking to maximize efficiency. 6. If possible, delegate minor tasks to others. 7. Keep communication clear and concise if you need help or updates. Stay focused and take short breaks to avoid burnout. You can do this!"
+        }
+      ],
+      "reports": {
+        "tier1": {
+          "tier": 1,
+          "sample_count": 4,
+          "average_score": 0.5875,
+          "samples": [
+            {
+              "id": "billing-double-charge",
+              "score": 0.7,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 3,
+                  "preferred_matched": 1,
+                  "forbidden_total": 3,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 3,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 317,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "debug-stack-trace",
+              "score": 0.55,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 3,
+                  "preferred_matched": 0,
+                  "forbidden_total": 3,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 3,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 445,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "formal-humor-balance",
+              "score": 0.55,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 3,
+                  "preferred_matched": 0,
+                  "forbidden_total": 3,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 3,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 582,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "urgent-project-triage",
+              "score": 0.55,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 3,
+                  "preferred_matched": 0,
+                  "forbidden_total": 3,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 3,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 594,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "deltas": {
+    "tier1": {
+      "average_score": 0.1875,
+      "per_scenario": [
+        {
+          "id": "billing-double-charge",
+          "compiled_score": 0.85,
+          "generic_score": 0.7,
+          "delta": 0.15
+        },
+        {
+          "id": "debug-stack-trace",
+          "compiled_score": 0.85,
+          "generic_score": 0.55,
+          "delta": 0.3
+        },
+        {
+          "id": "formal-humor-balance",
+          "compiled_score": 0.7,
+          "generic_score": 0.55,
+          "delta": 0.15
+        },
+        {
+          "id": "urgent-project-triage",
+          "compiled_score": 0.7,
+          "generic_score": 0.55,
+          "delta": 0.15
+        }
+      ]
+    }
+  },
+  "caveats": [
+    "Generation and scoring share provider dependencies; network/API stability affects reproducibility.",
+    "Tier 2 currently uses OpenAI embeddings regardless of generation provider.",
+    "Tier 2 in live A/B runs excludes helpfulness to isolate personality-style adherence."
+  ]
+}

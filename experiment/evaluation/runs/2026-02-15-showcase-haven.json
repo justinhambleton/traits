@@ -1,0 +1,320 @@
+{
+  "generated_at": "2026-02-15T05:14:03.516Z",
+  "method": "live-generation-ab",
+  "profile_path": "profiles/haven.yaml",
+  "scenario_file": "experiment/calibration/scenarios.v1.json",
+  "scenario_ids": [
+    "billing-double-charge",
+    "debug-stack-trace",
+    "formal-humor-balance",
+    "urgent-project-triage"
+  ],
+  "generation": {
+    "provider": "openai",
+    "model": "gpt-4.1-mini",
+    "compile_model": "gpt-4o"
+  },
+  "keys_present": {
+    "openai": true,
+    "anthropic": true
+  },
+  "tier_requested": 1,
+  "tier_resolution": {
+    "tier_requested": 1,
+    "tier_executed": 1,
+    "tiers_run": [
+      1
+    ],
+    "blocked": []
+  },
+  "arms": {
+    "compiled": {
+      "system_prompt": "compiled personality prompt",
+      "samples": [
+        {
+          "id": "billing-double-charge",
+          "prompt": "user: You charged me twice this month and support ignored me. Fix this now.",
+          "response": "I understand how frustrating it must be to see a double charge and not get the support you expected. To help resolve this, I recommend contacting your care team's billing department directly with your billing statements handy. If you need, I can guide you on how to reach them or what information to provide to ensure a quicker resolution. Would you like me to assist with that?"
+        },
+        {
+          "id": "debug-stack-trace",
+          "prompt": "user: My Node service crashes with TypeError: Cannot read properties of undefined at startup. Where should I look first?",
+          "response": "I'm sorry to hear your Node service is crashing. This error usually means your code is trying to access a property on an object that hasn't been defined yet. To troubleshoot systematically, first check the exact line mentioned in the error stack trace to identify which variable is undefined. Next, review the code leading up to that line to ensure all objects are properly initialized before use. It can also help to add console logs before the error line to inspect variable states. If you have asynchronous code, verify that any data dependencies are resolved before accessing their properties. If you want, I can guide you through these steps in more detail."
+        },
+        {
+          "id": "formal-humor-balance",
+          "prompt": "user: Draft a professional announcement for a delayed release, and keep it lightly upbeat without sounding unserious.",
+          "response": "Certainly! Here's a professional announcement draft that maintains formality with a lightly upbeat tone:\n\n\"Dear Valued Customers and Partners,\n\nWe would like to inform you that the release of our upcoming product has been rescheduled to a later date. While we understand this may come as a disappointment, please rest assured that this additional time will allow us to enhance the quality and performance you expect from us.\n\nWe appreciate your patience and continued support as we work diligently to deliver an exceptional experience. Stay tuned for further updates, and thank you for being part of our journey.\n\nWarm regards,\n[Your Company/Team Name]\""
+        },
+        {
+          "id": "urgent-project-triage",
+          "prompt": "user: My deadline is tomorrow and I am behind. Give me a strict triage plan for today.",
+          "response": "I understand how stressful it can be to face a tight deadline. To help you manage your time effectively today, let's prioritize your tasks based on urgency and impact. First, list all the tasks you need to complete. Then, identify which ones are critical to meet the deadline and focus on those exclusively. Break these critical tasks into smaller, manageable steps and allocate specific time blocks to each, minimizing distractions during these periods. Remember to take short breaks to maintain focus and energy. If possible, communicate with your team or supervisor about your progress to manage expectations. Would you like help creating a detailed schedule for today based on your task list?"
+        }
+      ],
+      "reports": {
+        "tier1": {
+          "tier": 1,
+          "sample_count": 4,
+          "average_score": 0.6625000000000001,
+          "samples": [
+            {
+              "id": "billing-double-charge",
+              "score": 1,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 1,
+                  "preferred_matched": 1,
+                  "forbidden_total": 5,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 5,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 378,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "debug-stack-trace",
+              "score": 0.55,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 1,
+                  "preferred_matched": 0,
+                  "forbidden_total": 5,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 5,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 662,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "formal-humor-balance",
+              "score": 0.55,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 1,
+                  "preferred_matched": 0,
+                  "forbidden_total": 5,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 5,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 653,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "urgent-project-triage",
+              "score": 0.55,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 1,
+                  "preferred_matched": 0,
+                  "forbidden_total": 5,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 5,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 696,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "generic": {
+      "system_prompt": "You are a helpful healthcare assistant.",
+      "samples": [
+        {
+          "id": "billing-double-charge",
+          "prompt": "user: You charged me twice this month and support ignored me. Fix this now.",
+          "response": "I'm really sorry to hear about the double charge and that you haven't received support yet. I understand how frustrating this must be. Let's get this sorted out quickly. Could you please provide me with your account details or the transaction information? I'll make sure to investigate the issue and work on a resolution for you right away."
+        },
+        {
+          "id": "debug-stack-trace",
+          "prompt": "user: My Node service crashes with TypeError: Cannot read properties of undefined at startup. Where should I look first?",
+          "response": "Start by checking the exact line mentioned in the error stack trace to identify which variable is undefined. Then, verify that all required environment variables and configuration files are properly loaded before that line executes. Next, review any asynchronous initialization code to ensure dependencies are fully initialized before use. Finally, add console logs or use a debugger to trace the variable values leading up to the error for more insight."
+        },
+        {
+          "id": "formal-humor-balance",
+          "prompt": "user: Draft a professional announcement for a delayed release, and keep it lightly upbeat without sounding unserious.",
+          "response": "We would like to inform our valued customers and partners that the release originally scheduled for this month will be delayed. While we understand that waiting is never anyone's favorite pastime, we assure you that this brief pause is to ensure the highest quality and performance you expect from us. We appreciate your patience and continued support as we put the finishing touches on what we believe will be worth the wait. Stay tuned for the new release date, which we promise will be announced soon—because good things come to those who wait, and we’re making sure it’s really good!"
+        },
+        {
+          "id": "urgent-project-triage",
+          "prompt": "user: My deadline is tomorrow and I am behind. Give me a strict triage plan for today.",
+          "response": "To manage your urgent deadline effectively, follow this strict triage plan for today: 1. Prioritize Tasks: List all tasks required to meet your deadline. Identify the most critical ones that directly impact project completion. 2. Allocate Time Blocks: Divide your day into focused work sessions (e.g., 90-minute blocks) with short breaks in between to maintain productivity. 3. Eliminate Distractions: Turn off notifications, close unnecessary tabs, and inform others you need uninterrupted time. 4. Delegate if Possible: Identify any tasks that can be delegated to others to free up your time for high-priority work. 5. Set Mini-Deadlines: Break down your work into smaller milestones to track progress throughout the day. 6. Stay Hydrated and Take Short Breaks: Maintain energy and focus by drinking water and taking brief breaks. 7. Review Progress: At the end of each time block, assess your progress and adjust your plan if needed. Stay focused and keep your goal in sight—you can do this!"
+        }
+      ],
+      "reports": {
+        "tier1": {
+          "tier": 1,
+          "sample_count": 4,
+          "average_score": 0.55,
+          "samples": [
+            {
+              "id": "billing-double-charge",
+              "score": 0.55,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 1,
+                  "preferred_matched": 0,
+                  "forbidden_total": 5,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 5,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 340,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "debug-stack-trace",
+              "score": 0.55,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 1,
+                  "preferred_matched": 0,
+                  "forbidden_total": 5,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 5,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 454,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "formal-humor-balance",
+              "score": 0.55,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 1,
+                  "preferred_matched": 0,
+                  "forbidden_total": 5,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 5,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 587,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "urgent-project-triage",
+              "score": 0.55,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 1,
+                  "preferred_matched": 0,
+                  "forbidden_total": 5,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 5,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 994,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "deltas": {
+    "tier1": {
+      "average_score": 0.1125,
+      "per_scenario": [
+        {
+          "id": "billing-double-charge",
+          "compiled_score": 1,
+          "generic_score": 0.55,
+          "delta": 0.45
+        },
+        {
+          "id": "debug-stack-trace",
+          "compiled_score": 0.55,
+          "generic_score": 0.55,
+          "delta": 0
+        },
+        {
+          "id": "formal-humor-balance",
+          "compiled_score": 0.55,
+          "generic_score": 0.55,
+          "delta": 0
+        },
+        {
+          "id": "urgent-project-triage",
+          "compiled_score": 0.55,
+          "generic_score": 0.55,
+          "delta": 0
+        }
+      ]
+    }
+  },
+  "caveats": [
+    "Generation and scoring share provider dependencies; network/API stability affects reproducibility.",
+    "Tier 2 currently uses OpenAI embeddings regardless of generation provider.",
+    "Tier 2 in live A/B runs excludes helpfulness to isolate personality-style adherence."
+  ]
+}

@@ -6,6 +6,8 @@ coverage/
 .nyc_output/
 .turbo/
 *.tsbuildinfo
+docs/.vitepress/dist/
+docs/.vitepress/cache/
 
 .DS_Store
 .vscode/
