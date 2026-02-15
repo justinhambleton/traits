@@ -24,10 +24,20 @@ const PROFILE_META = {
     label: "architect",
     title: "Developer Assistant",
     accent: "#f97316"
+  },
+  educator: {
+    label: "educator",
+    title: "Learning Companion",
+    accent: "#8b5cf6"
+  },
+  advisor: {
+    label: "advisor",
+    title: "Regulated Advisory Assistant",
+    accent: "#ef4444"
   }
 };
 
-const PROFILE_ORDER = ["haven", "resolve", "architect"];
+const PROFILE_ORDER = ["haven", "resolve", "architect", "educator", "advisor"];
 
 function assertFile(filePath) {
   if (!fs.existsSync(filePath)) {
@@ -84,6 +94,20 @@ function getScenarioPrompt(scenario = {}) {
   return String(userMessage?.content ?? "");
 }
 
+function profilePathFor(repoRoot, slug) {
+  return path.join(repoRoot, "profiles", `${slug}.yaml`);
+}
+
+function samplesFromSuite(suite) {
+  return suite.scenarios.map((scenario) => ({
+    id: String(scenario.id),
+    category: String(scenario.category ?? "unknown"),
+    expectedBehavior: String(scenario.expected_behavior ?? ""),
+    prompt: cleanPrompt("", getScenarioPrompt(scenario)),
+    response: String(scenario.expected_behavior ?? "")
+  }));
+}
+
 async function main() {
   const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../..");
   const core = await loadCore(repoRoot);
@@ -99,10 +123,7 @@ async function main() {
   const profiles = {};
 
   for (const slug of PROFILE_ORDER) {
-    const runPath = path.join(repoRoot, RUN_FILES[slug]);
-    assertFile(runPath);
-    const runData = readJson(runPath);
-    const profilePath = path.join(repoRoot, runData.profile_path);
+    const profilePath = profilePathFor(repoRoot, slug);
     assertFile(profilePath);
 
     const profileDoc = core.loadProfileFile(profilePath);
@@ -112,29 +133,50 @@ async function main() {
       knowledgeBaseDir
     });
 
-    const sampleById = new Map(
-      (runData.arms?.compiled?.samples ?? []).map((sample) => [String(sample.id), sample])
-    );
-    const tier1ById = new Map(
-      (runData.arms?.compiled?.reports?.tier1?.samples ?? []).map((sample) => [
-        String(sample.id),
-        Number(sample.score ?? 0)
-      ])
-    );
+    let scenarios = [];
+    let sourceLabel = `profiles/${slug}.yaml`;
 
-    const scenarios = (runData.scenario_ids ?? []).map((scenarioId) => {
-      const id = String(scenarioId);
-      const scenarioDoc = scenarioById.get(id) ?? {};
-      const sample = sampleById.get(id) ?? {};
-      return {
-        id,
-        category: String(scenarioDoc.category ?? "unknown"),
-        expectedBehavior: String(scenarioDoc.expected_behavior ?? ""),
-        prompt: cleanPrompt(sample.prompt, getScenarioPrompt(scenarioDoc)),
-        response: String(sample.response ?? ""),
-        tier1Score: tier1ById.has(id) ? tier1ById.get(id) : null
-      };
-    });
+    if (RUN_FILES[slug]) {
+      const runPath = path.join(repoRoot, RUN_FILES[slug]);
+      assertFile(runPath);
+      const runData = readJson(runPath);
+      const sampleById = new Map(
+        (runData.arms?.compiled?.samples ?? []).map((sample) => [String(sample.id), sample])
+      );
+      const tier1ById = new Map(
+        (runData.arms?.compiled?.reports?.tier1?.samples ?? []).map((sample) => [
+          String(sample.id),
+          Number(sample.score ?? 0)
+        ])
+      );
+      scenarios = (runData.scenario_ids ?? []).map((scenarioId) => {
+        const id = String(scenarioId);
+        const scenarioDoc = scenarioById.get(id) ?? {};
+        const sample = sampleById.get(id) ?? {};
+        return {
+          id,
+          category: String(scenarioDoc.category ?? "unknown"),
+          expectedBehavior: String(scenarioDoc.expected_behavior ?? ""),
+          prompt: cleanPrompt(sample.prompt, getScenarioPrompt(scenarioDoc)),
+          response: String(sample.response ?? ""),
+          tier1Score: tier1ById.has(id) ? tier1ById.get(id) : null
+        };
+      });
+      sourceLabel = RUN_FILES[slug];
+    } else {
+      const suite = core.loadBuiltInEvalSuite(slug);
+      if (!suite) {
+        throw new Error(`Missing run file and built-in suite for profile "${slug}"`);
+      }
+      const suiteSamples = samplesFromSuite(suite);
+      const tier1 = core.runTier1Evaluation(profileDoc, suiteSamples);
+      const tier1ById = new Map(tier1.samples.map((sample) => [sample.id, Number(sample.score)]));
+      scenarios = suiteSamples.map((sample) => ({
+        ...sample,
+        tier1Score: tier1ById.has(sample.id) ? tier1ById.get(sample.id) : null
+      }));
+      sourceLabel = `built-in-suite:${slug}`;
+    }
 
     const baseVoice = {
       formality: asLevel(profileDoc.voice?.formality),
@@ -151,7 +193,7 @@ async function main() {
       ...PROFILE_META[slug],
       name: String(profileDoc.meta?.name ?? slug),
       description: String(profileDoc.meta?.description ?? ""),
-      profilePath: runData.profile_path,
+      profilePath: `profiles/${slug}.yaml`,
       profile: profileDoc,
       baseVoice,
       baseHumorStyle,
@@ -164,7 +206,11 @@ async function main() {
 
   const payload = {
     generatedAt: new Date().toISOString(),
-    sourceRuns: RUN_FILES,
+    sourceRuns: {
+      ...RUN_FILES,
+      educator: "built-in-suite:educator",
+      advisor: "built-in-suite:advisor"
+    },
     scenarioFile: "experiment/calibration/scenarios.v1.json",
     profileOrder: PROFILE_ORDER,
     levels: ["very-low", "low", "medium", "high", "very-high"],

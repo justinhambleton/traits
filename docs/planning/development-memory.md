@@ -413,3 +413,9 @@ Decision log for implementation-critical choices. Keep entries brief and factual
 - Why: Regulated advisory is a distinct policy archetype needed for profile breadth and evaluation workflows; bundling an advisor suite enables immediate Tier 1 baseline runs with no external scenario files.
 - Files: `profiles/advisor.yaml`, `packages/core/src/eval/scenarios/suites.ts`, `packages/cli/src/commands/eval.ts`, `packages/core/test/eval-suites.test.js`, `packages/cli/test/eval.test.js`, `docs/planning/development-memory.md`
 - Follow-up: Regenerate playground data and docs landing/profile cards so educator and advisor appear in interactive docs flows.
+
+- Date: 2026-02-15
+- Decision: Regenerate playground data with five-profile coverage and add suite-backed fallback generation in the build script for profiles without live A/B run artifacts.
+- Why: Playground selector needed to include `educator` and `advisor` immediately; using built-in suites for scenario/score hydration keeps data generation deterministic without blocking on new live-run files.
+- Files: `experiment/scripts/build-playground-data.mjs`, `docs/site/data/playground.json`, `docs/planning/development-memory.md`
+- Follow-up: Backfill live A/B run artifacts for educator/advisor and switch playground source mapping from suite fallback to live-run data once available.
