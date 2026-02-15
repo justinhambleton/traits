@@ -341,3 +341,15 @@ Decision log for implementation-critical choices. Keep entries brief and factual
 - Why: CI workflows need machine-consumable outputs; JSON exposes full eval payloads while JUnit enables scenario-level quality gates without changing core evaluator behavior.
 - Files: `packages/cli/src/commands/eval.ts`, `packages/cli/test/eval.test.js`, `docs/planning/development-memory.md`
 - Follow-up: Implement Phase 3b by adding Tier 2/3 interpretation caveat text to human-readable output only (exclude JSON/JUnit).
+
+- Date: 2026-02-15
+- Decision: Add Tier 2 and Tier 3 interpretation caveats to human-readable `traits eval` output only.
+- Why: Review feedback requires explicit guidance that higher-tier signals are useful but noisy; caveats now appear only where humans read results and are excluded from machine formats (`json`/`junit`).
+- Files: `packages/cli/src/commands/eval.ts`, `packages/cli/test/eval.test.js`, `docs/planning/development-memory.md`
+- Follow-up: Implement built-in baseline suites with `--suite` selection to complete Phase 3.
+
+- Date: 2026-02-15
+- Decision: Ship bundled baseline scenario suites (`support`, `healthcare`, `developer`) in core and add `traits eval --suite <name>` as an alternative sample source in CLI.
+- Why: Users needed starter scenario coverage without authoring custom files; suite loading now provides 8-scenario archetype baselines with realistic prompts and expected behaviors.
+- Files: `packages/core/src/eval/scenarios/suites.ts`, `packages/core/src/internal.ts`, `packages/core/test/eval-suites.test.js`, `packages/cli/src/commands/eval.ts`, `packages/cli/test/eval.test.js`, `docs/planning/development-memory.md`
+- Follow-up: Add docs coverage for `--suite` usage and include suite-selection examples in evaluation guide/help output.

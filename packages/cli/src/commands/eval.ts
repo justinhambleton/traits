@@ -9,6 +9,7 @@ import {
 import {
   detectEvalTierAvailability,
   formatValidationResult,
+  loadBuiltInEvalSuite,
   resolveTierExecution,
   runOfflineBaselineScaffold,
   toValidationResultObject
@@ -29,6 +30,7 @@ type EvalArgs = {
   profilePath: string | null;
   model: string | null;
   tier: number | null;
+  suite: string | null;
   provider: EvalProvider;
   embeddingModel: string | null;
   judgeModel: string | null;
@@ -84,6 +86,7 @@ function printEvalUsage(out: OutputWriter = process.stderr): void {
       "Options:",
       "  --model <model>           Model target (required)",
       "  --tier <1|2|3>            Highest tier to run (default: highest available)",
+      "  --suite <name>            Built-in baseline suite: support|healthcare|developer",
       "  --provider <name>         Judge provider for Tier 3: auto|openai|anthropic",
       "  --embedding-model <name>  Embedding model for Tier 2 (OpenAI)",
       "  --judge-model <name>      Judge model for Tier 3 provider",
@@ -117,6 +120,7 @@ function parseEvalArgs(args: string[]): ParsedEvalArgs {
     profilePath: null,
     model: null,
     tier: null,
+    suite: null,
     provider: "auto",
     embeddingModel: null,
     judgeModel: null,
@@ -177,6 +181,7 @@ function parseEvalArgs(args: string[]): ParsedEvalArgs {
     if (
       arg === "--model" ||
       arg === "--tier" ||
+      arg === "--suite" ||
       arg === "--provider" ||
       arg === "--format" ||
       arg === "--embedding-model" ||
@@ -198,6 +203,7 @@ function parseEvalArgs(args: string[]): ParsedEvalArgs {
       if (!value) return { error: `Missing value for "${arg}"` };
       if (arg === "--model") result.model = value;
       if (arg === "--tier") result.tier = Number(value);
+      if (arg === "--suite") result.suite = String(value).toLowerCase();
       if (arg === "--provider") {
         result.provider = String(value).toLowerCase() as EvalProvider;
       }
@@ -241,6 +247,20 @@ function parseEvalArgs(args: string[]): ParsedEvalArgs {
   if (!(["auto", "openai", "anthropic"] as const).includes(result.provider)) {
     return { error: 'Invalid "--provider" value. Expected auto, openai, or anthropic.' };
   }
+  if (
+    result.suite != null &&
+    !(["support", "healthcare", "developer"] as const).includes(
+      result.suite as "support" | "healthcare" | "developer"
+    )
+  ) {
+    return { error: 'Invalid "--suite" value. Expected support, healthcare, or developer.' };
+  }
+  if (result.suite != null && result.samplesPath != null) {
+    return { error: 'Use either "--suite" or "--samples/--scenarios", not both.' };
+  }
+  if (result.suite != null && result.responses.length > 0) {
+    return { error: 'Use either "--suite" or "--response", not both.' };
+  }
   if (!(["text", "json", "junit"] as const).includes(result.format)) {
     return { error: 'Invalid "--format" value. Expected text, json, or junit.' };
   }
@@ -275,6 +295,22 @@ function parseEvalArgs(args: string[]): ParsedEvalArgs {
 }
 
 function loadSamples(options: EvalArgs, cwd: string): EvalSample[] {
+  if (options.suite) {
+    const suite = loadBuiltInEvalSuite(options.suite);
+    if (!suite) {
+      throw new Error(
+        `Unknown suite "${options.suite}". Expected support, healthcare, or developer.`
+      );
+    }
+    return suite.scenarios.map((scenario) => ({
+      id: scenario.id,
+      prompt: scenario.messages
+        .map((message) => `${message.role}: ${message.content}`)
+        .join("\n"),
+      response: scenario.expected_behavior ?? ""
+    }));
+  }
+
   if (options.samplesPath) {
     const sampleFile = path.resolve(cwd, options.samplesPath);
     const parsed = JSON.parse(fs.readFileSync(sampleFile, "utf8")) as unknown;
@@ -589,6 +625,7 @@ export async function runEval(args: string[], io: CommandIO = process): Promise<
       profile: profilePath,
       model: options.model,
       format: options.format,
+      suite: options.suite,
       tier_requested: requestedTier,
       tier_executed: tierResolution.tier_executed,
       tier_resolution: tierResolution,

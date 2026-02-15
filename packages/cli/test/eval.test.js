@@ -249,6 +249,50 @@ test("traits eval supports sample file input", () => {
   }
 });
 
+test("traits eval supports built-in suite input", () => {
+  const result = runCLI([
+    "eval",
+    "profiles/resolve.yaml",
+    "--model",
+    "claude-sonnet",
+    "--suite",
+    "support",
+    "--json"
+  ]);
+  assert.equal(result.status, 0);
+  const output = JSON.parse(result.stdout);
+  assert.equal(output.suite, "support");
+  assert.equal(output.report.tier1.sample_count, 8);
+});
+
+test("traits eval rejects invalid suite value", () => {
+  const result = runCLI([
+    "eval",
+    "profiles/resolve.yaml",
+    "--model",
+    "claude-sonnet",
+    "--suite",
+    "finance"
+  ]);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /Invalid "--suite" value/);
+});
+
+test("traits eval rejects suite mixed with inline responses", () => {
+  const result = runCLI([
+    "eval",
+    "profiles/resolve.yaml",
+    "--model",
+    "claude-sonnet",
+    "--suite",
+    "support",
+    "--response",
+    "sample"
+  ]);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /Use either "--suite" or "--response"/);
+});
+
 test("traits eval accepts provider runtime flags", () => {
   const result = runCLI([
     "eval",
