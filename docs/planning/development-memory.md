@@ -281,3 +281,9 @@ Decision log for implementation-critical choices. Keep entries brief and factual
 - Why: Prevent fallback auth from an unrelated token path during trusted publishing so OIDC is the sole publish credential mechanism and failure signals remain actionable.
 - Files: `.github/workflows/release.yml`, `docs/planning/development-memory.md`
 - Follow-up: Re-run release after npm trusted publisher/scope setup to validate first `@traits-dev/*` publish.
+
+- Date: 2026-02-15
+- Decision: Re-enable token-based npm auth env (`NPM_TOKEN`/`NODE_AUTH_TOKEN`) in release publish step as a bootstrap path for first publish.
+- Why: First publish failed under OIDC-only flow; until npm trusted publisher linkage is fully effective for `@traits-dev/*`, bootstrap publishing requires explicit token auth.
+- Files: `.github/workflows/release.yml`, `docs/planning/development-memory.md`
+- Follow-up: After first successful publish and trusted publisher validation, remove token env again and return to OIDC-only publishing.
