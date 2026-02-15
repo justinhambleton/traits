@@ -192,10 +192,11 @@ Trusted publishing is configured via npm OIDC in CI.
 
 ## Documentation
 
-- Landing: `docs/site/index.md`
 - Schema reference: `docs/site/schema-reference.md`
 - Guides: `docs/site/guides/`
 - API reference: `docs/site/api/core.md`
+- Contributing guide: `CONTRIBUTING.md`
+- Security policy: `SECURITY.md`
 
 ## License
 
