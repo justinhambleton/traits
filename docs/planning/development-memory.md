@@ -329,3 +329,9 @@ Decision log for implementation-critical choices. Keep entries brief and factual
 - Why: External feedback identified framework integration examples as the immediate adoption blocker; providing direct copy-paste recipes for OpenAI, Anthropic, Vercel AI SDK, and routing patterns removes the "where does compiled text go?" gap.
 - Files: `docs/site/guides/integrations.md`, `docs/.vitepress/config.mts`, `docs/site/index.md`, `docs/planning/development-memory.md`
 - Follow-up: Continue Phase 2 by filling remaining guide/API pages to eliminate nav dead-ends and complete docs coverage for first-time adopters.
+
+- Date: 2026-02-15
+- Decision: Complete Phase 2 docs core pages by expanding onboarding (`first-profile`), inheritance safety (`extending-profiles`), eval interpretation (`running-evaluations`), and full public API signatures (`api/core`).
+- Why: Adoption feedback cited incomplete guides and skeletal API docs as blockers; these pages now provide an end-to-end onboarding path plus implementation-level reference detail.
+- Files: `docs/site/guides/first-profile.md`, `docs/site/guides/extending-profiles.md`, `docs/site/guides/running-evaluations.md`, `docs/site/api/core.md`, `docs/planning/development-memory.md`
+- Follow-up: Add the remaining Phase 2 documentation pages and run a link-check pass to confirm zero dead internal links before promoting docs externally.

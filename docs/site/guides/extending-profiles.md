@@ -1,31 +1,90 @@
 # Extend Profiles Safely
 
-Use `extends` to create variants without copying full profiles.
+Use `extends` when you want controlled reuse without copy-pasting full YAML.
 
-## Base pattern
+## Example: `brand-base` -> `domain-health`
+
+Parent (`brand-base.yaml`):
 
 ```yaml
-schema: "v1.4"
-extends: "resolve"
+schema: "v1.5"
 meta:
-  name: "resolve-enterprise"
+  name: "brand-base"
+  version: "1.0.0"
+  description: "Shared brand voice policy"
+identity:
+  role: "Brand assistant"
+voice:
+  formality: "medium"
+  warmth: "high"
+  verbosity: "medium"
+  directness: "medium"
+  empathy: "high"
+  humor:
+    target: "very-low"
+    style: "none"
+behavioral_rules:
+  - "Acknowledge user goals before proposing actions"
+capabilities:
+  tools: []
+  constraints:
+    - "Never claim actions without tool confirmation."
+  handoff:
+    trigger: "Request needs unavailable operations."
+    action: "Offer handoff to a human operator."
 ```
 
-## Rules that matter
+Child (`domain-health.yaml`):
 
-- Safety arrays append by default; they do not silently replace parent values.
-- `context_adaptations` merge by `when` key.
-- Use `_remove` keys only when intentional and auditable.
+```yaml
+schema: "v1.5"
+extends: "brand-base"
+meta:
+  name: "domain-health"
+  description: "Healthcare-safe variant"
+voice:
+  directness:
+    target: "medium"
+    adapt: true
+    floor: "low"
+    ceiling: "medium"
+behavioral_rules:
+  - "Never diagnose; frame guidance as context for professional care"
+context_adaptations:
+  - when: "crisis_indicators"
+    priority: 100
+    inject:
+      - "Provide emergency and crisis resources immediately"
+```
 
-## Important diagnostics
+## Merge behavior to remember
 
-- `S006` warns when you remove safety-relevant parent constraints.
-- `S006` errors if merged safety constraints are fewer than parent.
-- `S007` warns when safety-critical adaptations are missing priority (`100` expected).
+1. `meta`, `identity`: field-level merge.
+2. `voice`: child replaces each dimension it sets.
+3. `behavioral_rules`: append with dedup.
+4. `vocabulary.preferred_terms` / `forbidden_terms`: append with case-insensitive dedup.
+5. `context_adaptations`: merge by `when` key (same key replaced, new key appended).
+6. `capabilities`: tools/constraints append with dedup; `handoff` fields are child-over-parent.
+
+## Removal escape hatches
+
+Use removals only when there is an explicit policy reason:
+
+- `behavioral_rules_remove`
+- `vocabulary.preferred_terms_remove`
+- `vocabulary.forbidden_terms_remove`
+- `context_adaptations_remove`
+
+## Safety diagnostics in inheritance
+
+1. `S006` warns on safety-relevant removals and errors on net safety regression.
+2. `S007` warns when safety-named adaptations are missing `priority: 100`.
 
 ## Recommended workflow
 
-1. Validate parent.
-2. Validate child.
-3. Validate child with `--strict`.
-4. Compile and inspect trace output.
+```bash
+pnpm exec traits validate brand-base.yaml
+pnpm exec traits validate domain-health.yaml
+pnpm exec traits validate domain-health.yaml --strict
+pnpm exec traits compile domain-health.yaml --model gpt-4o
+```
