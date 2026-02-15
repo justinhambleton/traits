@@ -419,3 +419,9 @@ Decision log for implementation-critical choices. Keep entries brief and factual
 - Why: Playground selector needed to include `educator` and `advisor` immediately; using built-in suites for scenario/score hydration keeps data generation deterministic without blocking on new live-run files.
 - Files: `experiment/scripts/build-playground-data.mjs`, `docs/site/data/playground.json`, `docs/planning/development-memory.md`
 - Follow-up: Backfill live A/B run artifacts for educator/advisor and switch playground source mapping from suite fallback to live-run data once available.
+
+- Date: 2026-02-15
+- Decision: Defer Tier 1 scorer calibration expansion for education/advisory verticals after observing uniform `0.55` scores across all educator/advisor suite scenarios.
+- Why: Current Tier 1 weighting and marker set are heavily vocabulary-driven and not yet discriminating enough for new vertical phrasing; this is a calibration quality issue, not a release blocker for profile/suite shipping.
+- Files: `docs/planning/development-memory.md`
+- Follow-up: Add domain-specific preferred-term and structure markers for education/advisory and rerun Tier 1 distribution checks to verify scenario-level variance.
