@@ -165,6 +165,32 @@ test("traits eval with tier 2 request falls back to tier 1 scaffold", () => {
   assert.match(result.stderr, /Tier 2 unavailable:/);
 });
 
+test("traits eval text output prints Tier 2 and Tier 3 interpretation caveats when tiers execute", () => {
+  const result = runCLI([
+    "eval",
+    "profiles/resolve.yaml",
+    "--model",
+    "claude-sonnet",
+    "--response",
+    "I understand. Here's what I can do next."
+  ]);
+  assert.equal(result.status, 0);
+
+  if (result.stdout.includes("Tier 2 average score:")) {
+    assert.match(
+      result.stdout,
+      /Note: Tier 2 embedding scores are directionally useful but sensitive to model granularity\./
+    );
+  }
+
+  if (result.stdout.includes("Tier 3 average score:")) {
+    assert.match(
+      result.stdout,
+      /Note: Tier 3 judge scores are noisy across runs\. Do not use as a sole merge gate\./
+    );
+  }
+});
+
 test("traits eval provider preference affects tier 3 availability messaging", () => {
   const result = runCLI([
     "eval",

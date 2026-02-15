@@ -630,9 +630,15 @@ export async function runEval(args: string[], io: CommandIO = process): Promise<
     }
     if (tierReports.tier2) {
       io.stdout.write(`Tier 2 average score: ${tierReports.tier2.average_score.toFixed(3)}\n`);
+      io.stdout.write(
+        "Note: Tier 2 embedding scores are directionally useful but sensitive to model granularity.\n"
+      );
     }
     if (tierReports.tier3) {
       io.stdout.write(`Tier 3 average score: ${tierReports.tier3.average_score.toFixed(3)}\n`);
+      io.stdout.write(
+        "Note: Tier 3 judge scores are noisy across runs. Do not use as a sole merge gate.\n"
+      );
     }
     if (baselineReport?.tier1) {
       io.stdout.write(
