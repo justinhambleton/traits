@@ -31,5 +31,6 @@ pnpm exec traits eval my-profile.yaml --tier 1
 
 1. [Interactive Showcase](/showcase)
 2. [Schema Reference (`v1.5`)](/schema-reference)
-3. [Write Your First Profile](/guides/first-profile)
-4. [API Reference (`@traits-dev/core`)](/api/core)
+3. [Integration Recipes](/guides/integrations)
+4. [Write Your First Profile](/guides/first-profile)
+5. [API Reference (`@traits-dev/core`)](/api/core)
