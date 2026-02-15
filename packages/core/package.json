@@ -1,6 +1,6 @@
 {
   "name": "@traits-dev/core",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Core traits.dev SDK for voice profile validation, behavioral policy compilation, and evaluation.",
   "keywords": [
     "traits-dev",
