@@ -335,3 +335,9 @@ Decision log for implementation-critical choices. Keep entries brief and factual
 - Why: Adoption feedback cited incomplete guides and skeletal API docs as blockers; these pages now provide an end-to-end onboarding path plus implementation-level reference detail.
 - Files: `docs/site/guides/first-profile.md`, `docs/site/guides/extending-profiles.md`, `docs/site/guides/running-evaluations.md`, `docs/site/api/core.md`, `docs/planning/development-memory.md`
 - Follow-up: Add the remaining Phase 2 documentation pages and run a link-check pass to confirm zero dead internal links before promoting docs externally.
+
+- Date: 2026-02-15
+- Decision: Implement Phase 3c eval output formats in CLI by adding `--format json|junit` (default text), keeping `--json` as backward-compatible alias, and introducing JUnit threshold controls for per-scenario pass/fail mapping.
+- Why: CI workflows need machine-consumable outputs; JSON exposes full eval payloads while JUnit enables scenario-level quality gates without changing core evaluator behavior.
+- Files: `packages/cli/src/commands/eval.ts`, `packages/cli/test/eval.test.js`, `docs/planning/development-memory.md`
+- Follow-up: Implement Phase 3b by adding Tier 2/3 interpretation caveat text to human-readable output only (exclude JSON/JUnit).

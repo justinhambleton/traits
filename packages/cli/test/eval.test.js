@@ -62,6 +62,61 @@ test("traits eval --json emits structured report", () => {
   assert.equal(output.report.overall_score > 0, true);
 });
 
+test("traits eval --format json emits structured report", () => {
+  const result = runCLI([
+    "eval",
+    "profiles/resolve.yaml",
+    "--model",
+    "claude-sonnet",
+    "--response",
+    "I understand. Here's what I can do next.",
+    "--format",
+    "json"
+  ]);
+  assert.equal(result.status, 0);
+  const output = JSON.parse(result.stdout);
+  assert.equal(output.format, "json");
+  assert.equal(output.tier_executed, 1);
+  assert.equal(output.report.tier1.tier, 1);
+});
+
+test("traits eval --format junit emits xml report", () => {
+  const result = runCLI([
+    "eval",
+    "profiles/resolve.yaml",
+    "--model",
+    "claude-sonnet",
+    "--response",
+    "I understand. Here's what I can do next.",
+    "--format",
+    "junit",
+    "--junit-threshold",
+    "0.1"
+  ]);
+  assert.equal(result.status, 0);
+  assert.match(result.stdout, /\<\?xml version="1.0" encoding="UTF-8"\?\>/);
+  assert.match(result.stdout, /\<testsuite name="traits\.eval"/);
+  assert.match(result.stdout, /\<testcase classname="traits\.eval\.resolve" name="sample-1"/);
+  assert.doesNotMatch(result.stdout, /\<failure message=/);
+});
+
+test("traits eval --format junit exits non-zero on threshold failures", () => {
+  const result = runCLI([
+    "eval",
+    "profiles/resolve.yaml",
+    "--model",
+    "claude-sonnet",
+    "--response",
+    "ok",
+    "--format",
+    "junit",
+    "--junit-threshold-tier1",
+    "0.8"
+  ]);
+  assert.equal(result.status, 1);
+  assert.match(result.stdout, /\<failure message="traits eval threshold failure"/);
+});
+
 test("traits eval --no-helpfulness disables helpfulness checks", () => {
   const result = runCLI([
     "eval",
@@ -208,4 +263,36 @@ test("traits eval rejects invalid provider runtime numeric flags", () => {
   ]);
   assert.equal(result.status, 1);
   assert.match(result.stderr, /Invalid "--max-retries" value/);
+});
+
+test("traits eval rejects invalid --format value", () => {
+  const result = runCLI([
+    "eval",
+    "profiles/resolve.yaml",
+    "--model",
+    "claude-sonnet",
+    "--response",
+    "sample",
+    "--format",
+    "csv"
+  ]);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /Invalid "--format" value/);
+});
+
+test("traits eval rejects invalid JUnit threshold value", () => {
+  const result = runCLI([
+    "eval",
+    "profiles/resolve.yaml",
+    "--model",
+    "claude-sonnet",
+    "--response",
+    "sample",
+    "--format",
+    "junit",
+    "--junit-threshold",
+    "2"
+  ]);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /Invalid "--junit-threshold" value/);
 });

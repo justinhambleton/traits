@@ -23,6 +23,8 @@ type EvalSample = {
   response?: string;
 };
 
+type OutputFormat = "text" | "json" | "junit";
+
 type EvalArgs = {
   profilePath: string | null;
   model: string | null;
@@ -36,6 +38,11 @@ type EvalArgs = {
   maxRetries: number | null;
   retryBaseMs: number | null;
   json: boolean;
+  format: OutputFormat;
+  junitThreshold: number | null;
+  junitThresholdTier1: number | null;
+  junitThresholdTier2: number | null;
+  junitThresholdTier3: number | null;
   strict: boolean;
   verbose: boolean;
   noColor: boolean;
@@ -62,6 +69,12 @@ type TierReports = {
   tier3?: Tier3Report;
 };
 
+type JUnitThresholds = {
+  tier1: number;
+  tier2: number;
+  tier3: number;
+};
+
 function printEvalUsage(out: OutputWriter = process.stderr): void {
   out.write(
     [
@@ -83,6 +96,11 @@ function printEvalUsage(out: OutputWriter = process.stderr): void {
       "  --samples <path>          JSON file with samples: [{ id, response }]",
       "  --scenarios <path>        Alias for --samples in this scaffold",
       "  --json                    Output structured JSON",
+      "  --format <text|json|junit> Output format (default: text)",
+      "  --junit-threshold <num>   Global JUnit pass threshold in [0,1] (default: 0.7)",
+      "  --junit-threshold-tier1 <num> Tier 1 JUnit threshold override",
+      "  --junit-threshold-tier2 <num> Tier 2 JUnit threshold override",
+      "  --junit-threshold-tier3 <num> Tier 3 JUnit threshold override",
       "  --strict                  Treat validation warnings as errors",
       "  --verbose                 Include command metadata output",
       "  --no-color                Disable colorized output",
@@ -108,6 +126,11 @@ function parseEvalArgs(args: string[]): ParsedEvalArgs {
     maxRetries: null,
     retryBaseMs: null,
     json: false,
+    format: "text",
+    junitThreshold: null,
+    junitThresholdTier1: null,
+    junitThresholdTier2: null,
+    junitThresholdTier3: null,
     strict: false,
     verbose: false,
     noColor: false,
@@ -123,6 +146,7 @@ function parseEvalArgs(args: string[]): ParsedEvalArgs {
     const arg = args[index];
     if (arg === "--json") {
       result.json = true;
+      result.format = "json";
       continue;
     }
     if (arg === "--strict") {
@@ -154,6 +178,7 @@ function parseEvalArgs(args: string[]): ParsedEvalArgs {
       arg === "--model" ||
       arg === "--tier" ||
       arg === "--provider" ||
+      arg === "--format" ||
       arg === "--embedding-model" ||
       arg === "--judge-model" ||
       arg === "--openai-base-url" ||
@@ -161,6 +186,10 @@ function parseEvalArgs(args: string[]): ParsedEvalArgs {
       arg === "--timeout-ms" ||
       arg === "--max-retries" ||
       arg === "--retry-base-ms" ||
+      arg === "--junit-threshold" ||
+      arg === "--junit-threshold-tier1" ||
+      arg === "--junit-threshold-tier2" ||
+      arg === "--junit-threshold-tier3" ||
       arg === "--response" ||
       arg === "--samples" ||
       arg === "--scenarios"
@@ -172,6 +201,9 @@ function parseEvalArgs(args: string[]): ParsedEvalArgs {
       if (arg === "--provider") {
         result.provider = String(value).toLowerCase() as EvalProvider;
       }
+      if (arg === "--format") {
+        result.format = String(value).toLowerCase() as OutputFormat;
+      }
       if (arg === "--embedding-model") result.embeddingModel = value;
       if (arg === "--judge-model") result.judgeModel = value;
       if (arg === "--openai-base-url") result.openaiBaseUrl = value;
@@ -179,6 +211,10 @@ function parseEvalArgs(args: string[]): ParsedEvalArgs {
       if (arg === "--timeout-ms") result.timeoutMs = Number(value);
       if (arg === "--max-retries") result.maxRetries = Number(value);
       if (arg === "--retry-base-ms") result.retryBaseMs = Number(value);
+      if (arg === "--junit-threshold") result.junitThreshold = Number(value);
+      if (arg === "--junit-threshold-tier1") result.junitThresholdTier1 = Number(value);
+      if (arg === "--junit-threshold-tier2") result.junitThresholdTier2 = Number(value);
+      if (arg === "--junit-threshold-tier3") result.junitThresholdTier3 = Number(value);
       if (arg === "--response") result.responses.push(value);
       if (arg === "--samples" || arg === "--scenarios") result.samplesPath = value;
       index += 1;
@@ -205,6 +241,9 @@ function parseEvalArgs(args: string[]): ParsedEvalArgs {
   if (!(["auto", "openai", "anthropic"] as const).includes(result.provider)) {
     return { error: 'Invalid "--provider" value. Expected auto, openai, or anthropic.' };
   }
+  if (!(["text", "json", "junit"] as const).includes(result.format)) {
+    return { error: 'Invalid "--format" value. Expected text, json, or junit.' };
+  }
   if (result.timeoutMs != null && (!Number.isInteger(result.timeoutMs) || result.timeoutMs < 0)) {
     return { error: 'Invalid "--timeout-ms" value. Expected a non-negative integer.' };
   }
@@ -219,6 +258,17 @@ function parseEvalArgs(args: string[]): ParsedEvalArgs {
     (!Number.isInteger(result.retryBaseMs) || result.retryBaseMs < 0)
   ) {
     return { error: 'Invalid "--retry-base-ms" value. Expected a non-negative integer.' };
+  }
+  for (const [flag, value] of [
+    ["--junit-threshold", result.junitThreshold],
+    ["--junit-threshold-tier1", result.junitThresholdTier1],
+    ["--junit-threshold-tier2", result.junitThresholdTier2],
+    ["--junit-threshold-tier3", result.junitThresholdTier3]
+  ] as const) {
+    if (value == null) continue;
+    if (!Number.isFinite(value) || value < 0 || value > 1) {
+      return { error: `Invalid "${flag}" value. Expected a number in [0, 1].` };
+    }
   }
 
   return { value: result };
@@ -255,8 +305,140 @@ function loadSamples(options: EvalArgs, cwd: string): EvalSample[] {
 }
 
 function writeProgress(io: CommandIO, options: EvalArgs, message: string): void {
-  if (options.json) return;
+  if (options.format !== "text") return;
   io.stderr.write(`${message}\n`);
+}
+
+function escapeXml(value: unknown): string {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
+function resolveJUnitThresholds(options: EvalArgs): JUnitThresholds {
+  const base = options.junitThreshold ?? 0.7;
+  return {
+    tier1: options.junitThresholdTier1 ?? base,
+    tier2: options.junitThresholdTier2 ?? base,
+    tier3: options.junitThresholdTier3 ?? base
+  };
+}
+
+function buildSampleScoreMap(
+  samples: Array<{ id: string; score: number }> | undefined
+): Map<string, number> {
+  return new Map((samples ?? []).map((sample) => [String(sample.id), Number(sample.score)]));
+}
+
+function collectScenarioIds(reports: TierReports): string[] {
+  const ids: string[] = [];
+  const seen = new Set<string>();
+
+  for (const sample of reports.tier1?.samples ?? []) {
+    const id = String(sample.id);
+    if (seen.has(id)) continue;
+    seen.add(id);
+    ids.push(id);
+  }
+  for (const sample of reports.tier2?.samples ?? []) {
+    const id = String(sample.id);
+    if (seen.has(id)) continue;
+    seen.add(id);
+    ids.push(id);
+  }
+  for (const sample of reports.tier3?.samples ?? []) {
+    const id = String(sample.id);
+    if (seen.has(id)) continue;
+    seen.add(id);
+    ids.push(id);
+  }
+
+  return ids;
+}
+
+function buildJUnitReport(args: {
+  profilePath: string;
+  model: string;
+  tierReports: TierReports;
+  thresholds: JUnitThresholds;
+}): { xml: string; tests: number; failures: number } {
+  const ids = collectScenarioIds(args.tierReports);
+  const tier1Scores = buildSampleScoreMap(args.tierReports.tier1?.samples);
+  const tier2Scores = buildSampleScoreMap(args.tierReports.tier2?.samples);
+  const tier3Scores = buildSampleScoreMap(args.tierReports.tier3?.samples);
+  const className = `traits.eval.${path.basename(args.profilePath, path.extname(args.profilePath))}`;
+
+  let failures = 0;
+  const testCases: string[] = [];
+  for (const id of ids) {
+    const reasons: string[] = [];
+    const scoreLines: string[] = [];
+
+    const tier1 = tier1Scores.get(id);
+    if (tier1 != null) {
+      scoreLines.push(`tier1=${tier1.toFixed(3)} threshold=${args.thresholds.tier1.toFixed(3)}`);
+      if (tier1 < args.thresholds.tier1) {
+        reasons.push(
+          `Tier 1 score ${tier1.toFixed(3)} below threshold ${args.thresholds.tier1.toFixed(3)}`
+        );
+      }
+    }
+    const tier2 = tier2Scores.get(id);
+    if (tier2 != null) {
+      scoreLines.push(`tier2=${tier2.toFixed(3)} threshold=${args.thresholds.tier2.toFixed(3)}`);
+      if (tier2 < args.thresholds.tier2) {
+        reasons.push(
+          `Tier 2 score ${tier2.toFixed(3)} below threshold ${args.thresholds.tier2.toFixed(3)}`
+        );
+      }
+    }
+    const tier3 = tier3Scores.get(id);
+    if (tier3 != null) {
+      scoreLines.push(`tier3=${tier3.toFixed(3)} threshold=${args.thresholds.tier3.toFixed(3)}`);
+      if (tier3 < args.thresholds.tier3) {
+        reasons.push(
+          `Tier 3 score ${tier3.toFixed(3)} below threshold ${args.thresholds.tier3.toFixed(3)}`
+        );
+      }
+    }
+
+    const testcase: string[] = [];
+    testcase.push(
+      `  <testcase classname="${escapeXml(className)}" name="${escapeXml(id)}" time="0">`
+    );
+    if (reasons.length > 0) {
+      failures += 1;
+      testcase.push(
+        `    <failure message="${escapeXml("traits eval threshold failure")}">${escapeXml(
+          reasons.join(" | ")
+        )}</failure>`
+      );
+    }
+    if (scoreLines.length > 0) {
+      testcase.push(`    <system-out>${escapeXml(scoreLines.join(" | "))}</system-out>`);
+    }
+    testcase.push("  </testcase>");
+    testCases.push(testcase.join("\n"));
+  }
+
+  const xml = [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    "<testsuites>",
+    `  <testsuite name="traits.eval" tests="${ids.length}" failures="${failures}" errors="0" skipped="0" time="0">`,
+    `    <properties><property name="profile" value="${escapeXml(args.profilePath)}" /><property name="model" value="${escapeXml(args.model)}" /><property name="threshold_tier1" value="${args.thresholds.tier1.toFixed(3)}" /><property name="threshold_tier2" value="${args.thresholds.tier2.toFixed(3)}" /><property name="threshold_tier3" value="${args.thresholds.tier3.toFixed(3)}" /></properties>`,
+    ...testCases,
+    "  </testsuite>",
+    "</testsuites>"
+  ].join("\n");
+
+  return {
+    xml,
+    tests: ids.length,
+    failures
+  };
 }
 
 type CommandError = {
@@ -406,6 +588,7 @@ export async function runEval(args: string[], io: CommandIO = process): Promise<
     const payload: Record<string, unknown> = {
       profile: profilePath,
       model: options.model,
+      format: options.format,
       tier_requested: requestedTier,
       tier_executed: tierResolution.tier_executed,
       tier_resolution: tierResolution,
@@ -424,9 +607,19 @@ export async function runEval(args: string[], io: CommandIO = process): Promise<
       };
     }
 
-    if (options.json) {
+    if (options.format === "json") {
       io.stdout.write(`${JSON.stringify(payload, null, 2)}\n`);
       return 0;
+    }
+    if (options.format === "junit") {
+      const junit = buildJUnitReport({
+        profilePath,
+        model: options.model,
+        tierReports,
+        thresholds: resolveJUnitThresholds(options)
+      });
+      io.stdout.write(`${junit.xml}\n`);
+      return junit.failures > 0 ? 1 : 0;
     }
 
     if (tierReports.tier1) {
@@ -466,7 +659,7 @@ export async function runEval(args: string[], io: CommandIO = process): Promise<
     if (
       (typedError.code === "E_EVAL_TIER2_UNAVAILABLE" ||
         typedError.code === "E_EVAL_TIER3_UNAVAILABLE") &&
-      !options.json
+      options.format !== "json"
     ) {
       io.stderr.write(`Error: ${typedError.message ?? "Evaluation tier unavailable."}\n`);
       return 2;
@@ -475,7 +668,7 @@ export async function runEval(args: string[], io: CommandIO = process): Promise<
     if (
       (typedError.code === "E_EVAL_TIER2_UNAVAILABLE" ||
         typedError.code === "E_EVAL_TIER3_UNAVAILABLE") &&
-      options.json
+      options.format === "json"
     ) {
       io.stdout.write(
         `${JSON.stringify(
@@ -495,7 +688,7 @@ export async function runEval(args: string[], io: CommandIO = process): Promise<
       | undefined;
 
     if (typedError.code === "E_EVAL_VALIDATION" && validation) {
-      if (options.json) {
+      if (options.format === "json") {
         io.stdout.write(
           `${JSON.stringify(
             {
