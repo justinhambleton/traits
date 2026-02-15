@@ -287,3 +287,9 @@ Decision log for implementation-critical choices. Keep entries brief and factual
 - Why: First publish failed under OIDC-only flow; until npm trusted publisher linkage is fully effective for `@traits-dev/*`, bootstrap publishing requires explicit token auth.
 - Files: `.github/workflows/release.yml`, `docs/planning/development-memory.md`
 - Follow-up: After first successful publish and trusted publisher validation, remove token env again and return to OIDC-only publishing.
+
+- Date: 2026-02-15
+- Decision: Return release workflow to OIDC-only npm publishing after trusted publishers were configured for both `@traits-dev/core` and `@traits-dev/cli`.
+- Why: With packages now published and trusted publisher links in place, token-based fallback is no longer needed; removing secret-based auth restores least-privilege CI publishing with provenance.
+- Files: `.github/workflows/release.yml`, `docs/planning/development-memory.md`
+- Follow-up: Execute the next package version publish (0.1.1+) to verify tokenless OIDC publish end-to-end and then permanently remove repository `NPM_TOKEN` secret.
