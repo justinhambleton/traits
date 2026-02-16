@@ -431,3 +431,9 @@ Decision log for implementation-critical choices. Keep entries brief and factual
 - Why: Tier 1 had a hard floor (`0.55`) for clean responses with no preferred-term hits, producing poor discrimination across domains. The updated scorer now surfaces per-dimension alignment and yields scenario-level variance across all bundled suites.
 - Files: `packages/core/src/eval/dimension-signals.ts`, `packages/core/src/eval/tier1.ts`, `packages/core/test/eval-tier1.test.js`, `docs/planning/development-memory.md`
 - Follow-up: Expand signal coverage for medium-target dimensions (especially warmth/empathy in healthcare/support suites) so dimension alignment contributes beyond verbosity/humor in terse expected-behavior baseline responses.
+
+- Date: 2026-02-16
+- Decision: Recompute playground scenario Tier 1 scores at data-build time from stored run responses, instead of trusting stale `run` artifact tier1 values.
+- Why: Tier 1 scoring changed, but run artifacts contain frozen historical scores. Recomputing in `build-playground-data` keeps the docs playground cards and scenario badges aligned with the current scorer without regenerating live response runs.
+- Files: `experiment/scripts/build-playground-data.mjs`, `docs/site/data/playground.json`, `docs/planning/development-memory.md`
+- Follow-up: If showcase/run artifacts are used outside docs, add an explicit migration script to refresh historical tier reports in run JSON files after major scoring revisions.

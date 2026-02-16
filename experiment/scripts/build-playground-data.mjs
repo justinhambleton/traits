@@ -82,10 +82,11 @@ async function loadCore(repoRoot) {
   if (
     typeof core.compileProfile !== "function" ||
     typeof core.loadProfileFile !== "function" ||
-    typeof core.renderImportedProfileYAML !== "function"
+    typeof core.renderImportedProfileYAML !== "function" ||
+    typeof core.runTier1Evaluation !== "function"
   ) {
     throw new Error(
-      "Missing required core exports (compileProfile/loadProfileFile/renderImportedProfileYAML)."
+      "Missing required core exports (compileProfile/loadProfileFile/renderImportedProfileYAML/runTier1Evaluation)."
     );
   }
   return core;
@@ -142,14 +143,18 @@ async function main() {
       const runPath = path.join(repoRoot, RUN_FILES[slug]);
       assertFile(runPath);
       const runData = readJson(runPath);
-      const sampleById = new Map(
-        (runData.arms?.compiled?.samples ?? []).map((sample) => [String(sample.id), sample])
-      );
+      const runSamples = (runData.arms?.compiled?.samples ?? []).map((sample) => ({
+        id: String(sample?.id ?? ""),
+        prompt: String(sample?.prompt ?? ""),
+        response: String(sample?.response ?? "")
+      }));
+      const sampleById = new Map(runSamples.map((sample) => [String(sample.id), sample]));
+      // Recompute Tier 1 against current scorer so playground cards stay in sync with scoring updates.
+      const recomputedTier1 = core.runTier1Evaluation(profileDoc, runSamples, {
+        includeHelpfulness: true
+      });
       const tier1ById = new Map(
-        (runData.arms?.compiled?.reports?.tier1?.samples ?? []).map((sample) => [
-          String(sample.id),
-          Number(sample.score ?? 0)
-        ])
+        recomputedTier1.samples.map((sample) => [String(sample.id), Number(sample.score ?? 0)])
       );
       scenarios = (runData.scenario_ids ?? []).map((scenarioId) => {
         const id = String(scenarioId);
