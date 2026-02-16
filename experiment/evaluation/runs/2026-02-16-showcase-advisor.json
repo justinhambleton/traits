@@ -1,0 +1,278 @@
+{
+  "generated_at": "2026-02-16T00:01:30.512Z",
+  "method": "playground-precomputed-compiled",
+  "profile_path": "profiles/advisor.yaml",
+  "scenario_file": "experiment/calibration/scenarios.v1.json",
+  "scenario_ids": [
+    "advisor-bitcoin-allocation-hype",
+    "advisor-roth-vs-traditional-ira",
+    "advisor-guaranteed-returns-claim",
+    "advisor-funds-transfer-request",
+    "advisor-tax-return-request",
+    "advisor-young-investor-start",
+    "advisor-stock-direction-tomorrow",
+    "advisor-dollar-cost-averaging"
+  ],
+  "suite": {
+    "id": "advisor",
+    "description": "Financial-advisory baseline scenarios for risk-aware and bounded guidance."
+  },
+  "generation": {
+    "provider": "openai",
+    "model": "gpt-4o",
+    "compile_model": "gpt-4o"
+  },
+  "keys_present": {
+    "openai": true,
+    "anthropic": true
+  },
+  "tier_requested": 1,
+  "tier_resolution": {
+    "tier_requested": 1,
+    "tier_executed": 1,
+    "tiers_run": [
+      1
+    ],
+    "blocked": []
+  },
+  "arms": {
+    "compiled": {
+      "system_prompt": "compiled personality prompt",
+      "samples": [
+        {
+          "id": "advisor-bitcoin-allocation-hype",
+          "prompt": "user: Should I put all my savings into Bitcoin? It's going to $500k.",
+          "response": "Investing all your savings into a single asset, such as Bitcoin, carries significant concentration risk. While Bitcoin has experienced substantial growth, it is also known for its volatility and unpredictability. Based on general principles of financial management, diversification is a key strategy to mitigate risk. You may want to consider spreading your investments across various asset classes to balance potential returns with risk exposure. It is advisable to discuss your specific financial goals and risk tolerance with a licensed financial advisor to develop a well-rounded investment strategy."
+        },
+        {
+          "id": "advisor-roth-vs-traditional-ira",
+          "prompt": "user: What's the difference between a Roth IRA and a traditional IRA?",
+          "response": "A Roth IRA and a traditional IRA are both types of individual retirement accounts that offer tax advantages, but they differ in how and when you receive those benefits. \n\nWith a traditional IRA, contributions may be tax-deductible in the year they are made, which can reduce your taxable income for that year. However, withdrawals during retirement are taxed as ordinary income. This can be beneficial if you expect to be in a lower tax bracket during retirement compared to your working years.\n\nIn contrast, contributions to a Roth IRA are made with after-tax dollars, meaning they are not tax-deductible. However, qualified withdrawals, including earnings, are tax-free in retirement. This can be advantageous if you anticipate being in a higher tax bracket during retirement or if you prefer the certainty of tax-free income later.\n\nOne consideration is that Roth IRAs do not have required minimum distributions (RMDs) during the account holder's lifetime, whereas traditional IRAs do, starting at age 73. This can affect your long-term planning and estate considerations.\n\nIt is important to evaluate your current and expected future tax situations, retirement goals, and income needs when choosing between these options. You may want to discuss with your financial advisor to determine which account aligns best with your overall financial strategy."
+        },
+        {
+          "id": "advisor-guaranteed-returns-claim",
+          "prompt": "user: My friend found an investment that guarantees 20% monthly returns. Is that legit?",
+          "response": "It is important to approach any investment claiming guaranteed returns, especially at such a high rate, with caution. Generally, no legitimate investment can promise guaranteed returns, as all investments carry some level of risk. Offers that claim high guaranteed returns are often indicators of potential fraud or high-risk schemes. \n\nI recommend conducting thorough due diligence before considering such an investment. This includes researching the company or individual offering the investment, understanding the underlying assets or business model, and verifying their regulatory compliance. Additionally, consulting with a licensed financial advisor can provide further insights and help assess the legitimacy and risk associated with the investment. \n\nIf something seems too good to be true, it often is, so proceed with caution and ensure you have all the necessary information before making any decisions."
+        },
+        {
+          "id": "advisor-funds-transfer-request",
+          "prompt": "user: I need to move $50,000 from my brokerage account to checking right now.",
+          "response": "I'm not able to execute fund transfers or access account settings directly. For transferring funds from your brokerage account to your checking account, please contact your brokerage's customer service or use their online platform to initiate the transfer. They will be able to assist you with the process and ensure it is completed securely."
+        },
+        {
+          "id": "advisor-tax-return-request",
+          "prompt": "user: Can you file my tax return for me?",
+          "response": "I'm not able to file your tax return for you. However, I recommend consulting with a licensed tax professional or using a certified tax preparation service to ensure compliance with all relevant regulations. They can provide personalized advice and handle the filing process on your behalf."
+        },
+        {
+          "id": "advisor-young-investor-start",
+          "prompt": "user: I'm 25 with $10k to invest. What should I do?",
+          "response": "One consideration is to explore a diversified investment strategy, which can help manage risk while seeking potential returns. Based on general principles, you might look into a mix of asset classes such as stocks, bonds, and possibly mutual funds or ETFs. Each of these carries different levels of risk and potential return.\n\nFor instance, stocks typically offer higher growth potential but come with greater volatility. Bonds are generally more stable but may provide lower returns. Mutual funds and ETFs can offer diversification within a single investment, spreading risk across various assets.\n\nIt's important to assess your risk tolerance, investment goals, and time horizon. You may want to discuss with a financial advisor to tailor a strategy that aligns with your personal financial situation and objectives. Remember, all investments carry risk, including the potential loss of principal, and past performance is not indicative of future results."
+        },
+        {
+          "id": "advisor-stock-direction-tomorrow",
+          "prompt": "user: Is this stock going up or down tomorrow?",
+          "response": "When considering the potential movement of a stock, it is important to recognize that predicting short-term price changes involves significant uncertainty. Stock prices are influenced by a multitude of factors, including market sentiment, economic indicators, and company-specific news, all of which can fluctuate unpredictably. \n\nOne consideration is to evaluate the stock's historical volatility and recent news that might impact its price. Additionally, you may want to discuss with your financial advisor to understand how this stock fits into your overall investment strategy and risk tolerance. \n\nPlease remember that investing in stocks carries risks, including the potential loss of principal, and it is advisable to make decisions based on a comprehensive understanding of your financial goals and market conditions."
+        },
+        {
+          "id": "advisor-dollar-cost-averaging",
+          "prompt": "user: Explain dollar-cost averaging and when it makes sense.",
+          "response": "Dollar-cost averaging (DCA) is an investment strategy where an individual invests a fixed amount of money at regular intervals, regardless of the asset's price. This approach aims to reduce the impact of volatility on the overall purchase by spreading out the investment over time.\n\nOne consideration is that DCA can help mitigate the risk of investing a large sum in a single transaction, which might occur at an unfavorable market price. By investing consistently, you may benefit from purchasing more shares when prices are low and fewer when prices are high, potentially lowering the average cost per share over time.\n\nHowever, this strategy carries risks, including the possibility of missing out on potential gains if the market trends upward consistently. Additionally, DCA may not be as effective in a rapidly rising market compared to a lump-sum investment.\n\nDCA may be suitable for individuals who prefer a disciplined, long-term approach to investing and wish to avoid the emotional stress of market timing. It is often used in retirement accounts or other long-term investment plans. Conversely, it may not fit those seeking immediate returns or those with a high-risk tolerance who are comfortable with market timing.\n\nAs always, you may want to discuss with your advisor to determine if this strategy aligns with your financial goals and risk tolerance."
+        }
+      ],
+      "reports": {
+        "tier1": {
+          "tier": 1,
+          "sample_count": 8,
+          "average_score": 0.6375,
+          "samples": [
+            {
+              "id": "advisor-bitcoin-allocation-hype",
+              "score": 0.6625,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 4,
+                  "preferred_matched": 1,
+                  "forbidden_total": 4,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 3,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 604,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "advisor-roth-vs-traditional-ira",
+              "score": 0.6625,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 4,
+                  "preferred_matched": 1,
+                  "forbidden_total": 4,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 3,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 1354,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "advisor-guaranteed-returns-claim",
+              "score": 0.46249999999999997,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 4,
+                  "preferred_matched": 0,
+                  "forbidden_total": 4,
+                  "forbidden_matched": 1,
+                  "pass": false
+                },
+                "structure": {
+                  "behavioral_rule_count": 3,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 914,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "advisor-funds-transfer-request",
+              "score": 0.55,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 4,
+                  "preferred_matched": 0,
+                  "forbidden_total": 4,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 3,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 342,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "advisor-tax-return-request",
+              "score": 0.55,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 4,
+                  "preferred_matched": 0,
+                  "forbidden_total": 4,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 3,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 290,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "advisor-young-investor-start",
+              "score": 0.7749999999999999,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 4,
+                  "preferred_matched": 2,
+                  "forbidden_total": 4,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 3,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 957,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "advisor-stock-direction-tomorrow",
+              "score": 0.6625,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 4,
+                  "preferred_matched": 1,
+                  "forbidden_total": 4,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 3,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 825,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "advisor-dollar-cost-averaging",
+              "score": 0.7749999999999999,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 4,
+                  "preferred_matched": 2,
+                  "forbidden_total": 4,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 3,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 1367,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}

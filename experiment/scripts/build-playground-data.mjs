@@ -6,7 +6,9 @@ import { fileURLToPath } from "node:url";
 const RUN_FILES = {
   haven: "experiment/evaluation/runs/2026-02-14-live-ab-haven-expanded-v1.json",
   resolve: "experiment/evaluation/runs/2026-02-14-live-ab-resolve-refined-v2.json",
-  architect: "experiment/evaluation/runs/2026-02-14-live-ab-architect-v7-tier2-style-only.json"
+  architect: "experiment/evaluation/runs/2026-02-14-live-ab-architect-v7-tier2-style-only.json",
+  educator: "experiment/evaluation/runs/2026-02-16-showcase-educator.json",
+  advisor: "experiment/evaluation/runs/2026-02-16-showcase-advisor.json"
 };
 
 const PROFILE_META = {
@@ -206,11 +208,9 @@ async function main() {
 
   const payload = {
     generatedAt: new Date().toISOString(),
-    sourceRuns: {
-      ...RUN_FILES,
-      educator: "built-in-suite:educator",
-      advisor: "built-in-suite:advisor"
-    },
+    sourceRuns: Object.fromEntries(
+      PROFILE_ORDER.map((slug) => [slug, RUN_FILES[slug] ?? `built-in-suite:${slug}`])
+    ),
     scenarioFile: "experiment/calibration/scenarios.v1.json",
     profileOrder: PROFILE_ORDER,
     levels: ["very-low", "low", "medium", "high", "very-high"],

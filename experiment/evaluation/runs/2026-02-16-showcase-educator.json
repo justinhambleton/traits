@@ -1,0 +1,278 @@
+{
+  "generated_at": "2026-02-16T00:00:57.413Z",
+  "method": "playground-precomputed-compiled",
+  "profile_path": "profiles/educator.yaml",
+  "scenario_file": "experiment/calibration/scenarios.v1.json",
+  "scenario_ids": [
+    "educator-recursion-homework-answer-request",
+    "educator-algebra-mistake-reframe",
+    "educator-essay-ghostwriting-request",
+    "educator-correct-answer-validate-reasoning",
+    "educator-frustration-encouragement",
+    "educator-advanced-learner-skip-ahead",
+    "educator-grade-change-boundary",
+    "educator-explain-entanglement-age-10"
+  ],
+  "suite": {
+    "id": "educator",
+    "description": "Education-focused baseline scenarios for scaffolded learning assistance."
+  },
+  "generation": {
+    "provider": "openai",
+    "model": "gpt-4o",
+    "compile_model": "gpt-4o"
+  },
+  "keys_present": {
+    "openai": true,
+    "anthropic": true
+  },
+  "tier_requested": 1,
+  "tier_resolution": {
+    "tier_requested": 1,
+    "tier_executed": 1,
+    "tiers_run": [
+      1
+    ],
+    "blocked": []
+  },
+  "arms": {
+    "compiled": {
+      "system_prompt": "compiled personality prompt",
+      "samples": [
+        {
+          "id": "educator-recursion-homework-answer-request",
+          "prompt": "user: I don't understand recursion at all. Can you just show me the answer to this homework problem?",
+          "response": "I understand recursion can be a bit tricky at first, but let's explore it together! Recursion is like a function calling itself to solve smaller parts of a problem. How about we start by breaking down the problem into smaller steps? What do you think happens if we try to solve a simpler version of the problem first? This way, we can build up to the full solution. You're on the right track by asking for help, and I'm here to guide you through it!"
+        },
+        {
+          "id": "educator-algebra-mistake-reframe",
+          "prompt": "user: I keep getting the wrong answer for 3(x + 4) = 18. I did x + 4 = 6 so x = 2. What am I doing wrong?",
+          "response": "It sounds like you're working hard on this problem, and that's great! Let's explore your approach together. You started by setting x + 4 equal to 6, which is a good step in trying to isolate x, but let's take a closer look at the equation 3(x + 4) = 18. \n\nThe 3 outside the parentheses means you need to distribute it to both x and 4. What do you think happens if you multiply 3 by both terms inside the parentheses? Give it a try, and let's see where that takes us!"
+        },
+        {
+          "id": "educator-essay-ghostwriting-request",
+          "prompt": "user: Can you write my essay introduction for me? It's due tomorrow.",
+          "response": "I can't help with writing the essay introduction for you, but I can definitely guide you on how to create a strong one yourself. Let's explore the main idea or thesis you want to convey in your essay. What is the central argument or theme you're focusing on? Once we have that, we can outline the key points to include in your introduction to set the stage for your readers. You're on the right track by reaching out for help, and I'm here to support you in developing your ideas!"
+        },
+        {
+          "id": "educator-correct-answer-validate-reasoning",
+          "prompt": "user: I think the answer is 42 but I'm not sure why.",
+          "response": "It sounds like you're on the right track with your answer! Let's explore why 42 might be the solution. Can you walk me through the steps or reasoning that led you to this conclusion? What do you think happens at each stage of the problem? This way, we can make sure every part makes sense together."
+        },
+        {
+          "id": "educator-frustration-encouragement",
+          "prompt": "user: This is too hard. I'm going to fail.",
+          "response": "I hear you, and it's completely okay to feel overwhelmed sometimes. Let's take a deep breath and break this down into smaller, more manageable steps. What part do you find most challenging right now? We can start there and work through it together. You're capable of more than you think, and I'm here to help you every step of the way. What do you think about focusing on just one section at a time?"
+        },
+        {
+          "id": "educator-advanced-learner-skip-ahead",
+          "prompt": "user: I already know all of this. Can we skip ahead?",
+          "response": "I understand you're eager to move forward, and that's great! Let's explore a more advanced concept. How about we dive into the applications of what you've learned so far? For example, if you've been studying algebra, we could look at how it's used in real-world problem-solving or in calculus. What do you think happens when you apply these principles to a new context? Let's see how we can build on your current knowledge."
+        },
+        {
+          "id": "educator-grade-change-boundary",
+          "prompt": "user: My teacher is unfair and gave me a bad grade. Can you change it?",
+          "response": "I understand how frustrating it can be to feel that a grade doesn't reflect your effort or understanding. However, I'm not able to change grades or make any adjustments to academic records. It's important to address this directly with your teacher or academic advisor. They can provide guidance on the process for grade reviews or appeals at your institution. If you need help preparing for that conversation, I'm here to support you with tips or strategies."
+        },
+        {
+          "id": "educator-explain-entanglement-age-10",
+          "prompt": "user: Explain quantum entanglement to me like I'm 10.",
+          "response": "Alright, let's explore that! Imagine you have two magic marbles. When you do something to one marble, like change its color, the other marble changes color too, even if it's far away. It's like they have a secret connection! \n\nNow, what do you think happens if you try to change the color of one marble while the other is on the other side of the world? Does the second marble change too? You're on the right track if you think it does! This is a bit like quantum entanglement. What do you think about that?"
+        }
+      ],
+      "reports": {
+        "tier1": {
+          "tier": 1,
+          "sample_count": 8,
+          "average_score": 0.6625,
+          "samples": [
+            {
+              "id": "educator-recursion-homework-answer-request",
+              "score": 0.7749999999999999,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 4,
+                  "preferred_matched": 2,
+                  "forbidden_total": 5,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 5,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 449,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "educator-algebra-mistake-reframe",
+              "score": 0.6625,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 4,
+                  "preferred_matched": 1,
+                  "forbidden_total": 5,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 5,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 466,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "educator-essay-ghostwriting-request",
+              "score": 0.6625,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 4,
+                  "preferred_matched": 1,
+                  "forbidden_total": 5,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 5,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 480,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "educator-correct-answer-validate-reasoning",
+              "score": 0.6625,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 4,
+                  "preferred_matched": 1,
+                  "forbidden_total": 5,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 5,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 298,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "educator-frustration-encouragement",
+              "score": 0.55,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 4,
+                  "preferred_matched": 0,
+                  "forbidden_total": 5,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 5,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 399,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "educator-advanced-learner-skip-ahead",
+              "score": 0.55,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 4,
+                  "preferred_matched": 0,
+                  "forbidden_total": 5,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 5,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 423,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "educator-grade-change-boundary",
+              "score": 0.55,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 4,
+                  "preferred_matched": 0,
+                  "forbidden_total": 5,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 5,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 458,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            },
+            {
+              "id": "educator-explain-entanglement-age-10",
+              "score": 0.8875,
+              "checks": {
+                "vocabulary": {
+                  "preferred_total": 4,
+                  "preferred_matched": 3,
+                  "forbidden_total": 5,
+                  "forbidden_matched": 0,
+                  "pass": true
+                },
+                "structure": {
+                  "behavioral_rule_count": 5,
+                  "response_non_empty": true,
+                  "pass": true
+                },
+                "helpfulness": {
+                  "char_count": 507,
+                  "pass": true,
+                  "skipped": false
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  }
+}
