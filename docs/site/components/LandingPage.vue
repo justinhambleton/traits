@@ -2,16 +2,18 @@
   <div class="landing-shell">
     <header class="top-nav">
       <a class="brand" :href="links.home">traits.dev</a>
-      <nav>
-        <a :href="links.quickstart">Quickstart</a>
-        <a :href="links.playground">Playground</a>
-        <a :href="links.guides">Guides</a>
-        <a :href="links.reference">Reference</a>
-        <a :href="links.api">API</a>
-      </nav>
-      <a class="github-link" href="https://github.com/justinhambleton/traits" target="_blank" rel="noreferrer" aria-label="GitHub">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
-      </a>
+      <div class="nav-group">
+        <nav>
+          <a :href="links.quickstart">Quickstart</a>
+          <a :href="links.playground">Playground</a>
+          <a :href="links.guides">Guides</a>
+          <a :href="links.reference">Reference</a>
+          <a :href="links.api">API</a>
+        </nav>
+        <a class="github-link" href="https://github.com/justinhambleton/traits" target="_blank" rel="noreferrer" aria-label="GitHub">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+        </a>
+      </div>
     </header>
 
     <section class="hero section">
@@ -61,36 +63,51 @@
         Each profile defines voice targets, behavioral rules, and capability boundaries
         for a specific domain. Use them as base policies or extend them for your fleet.
       </p>
-      <div class="profile-grid">
-        <article
+      <div class="profile-tabs">
+        <button
           v-for="profile in profiles"
           :key="profile.id"
-          class="profile-card"
-          :style="{ '--accent': profile.accent }"
+          type="button"
+          :class="{ active: activeProfile === profile.id }"
+          :style="activeProfile === profile.id ? { background: profile.accent, borderColor: profile.accent } : {}"
+          @click="activeProfile = profile.id"
         >
-          <div class="profile-header">
-            <p class="profile-name">{{ profile.name }}</p>
+          {{ profile.name }}
+        </button>
+      </div>
+      <article
+        v-for="profile in profiles"
+        :key="profile.id"
+        class="profile-detail"
+        :style="{ '--profile-accent': profile.accent }"
+        v-show="activeProfile === profile.id"
+      >
+        <div class="profile-detail-top">
+          <div class="profile-detail-info">
             <h3>{{ profile.title }}</h3>
-            <p>{{ profile.description }}</p>
+            <p class="profile-desc">{{ profile.description }}</p>
+            <div class="sample">
+              <p class="sample-label">Scenario</p>
+              <p class="sample-prompt">{{ profile.sample.prompt }}</p>
+              <p class="sample-label">Response style</p>
+              <p class="sample-response">{{ profile.sample.response }}</p>
+            </div>
+            <a class="profile-link" :href="`${links.playground}?profile=${profile.id}`">Explore in Playground</a>
           </div>
-          <div class="dimension-bars">
-            <div v-for="dimension in profile.dimensions" :key="`${profile.id}-${dimension.name}`" class="dimension-row">
-              <span>{{ dimension.name }}</span>
-              <div class="bar-track">
-                <div class="bar-fill" :style="{ width: `${levelPercent(dimension.value)}%` }" />
+          <div class="profile-detail-dims">
+            <p class="dims-label">Voice dimensions</p>
+            <div class="dimension-bars">
+              <div v-for="dimension in profile.dimensions" :key="`${profile.id}-${dimension.name}`" class="dimension-row">
+                <span>{{ dimension.name }}</span>
+                <div class="bar-track">
+                  <div class="bar-fill" :style="{ width: `${levelPercent(dimension.value)}%`, background: profile.accent }" />
+                </div>
+                <strong>{{ dimension.value }}</strong>
               </div>
-              <strong>{{ dimension.value }}</strong>
             </div>
           </div>
-          <div class="sample">
-            <p class="sample-label">Scenario</p>
-            <p class="sample-prompt">{{ profile.sample.prompt }}</p>
-            <p class="sample-label">Response style</p>
-            <p class="sample-response">{{ profile.sample.response }}</p>
-          </div>
-          <a class="profile-link" :href="`${links.playground}?profile=${profile.id}`">Explore in Playground</a>
-        </article>
-      </div>
+        </div>
+      </article>
     </section>
 
     <section class="integrations section">
@@ -143,6 +160,7 @@ import { withBase } from "vitepress";
 
 const installCopied = ref(false);
 const snippetCopied = ref(false);
+const activeProfile = ref("haven");
 
 const links = {
   home: withBase("/"),
@@ -273,6 +291,46 @@ const profiles = [
       response:
         "Start with Root cause / Patch / Next check framing and prioritize concrete triage commands over theory."
     }
+  },
+  {
+    id: "educator",
+    name: "educator",
+    title: "Learning Companion",
+    accent: "#a78bfa",
+    description: "Guided tutoring policy with Socratic questioning, scaffolded explanations, and encouragement-first feedback that adapts to learner confidence.",
+    dimensions: [
+      { name: "Formality", value: "low" },
+      { name: "Warmth", value: "high" },
+      { name: "Verbosity", value: "medium" },
+      { name: "Directness", value: "medium" },
+      { name: "Empathy", value: "high" },
+      { name: "Humor", value: "low" }
+    ],
+    sample: {
+      prompt: "I don't understand recursion at all. Can you help with my homework?",
+      response:
+        "Start with encouragement, then walk through the concept using a concrete analogy before guiding the student to solve it themselves."
+    }
+  },
+  {
+    id: "advisor",
+    name: "advisor",
+    title: "Regulated Advisory Assistant",
+    accent: "#facc15",
+    description: "Risk-aware financial guidance policy with regulatory disclaimers, concentration-risk warnings, and mandatory referral-to-licensed-professional constraints.",
+    dimensions: [
+      { name: "Formality", value: "high" },
+      { name: "Warmth", value: "medium" },
+      { name: "Verbosity", value: "medium" },
+      { name: "Directness", value: "high" },
+      { name: "Empathy", value: "medium" },
+      { name: "Humor", value: "very-low" }
+    ],
+    sample: {
+      prompt: "Should I put all my savings into Bitcoin?",
+      response:
+        "Flag concentration risk, explain diversification principles, and always include a disclaimer to consult a licensed financial advisor."
+    }
   }
 ];
 
@@ -381,11 +439,11 @@ function levelPercent(level) {
 .landing-shell {
   --ink: #e5e7eb;
   --muted: #9ca3af;
-  --surface: #0a0f1a;
+  --surface: #1F2937;
   --surface-2: #111827;
   --surface-3: #111827;
   --border: #374151;
-  --accent: #60a5fa;
+  --accent: #FFA77F;
   color: var(--ink);
   background: var(--surface);
   min-height: 100vh;
@@ -413,6 +471,12 @@ function levelPercent(level) {
   align-items: center;
   border-bottom: 1px solid var(--border);
   padding-bottom: 16px;
+}
+
+.nav-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .top-nav nav {
@@ -461,7 +525,7 @@ function levelPercent(level) {
 }
 
 .hero h1 {
-  margin: 8px 0 0;
+  margin: 16px 0 0;
   font-size: clamp(2.2rem, 6vw, 4.1rem);
   line-height: 1.02;
   color: #f8fafc;
@@ -469,7 +533,7 @@ function levelPercent(level) {
 }
 
 .subhead {
-  margin: 16px 0 0;
+  margin: 24px 0 0;
   color: #d1d5db;
   font-size: 1.06rem;
   max-width: 56ch;
@@ -477,9 +541,9 @@ function levelPercent(level) {
 }
 
 .install-command {
-  margin-top: 24px;
+  margin-top: 32px;
   border: 1px solid var(--border);
-  background: #030712;
+  background: #0f172a;
   color: #e5e7eb;
   border-radius: 0;
   padding: 12px 16px;
@@ -500,7 +564,7 @@ function levelPercent(level) {
 }
 
 .hero-buttons {
-  margin-top: 12px;
+  margin-top: 16px;
   display: flex;
   gap: 8px;
 }
@@ -590,7 +654,7 @@ function levelPercent(level) {
   margin: 0;
   border-radius: 0;
   border: 1px solid var(--border);
-  background: #030712;
+  background: #0f172a;
   padding: 16px;
   min-height: 220px;
   overflow-x: auto;
@@ -605,52 +669,80 @@ function levelPercent(level) {
   max-width: 72ch;
 }
 
-.profile-grid {
+.profile-tabs {
   margin-top: 24px;
-  display: grid;
-  gap: 16px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
-.profile-card {
+.profile-tabs button {
   border: 1px solid var(--border);
   border-radius: 0;
+  padding: 8px 20px;
   background: var(--surface-2);
-  overflow: hidden;
+  color: #9ca3af;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-transform: lowercase;
+  letter-spacing: 0.02em;
+}
+
+.profile-tabs button.active {
+  color: #1F2937;
+}
+
+.profile-tabs button:not(.active):hover {
+  border-color: var(--accent);
+  color: var(--ink);
+}
+
+.profile-detail {
+  margin-top: 16px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+}
+
+.profile-detail-top {
   display: grid;
-  grid-template-rows: auto auto 1fr auto;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
 }
 
-.profile-header {
-  padding: 16px;
-  background: var(--surface-2);
-  border-bottom: 1px solid var(--border);
+.profile-detail-info {
+  padding: 24px;
+  border-right: 1px solid var(--border);
 }
 
-.profile-name {
+.profile-detail-info h3 {
   margin: 0;
+  font-size: 1.3rem;
+}
+
+.profile-desc {
+  margin: 8px 0 0;
+  color: #d1d5db;
+  line-height: 1.5;
+  font-size: 0.92rem;
+}
+
+.profile-detail-dims {
+  padding: 24px;
+}
+
+.dims-label {
+  margin: 0 0 16px;
+  font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  font-size: 0.72rem;
+  color: #9ca3af;
   font-weight: 700;
-  color: var(--accent);
-}
-
-.profile-header h3 {
-  margin: 4px 0;
-  font-size: 1.1rem;
-}
-
-.profile-header p {
-  margin: 0;
-  color: #d1d5db;
-  line-height: 1.45;
 }
 
 .dimension-bars {
-  padding: 16px;
   display: grid;
-  gap: 8px;
+  gap: 12px;
 }
 
 .dimension-row {
@@ -662,29 +754,30 @@ function levelPercent(level) {
 
 .dimension-row span {
   color: #9ca3af;
-  font-size: 0.75rem;
+  font-size: 0.78rem;
 }
 
 .dimension-row strong {
   color: #e5e7eb;
   text-transform: capitalize;
-  font-size: 0.7rem;
+  font-size: 0.73rem;
 }
 
 .bar-track {
   border-radius: 0;
   height: 8px;
-  background: #1f2937;
+  background: #273345;
 }
 
 .bar-fill {
   height: 100%;
   border-radius: 0;
-  background: var(--accent);
 }
 
 .sample {
-  padding: 0 16px 16px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
 }
 
 .sample-label {
@@ -693,6 +786,10 @@ function levelPercent(level) {
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: #9ca3af;
+}
+
+.sample-label:first-child {
+  margin-top: 0;
 }
 
 .sample-prompt {
@@ -704,19 +801,19 @@ function levelPercent(level) {
 .sample-response {
   margin: 0;
   color: #d1d5db;
+  line-height: 1.5;
 }
 
 .profile-link {
-  border-top: 1px solid var(--border);
-  display: block;
+  display: inline-block;
+  margin-top: 16px;
   text-decoration: none;
-  color: var(--accent);
+  color: var(--profile-accent, var(--accent));
   font-weight: 600;
-  padding: 16px;
 }
 
 .profile-link:hover {
-  color: #93c5fd;
+  color: #ffcbb0;
 }
 
 .integration-tabs {
@@ -736,9 +833,9 @@ function levelPercent(level) {
 }
 
 .integration-tabs button.active {
-  background: #2563eb;
-  border-color: #2563eb;
-  color: #f8fafc;
+  background: #FFA77F;
+  border-color: #FFA77F;
+  color: #1F2937;
 }
 
 .integration-code {
@@ -766,7 +863,7 @@ function levelPercent(level) {
   margin: 0;
   border-radius: 0;
   border: 1px solid var(--border);
-  background: #030712;
+  background: #0f172a;
   color: #e5e7eb;
   padding: 16px;
   overflow-x: auto;
@@ -817,9 +914,17 @@ function levelPercent(level) {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .governance-grid,
-  .profile-grid {
+  .governance-grid {
     grid-template-columns: 1fr;
+  }
+
+  .profile-detail-top {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-detail-info {
+    border-right: none;
+    border-bottom: 1px solid var(--border);
   }
 }
 
@@ -875,7 +980,7 @@ function levelPercent(level) {
 }
 
 :global(html:not(.dark)) .eyebrow {
-  color: #2563eb;
+  color: #FFA77F;
 }
 
 :global(html:not(.dark)) .install-command {
@@ -891,8 +996,8 @@ function levelPercent(level) {
 }
 
 :global(html:not(.dark)) .hero-btn:hover {
-  border-color: #2563eb;
-  color: #2563eb;
+  border-color: #FFA77F;
+  color: #FFA77F;
 }
 
 :global(html:not(.dark)) .workflow h2,
@@ -925,22 +1030,27 @@ function levelPercent(level) {
   border-color: #374151;
 }
 
-:global(html:not(.dark)) .profile-card {
+:global(html:not(.dark)) .profile-tabs button {
   background: #ffffff;
   border-color: #d1d5db;
 }
 
-:global(html:not(.dark)) .profile-header {
-  background: #f8f9fa;
+:global(html:not(.dark)) .profile-detail {
+  background: #ffffff;
+  border-color: #d1d5db;
 }
 
-:global(html:not(.dark)) .profile-header p,
+:global(html:not(.dark)) .profile-detail-info {
+  border-color: #d1d5db;
+}
+
+:global(html:not(.dark)) .profile-desc,
 :global(html:not(.dark)) .sample-response {
   color: #374151;
 }
 
 :global(html:not(.dark)) .sample-prompt,
-:global(html:not(.dark)) .profile-header h3 {
+:global(html:not(.dark)) .profile-detail-info h3 {
   color: #0a0a0a;
 }
 
@@ -952,16 +1062,8 @@ function levelPercent(level) {
   background: #e5e7eb;
 }
 
-:global(html:not(.dark)) .bar-fill {
-  background: #2563eb;
-}
-
-:global(html:not(.dark)) .profile-name {
-  color: #2563eb;
-}
-
 :global(html:not(.dark)) .profile-link {
-  color: #2563eb;
+  color: #374151;
 }
 
 :global(html:not(.dark)) .integration-tabs button {
@@ -970,9 +1072,9 @@ function levelPercent(level) {
 }
 
 :global(html:not(.dark)) .integration-tabs button.active {
-  background: #2563eb;
-  border-color: #2563eb;
-  color: #f8fafc;
+  background: #FFA77F;
+  border-color: #FFA77F;
+  color: #1F2937;
 }
 
 :global(html:not(.dark)) .integration-code pre {
@@ -982,7 +1084,7 @@ function levelPercent(level) {
 :global(html:not(.dark)) .copy-snippet {
   background: #f8f9fa;
   border-color: #d1d5db;
-  color: #2563eb;
+  color: #FFA77F;
 }
 
 :global(html:not(.dark)) .badge {
