@@ -425,3 +425,9 @@ Decision log for implementation-critical choices. Keep entries brief and factual
 - Why: Current Tier 1 weighting and marker set are heavily vocabulary-driven and not yet discriminating enough for new vertical phrasing; this is a calibration quality issue, not a release blocker for profile/suite shipping.
 - Files: `docs/planning/development-memory.md`
 - Follow-up: Add domain-specific preferred-term and structure markers for education/advisory and rerun Tier 1 distribution checks to verify scenario-level variance.
+
+- Date: 2026-02-16
+- Decision: Recalibrate Tier 1 scoring by adding deterministic voice-dimension signal dictionaries, partial multi-word preferred-term matching, dimension-level diagnostics, and a reweighted formula that prioritizes voice alignment over exact phrase hits.
+- Why: Tier 1 had a hard floor (`0.55`) for clean responses with no preferred-term hits, producing poor discrimination across domains. The updated scorer now surfaces per-dimension alignment and yields scenario-level variance across all bundled suites.
+- Files: `packages/core/src/eval/dimension-signals.ts`, `packages/core/src/eval/tier1.ts`, `packages/core/test/eval-tier1.test.js`, `docs/planning/development-memory.md`
+- Follow-up: Expand signal coverage for medium-target dimensions (especially warmth/empathy in healthcare/support suites) so dimension alignment contributes beyond verbosity/humor in terse expected-behavior baseline responses.
