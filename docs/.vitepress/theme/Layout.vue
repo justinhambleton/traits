@@ -1,7 +1,9 @@
 <template>
-  <LandingPage v-if="isLanding" />
-  <DefaultTheme.Layout v-else>
-    <template #aside-outline-before>
+  <DefaultTheme.Layout>
+    <template v-if="isLanding" #home-hero-before>
+      <LandingPage />
+    </template>
+    <template v-if="!isLanding" #aside-outline-before>
       <CopyMarkdownButton />
     </template>
   </DefaultTheme.Layout>
@@ -17,3 +19,20 @@ import CopyMarkdownButton from "../../site/components/CopyMarkdownButton.vue";
 const { page } = useData();
 const isLanding = computed(() => page.value.relativePath === "index.md");
 </script>
+
+<style>
+.is-home .VPHome {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.is-home .VPHomeHero,
+.is-home .VPHomeFeatures {
+  display: none;
+}
+
+.is-home .VPContent.has-sidebar {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+</style>

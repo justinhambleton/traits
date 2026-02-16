@@ -79,3 +79,48 @@
 .vp-doc .custom-block {
   border-radius: 0;
 }
+
+/* Home page — VitePress nav on dark landing background */
+.is-home .VPNav {
+  background: #1b1a1f;
+  border-bottom: 1px solid #374151;
+}
+
+.is-home .VPNavBar {
+  background: transparent !important;
+  border-bottom: none !important;
+}
+
+.is-home .VPNavBar .divider {
+  display: none;
+}
+
+.is-home .VPNavBarTitle .title {
+  color: #f8fafc;
+}
+
+.is-home .VPNavBarMenuLink {
+  color: #9ca3af;
+}
+
+.is-home .VPNavBarMenuLink:hover {
+  color: #e5e7eb;
+}
+
+.is-home .VPNavBarHamburger .top,
+.is-home .VPNavBarHamburger .middle,
+.is-home .VPNavBarHamburger .bottom {
+  background-color: #e5e7eb;
+}
+
+.is-home .VPNavBarExtra .icon {
+  fill: #9ca3af;
+}
+
+.is-home .VPSocialLink {
+  color: #9ca3af;
+}
+
+.is-home .VPSocialLink:hover {
+  color: #e5e7eb;
+}
