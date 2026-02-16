@@ -103,7 +103,12 @@
       <p class="expected"><strong>Expected behavior:</strong> {{ activeScenario.expectedBehavior }}</p>
 
       <div class="response-box">
-        <p v-if="isDefaultVoiceConfig">{{ typedResponse }}</p>
+        <p v-if="byokLoading" class="no-response">Generating...</p>
+        <p v-else-if="byokError" class="response-error">{{ byokError }}</p>
+        <template v-else-if="displayedResponseSource !== 'none'">
+          <span v-if="displayedResponseSource === 'live'" class="live-badge">Live response</span>
+          <p>{{ typedResponse }}</p>
+        </template>
         <p v-else class="no-response">
           No precomputed response for this custom slider configuration yet. Reset to the profile
           default voice to view the recorded sample for this scenario.
@@ -131,6 +136,12 @@
             @change="persistByokKey"
           />
         </label>
+        <div class="byok-actions">
+          <button type="button" :disabled="!canGenerateLiveResponse" @click="generateLiveResponse">
+            Generate Live Response
+          </button>
+          <span v-if="byokLoading" class="byok-status">Generating...</span>
+        </div>
       </details>
     </section>
   </div>
@@ -140,6 +151,7 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import {
   compileResolvedProfile,
+  evaluateTier1Response,
   validateResolvedProfile
 } from "../../../packages/core/dist/index.js";
 import playgroundData from "../data/playground.json";
@@ -176,6 +188,11 @@ const humorStyle = ref("none");
 
 const byokProvider = ref("openai");
 const byokKey = ref("");
+const byokResponse = ref("");
+const byokLoading = ref(false);
+const byokError = ref("");
+const byokTier1Score = ref(null);
+const byokRequestId = ref(0);
 
 const activeProfile = computed(
   () => profileMap.get(selectedProfileId.value) ?? orderedProfiles[0]
@@ -199,6 +216,7 @@ const typedResponse = ref("");
 const compiledPrompt = ref("");
 const validationWarnings = ref([]);
 const validationErrors = ref([]);
+const compilationReady = ref(false);
 
 function voiceSignature(value, style) {
   return [
@@ -219,8 +237,34 @@ const activeVoiceSignature = computed(() => voiceSignature(voice.value, humorSty
 const isDefaultVoiceConfig = computed(
   () => activeVoiceSignature.value === defaultVoiceSignature.value
 );
-const activeTier1Score = computed(() =>
-  isDefaultVoiceConfig.value ? activeScenario.value.tier1Score : null
+const displayedResponseSource = computed(() => {
+  if (byokResponse.value) return "live";
+  if (isDefaultVoiceConfig.value && activeScenario.value.response) return "precomputed";
+  return "none";
+});
+const displayedResponseText = computed(() => {
+  if (displayedResponseSource.value === "live") return String(byokResponse.value ?? "");
+  if (displayedResponseSource.value === "precomputed")
+    return String(activeScenario.value.response ?? "");
+  return "";
+});
+const activeTier1Score = computed(() => {
+  if (byokLoading.value || byokError.value) return null;
+  if (byokResponse.value) return byokTier1Score.value;
+  return isDefaultVoiceConfig.value ? activeScenario.value.tier1Score : null;
+});
+const hasByokKey = computed(() => byokKey.value.trim().length > 0);
+const hasSelectedScenario = computed(
+  () => Boolean(activeScenario.value.id) && Boolean(activeScenario.value.prompt)
+);
+const canGenerateLiveResponse = computed(
+  () =>
+    byokProvider.value === "openai" &&
+    !byokLoading.value &&
+    hasByokKey.value &&
+    hasSelectedScenario.value &&
+    compilationReady.value &&
+    compiledPrompt.value.trim().length > 0
 );
 
 function replaceVoiceYaml(template, voiceTargets, style) {
@@ -285,6 +329,14 @@ function buildMutableProfile() {
   return profile;
 }
 
+function clearByokState() {
+  byokRequestId.value += 1;
+  byokLoading.value = false;
+  byokResponse.value = "";
+  byokError.value = "";
+  byokTier1Score.value = null;
+}
+
 function runCompilationNow() {
   try {
     const profile = buildMutableProfile();
@@ -295,6 +347,7 @@ function runCompilationNow() {
     compiledPrompt.value = compiled.text;
     validationWarnings.value = validation.warnings ?? [];
     validationErrors.value = validation.errors ?? [];
+    compilationReady.value = true;
   } catch (error) {
     compiledPrompt.value = `Compilation error: ${error instanceof Error ? error.message : String(error)}`;
     validationWarnings.value = [];
@@ -306,6 +359,7 @@ function runCompilationNow() {
         severity: "error"
       }
     ];
+    compilationReady.value = false;
   }
 }
 
@@ -325,8 +379,10 @@ function resetProfileState(profile) {
   humorStyle.value = profile.baseHumorStyle ?? "none";
   selectedScenarioId.value = profile.defaultScenarioId ?? profile.scenarios?.[0]?.id ?? "";
   compiledPrompt.value = String(profile.compiledPrompt ?? "");
+  compilationReady.value = compiledPrompt.value.trim().length > 0;
   validationWarnings.value = [];
   validationErrors.value = [];
+  clearByokState();
 }
 
 function typeResponse(text) {
@@ -369,6 +425,101 @@ function persistByokKey() {
 function readByokKey() {
   if (typeof window === "undefined") return;
   byokKey.value = window.localStorage.getItem(`traits_docs_api_key_${byokProvider.value}`) ?? "";
+}
+
+function extractAssistantContent(payload) {
+  const content = payload?.choices?.[0]?.message?.content;
+  if (typeof content === "string") return content.trim();
+  if (Array.isArray(content)) {
+    return content
+      .map((part) => {
+        if (typeof part === "string") return part;
+        if (part && typeof part === "object" && typeof part.text === "string") return part.text;
+        return "";
+      })
+      .join("")
+      .trim();
+  }
+  return "";
+}
+
+async function generateLiveResponse() {
+  if (!canGenerateLiveResponse.value) return;
+  const requestId = byokRequestId.value + 1;
+  byokRequestId.value = requestId;
+  byokLoading.value = true;
+  byokResponse.value = "";
+  byokError.value = "";
+  byokTier1Score.value = null;
+  typedResponse.value = "";
+
+  try {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${byokKey.value.trim()}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "gpt-4o",
+        messages: [
+          { role: "system", content: compiledPrompt.value },
+          { role: "user", content: activeScenario.value.prompt }
+        ]
+      })
+    });
+
+    let payload = null;
+    try {
+      payload = await response.json();
+    } catch {
+      payload = null;
+    }
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error("Invalid API key. Check your key and try again.");
+      }
+      if (response.status === 429) {
+        throw new Error("Rate limited. Wait a moment and try again.");
+      }
+      const apiMessage =
+        payload &&
+        typeof payload === "object" &&
+        payload.error &&
+        typeof payload.error === "object" &&
+        typeof payload.error.message === "string"
+          ? payload.error.message
+          : `OpenAI request failed (${response.status}).`;
+      throw new Error(apiMessage);
+    }
+
+    const text = extractAssistantContent(payload);
+    if (!text) {
+      throw new Error("OpenAI response did not include assistant text.");
+    }
+
+    if (requestId !== byokRequestId.value) return;
+    byokResponse.value = text;
+
+    try {
+      const profile = buildMutableProfile();
+      byokTier1Score.value = Number(evaluateTier1Response(profile, text).score);
+    } catch {
+      byokTier1Score.value = null;
+    }
+  } catch (error) {
+    if (requestId !== byokRequestId.value) return;
+    if (error instanceof TypeError) {
+      byokError.value = "Network error. Check your connection.";
+    } else {
+      byokError.value = error instanceof Error ? error.message : String(error);
+    }
+  } finally {
+    if (requestId === byokRequestId.value) {
+      byokLoading.value = false;
+    }
+  }
 }
 
 function syncUrlState() {
@@ -423,9 +574,13 @@ watch(selectedProfileId, (profileId) => {
 });
 
 watch(
-  () => [activeScenario.value.id, activeScenario.value.response, isDefaultVoiceConfig.value],
-  () => {
-    typeResponse(isDefaultVoiceConfig.value ? activeScenario.value.response : "");
+  () => [displayedResponseText.value, byokLoading.value, byokError.value],
+  ([responseText, loading, errorText]) => {
+    if (loading || errorText || !responseText) {
+      typeResponse("");
+      return;
+    }
+    typeResponse(responseText);
   },
   { immediate: true }
 );
@@ -441,8 +596,15 @@ watch(
     voice.value.humor,
     humorStyle.value
   ],
-  scheduleCompilation
+  () => {
+    clearByokState();
+    scheduleCompilation();
+  }
 );
+
+watch(selectedScenarioId, () => {
+  clearByokState();
+});
 
 watch(
   () => [
@@ -459,7 +621,10 @@ watch(
   syncUrlState
 );
 
-watch(byokProvider, readByokKey);
+watch(byokProvider, () => {
+  clearByokState();
+  readByokKey();
+});
 
 onMounted(() => {
   applyUrlState();
@@ -737,6 +902,20 @@ onBeforeUnmount(() => {
   padding: 0.9rem;
 }
 
+.live-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 0.55rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: #dcfce7;
+  color: #166534;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+
 .response-box p {
   margin: 0;
   white-space: pre-wrap;
@@ -746,6 +925,10 @@ onBeforeUnmount(() => {
 
 .no-response {
   color: #475569 !important;
+}
+
+.response-error {
+  color: #991b1b !important;
 }
 
 .byok {
@@ -762,6 +945,36 @@ onBeforeUnmount(() => {
 .byok p {
   margin: 0.55rem 0 0;
   color: #475569;
+}
+
+.byok-actions {
+  margin-top: 0.65rem;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.byok-actions button {
+  border: 1px solid #3b82f6;
+  border-radius: 0.55rem;
+  background: #2563eb;
+  color: #ffffff;
+  padding: 0.45rem 0.65rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.byok-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  border-color: #94a3b8;
+  background: #64748b;
+}
+
+.byok-status {
+  font-size: 0.78rem;
+  color: #334155;
 }
 
 :global(.dark) .panel {
@@ -838,8 +1051,31 @@ onBeforeUnmount(() => {
   color: #adc0dc !important;
 }
 
+:global(.dark) .response-error {
+  color: #fca5a5 !important;
+}
+
+:global(.dark) .live-badge {
+  background: #134e4a;
+  color: #99f6e4;
+}
+
 :global(.dark) .byok {
   border-top-color: #30455f;
+}
+
+:global(.dark) .byok-actions button {
+  border-color: #60a5fa;
+  background: #2563eb;
+}
+
+:global(.dark) .byok-actions button:disabled {
+  border-color: #4b5563;
+  background: #334155;
+}
+
+:global(.dark) .byok-status {
+  color: #cbd5e1;
 }
 
 @media (max-width: 1100px) {
