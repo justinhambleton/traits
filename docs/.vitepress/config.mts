@@ -38,6 +38,7 @@ export default defineConfig({
             { text: "Integration Recipes", link: "/guides/integrations" },
             { text: "Write Your First Profile", link: "/guides/first-profile" },
             { text: "Extend Profiles Safely", link: "/guides/extending-profiles" },
+            { text: "Composition Patterns", link: "/guides/composition-patterns" },
             { text: "Run Evaluations", link: "/guides/running-evaluations" }
           ]
         }
