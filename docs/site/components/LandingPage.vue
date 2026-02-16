@@ -130,6 +130,10 @@
       </div>
     </section>
 
+    <footer class="site-footer">
+      <p>&copy; {{ new Date().getFullYear() }} FRNTR, LLC. All rights reserved.</p>
+      <p class="built-in">Built in California</p>
+    </footer>
   </div>
 </template>
 
@@ -786,6 +790,26 @@ function levelPercent(level) {
 .badge img {
   display: block;
   height: 28px;
+}
+
+.site-footer {
+  width: min(1120px, calc(100% - 2rem));
+  margin: 0 auto;
+  padding: 32px 0 24px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+.site-footer p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.site-footer .built-in {
+  margin-top: 8px;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
 }
 
 @media (max-width: 1024px) {
