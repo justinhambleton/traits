@@ -1,5 +1,16 @@
 # @traits-dev/core
 
+## 0.7.0
+
+### Minor Changes
+
+- 16fb191: Release 0.7.0 with Tier 1 calibration hardening and docs/playground alignment updates.
+
+  - Recalibrate Tier 1 scoring with deterministic dimension-alignment heuristics (formality, warmth, verbosity, directness, empathy, humor) and per-dimension diagnostics in `checks.dimensions`.
+  - Add partial preferred-term matching for multi-word vocabulary phrases (word-level coverage) to reduce false floor effects from exact-substring matching.
+  - Reweight Tier 1 formula to prioritize voice alignment while retaining forbidden-term penalties and helpfulness weighting.
+  - Recompute playground Tier 1 scenario scores against the current scorer during data build so docs previews stay in sync after scoring revisions.
+
 ## 0.6.0
 
 ### Minor Changes

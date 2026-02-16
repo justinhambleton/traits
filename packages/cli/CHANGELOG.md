@@ -1,5 +1,16 @@
 # @traits-dev/cli
 
+## 0.7.0
+
+### Minor Changes
+
+- 16fb191: Release 0.7.0 synchronized with core Tier 1 calibration improvements and playground/docs workflow updates.
+
+### Patch Changes
+
+- Updated dependencies [16fb191]
+  - @traits-dev/core@0.7.0
+
 ## 0.6.0
 
 ### Minor Changes
