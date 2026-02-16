@@ -645,48 +645,48 @@ onBeforeUnmount(() => {
 <style scoped>
 .playground-shell {
   display: grid;
-  gap: 1.1rem;
+  gap: 16px;
 }
 
 .playground-header {
-  border: 1px solid #294166;
-  border-radius: 1rem;
-  background: radial-gradient(circle at top right, #101f37 0%, #0b1424 56%, #0a1220 100%);
-  color: #dbeafe;
-  padding: 1.15rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0;
+  background: #f8f9fa;
+  color: #0a0a0a;
+  padding: 16px;
 }
 
 .playground-header h1 {
-  margin: 0.45rem 0;
+  margin: 8px 0;
   line-height: 1.2;
   font-size: clamp(1.35rem, 2vw + 0.6rem, 2.05rem);
 }
 
 .playground-header p {
   margin: 0;
-  color: #b8c9e4;
+  color: #6b7280;
 }
 
 .eyebrow {
   margin: 0;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #8db4f3;
+  color: #2563eb;
   font-size: 0.74rem;
   font-weight: 700;
 }
 
 .playground-grid {
   display: grid;
-  gap: 0.9rem;
+  gap: 16px;
   grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
 }
 
 .panel {
-  border: 1px solid #d2deef;
-  border-radius: 0.9rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0;
   background: #ffffff;
-  padding: 0.95rem;
+  padding: 16px;
 }
 
 .panel h2 {
@@ -695,40 +695,40 @@ onBeforeUnmount(() => {
 }
 
 .field {
-  margin-top: 0.75rem;
+  margin-top: 8px;
   display: grid;
-  gap: 0.3rem;
+  gap: 4px;
 }
 
 .field span {
   font-size: 0.8rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #64748b;
+  color: #6b7280;
   font-weight: 700;
 }
 
 .field select,
 .field input {
-  border: 1px solid #cbd8ea;
-  border-radius: 0.6rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0;
   background: #fff;
-  color: #0f172a;
-  padding: 0.5rem 0.6rem;
+  color: #0a0a0a;
+  padding: 8px;
   font-size: 0.9rem;
 }
 
 .slider-list {
-  margin-top: 0.45rem;
+  margin-top: 8px;
   display: grid;
-  gap: 0.8rem;
+  gap: 8px;
 }
 
 .slider-field {
-  border: 1px solid #d9e4f3;
-  border-radius: 0.75rem;
-  background: #f8fbff;
-  padding: 0.6rem 0.65rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0;
+  background: #f8f9fa;
+  padding: 8px;
 }
 
 .slider-meta {
@@ -740,7 +740,7 @@ onBeforeUnmount(() => {
 
 .slider-meta span {
   text-transform: capitalize;
-  color: #1d4ed8;
+  color: #2563eb;
   font-weight: 700;
 }
 
@@ -751,8 +751,8 @@ onBeforeUnmount(() => {
 .tick-row {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
-  margin-top: 0.35rem;
-  color: #64748b;
+  margin-top: 4px;
+  color: #6b7280;
   font-size: 0.6rem;
   text-transform: uppercase;
   letter-spacing: 0.03em;
@@ -768,23 +768,23 @@ onBeforeUnmount(() => {
 }
 
 .yaml-block {
-  margin-top: 0.8rem;
+  margin-top: 16px;
 }
 
 .yaml-block p {
   margin: 0;
-  color: #475569;
+  color: #6b7280;
   font-size: 0.8rem;
   font-weight: 600;
 }
 
 .yaml-block pre {
-  margin: 0.45rem 0 0;
-  border-radius: 0.75rem;
-  border: 1px solid #293d62;
-  background: #0f172a;
-  color: #dbeafe;
-  padding: 0.75rem;
+  margin: 8px 0 0;
+  border-radius: 0;
+  border: 1px solid #374151;
+  background: #0a0a0a;
+  color: #e5e7eb;
+  padding: 16px;
   max-height: 260px;
   overflow: auto;
   font-size: 0.72rem;
@@ -792,12 +792,12 @@ onBeforeUnmount(() => {
 }
 
 .compiled-note {
-  margin: 0.35rem 0 0;
-  color: #475569;
+  margin: 4px 0 0;
+  color: #6b7280;
 }
 
 .validation-summary {
-  margin: 0.5rem 0 0;
+  margin: 8px 0 0;
   font-size: 0.84rem;
   color: #14532d;
 }
@@ -807,21 +807,21 @@ onBeforeUnmount(() => {
 }
 
 .validation-list {
-  margin: 0.45rem 0 0;
-  padding: 0.55rem 0.7rem;
-  border: 1px solid #d6e2f1;
-  border-radius: 0.65rem;
-  background: #f8fbff;
+  margin: 8px 0 0;
+  padding: 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 0;
+  background: #f8f9fa;
   list-style: none;
   display: grid;
-  gap: 0.35rem;
+  gap: 4px;
 }
 
 .validation-list li {
   display: grid;
-  gap: 0.2rem;
+  gap: 4px;
   font-size: 0.78rem;
-  color: #334155;
+  color: #374151;
 }
 
 .validation-list li.warning code {
@@ -837,46 +837,46 @@ onBeforeUnmount(() => {
 }
 
 .compiled pre {
-  margin: 0.6rem 0 0;
-  border-radius: 0.75rem;
-  border: 1px solid #293d62;
-  background: #030b19;
-  color: #dbeafe;
+  margin: 8px 0 0;
+  border-radius: 0;
+  border: 1px solid #374151;
+  background: #030712;
+  color: #e5e7eb;
   min-height: 580px;
   max-height: 760px;
   overflow: auto;
-  padding: 0.8rem;
+  padding: 16px;
   font-size: 0.72rem;
   line-height: 1.4;
 }
 
 .response {
   display: grid;
-  gap: 0.75rem;
+  gap: 16px;
 }
 
 .response-head {
   display: flex;
-  gap: 0.9rem;
+  gap: 16px;
   justify-content: space-between;
   align-items: flex-start;
 }
 
 .response-head p {
-  margin: 0.25rem 0 0;
-  color: #334155;
+  margin: 4px 0 0;
+  color: #374151;
 }
 
 .score-pill {
-  border: 1px solid #d4e0ef;
-  border-radius: 0.75rem;
-  background: #f8fbff;
-  padding: 0.5rem 0.65rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0;
+  background: #f8f9fa;
+  padding: 8px;
   text-align: right;
 }
 
 .score-pill span {
-  color: #64748b;
+  color: #6b7280;
   display: block;
   font-size: 0.72rem;
   text-transform: uppercase;
@@ -885,29 +885,29 @@ onBeforeUnmount(() => {
 }
 
 .score-pill strong {
-  color: #1d4ed8;
+  color: #2563eb;
   font-size: 1.2rem;
 }
 
 .expected {
   margin: 0;
-  color: #334155;
+  color: #374151;
 }
 
 .response-box {
-  border: 1px solid #d5e0ee;
-  border-radius: 0.8rem;
-  background: #f8fbff;
+  border: 1px solid #d1d5db;
+  border-radius: 0;
+  background: #f8f9fa;
   min-height: 160px;
-  padding: 0.9rem;
+  padding: 16px;
 }
 
 .live-badge {
   display: inline-flex;
   align-items: center;
-  margin-bottom: 0.55rem;
-  padding: 0.2rem 0.5rem;
-  border-radius: 999px;
+  margin-bottom: 8px;
+  padding: 2px 8px;
+  border-radius: 0;
   background: #dcfce7;
   color: #166534;
   font-size: 0.68rem;
@@ -919,12 +919,12 @@ onBeforeUnmount(() => {
 .response-box p {
   margin: 0;
   white-space: pre-wrap;
-  color: #0f172a;
+  color: #0a0a0a;
   line-height: 1.45;
 }
 
 .no-response {
-  color: #475569 !important;
+  color: #6b7280 !important;
 }
 
 .response-error {
@@ -932,34 +932,34 @@ onBeforeUnmount(() => {
 }
 
 .byok {
-  border-top: 1px solid #e2e8f0;
-  padding-top: 0.7rem;
+  border-top: 1px solid #d1d5db;
+  padding-top: 16px;
 }
 
 .byok summary {
   cursor: pointer;
-  color: #1e293b;
+  color: #0a0a0a;
   font-weight: 700;
 }
 
 .byok p {
-  margin: 0.55rem 0 0;
-  color: #475569;
+  margin: 8px 0 0;
+  color: #6b7280;
 }
 
 .byok-actions {
-  margin-top: 0.65rem;
+  margin-top: 8px;
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 8px;
 }
 
 .byok-actions button {
-  border: 1px solid #3b82f6;
-  border-radius: 0.55rem;
+  border: 1px solid #2563eb;
+  border-radius: 0;
   background: #2563eb;
   color: #ffffff;
-  padding: 0.45rem 0.65rem;
+  padding: 8px 16px;
   font-size: 0.82rem;
   font-weight: 700;
   cursor: pointer;
@@ -968,22 +968,36 @@ onBeforeUnmount(() => {
 .byok-actions button:disabled {
   cursor: not-allowed;
   opacity: 0.55;
-  border-color: #94a3b8;
-  background: #64748b;
+  border-color: #9ca3af;
+  background: #6b7280;
 }
 
 .byok-status {
   font-size: 0.78rem;
-  color: #334155;
+  color: #374151;
+}
+
+:global(.dark) .playground-header {
+  border-color: #374151;
+  background: #111827;
+  color: #e5e7eb;
+}
+
+:global(.dark) .playground-header p {
+  color: #9ca3af;
+}
+
+:global(.dark) .eyebrow {
+  color: #60a5fa;
 }
 
 :global(.dark) .panel {
-  border-color: #30455f;
-  background: #0c1727;
+  border-color: #374151;
+  background: #111827;
 }
 
 :global(.dark) .panel h2 {
-  color: #e2e8f0;
+  color: #e5e7eb;
 }
 
 :global(.dark) .field span,
@@ -993,7 +1007,7 @@ onBeforeUnmount(() => {
 :global(.dark) .byok p,
 :global(.dark) .tick-row,
 :global(.dark) .yaml-block p {
-  color: #9ab0cf;
+  color: #9ca3af;
 }
 
 :global(.dark) .validation-summary.error {
@@ -1001,12 +1015,12 @@ onBeforeUnmount(() => {
 }
 
 :global(.dark) .validation-list {
-  border-color: #324865;
-  background: #0f1b2e;
+  border-color: #374151;
+  background: #0a0f1a;
 }
 
 :global(.dark) .validation-list li {
-  color: #c7d5ec;
+  color: #d1d5db;
 }
 
 :global(.dark) .validation-list li.warning code {
@@ -1019,14 +1033,14 @@ onBeforeUnmount(() => {
 
 :global(.dark) .field select,
 :global(.dark) .field input {
-  border-color: #3a516f;
-  background: #0e1a2d;
-  color: #e2e8f0;
+  border-color: #374151;
+  background: #0a0f1a;
+  color: #e5e7eb;
 }
 
 :global(.dark) .slider-field {
-  border-color: #324863;
-  background: #0f1b2e;
+  border-color: #374151;
+  background: #0a0f1a;
 }
 
 :global(.dark) .slider-meta strong,
@@ -1034,21 +1048,29 @@ onBeforeUnmount(() => {
 :global(.dark) .expected,
 :global(.dark) .response-box p,
 :global(.dark) .byok summary {
-  color: #dbe7f9;
+  color: #e5e7eb;
+}
+
+:global(.dark) .slider-meta span {
+  color: #60a5fa;
 }
 
 :global(.dark) .score-pill {
-  border-color: #324865;
-  background: #122237;
+  border-color: #374151;
+  background: #0a0f1a;
+}
+
+:global(.dark) .score-pill strong {
+  color: #60a5fa;
 }
 
 :global(.dark) .response-box {
-  border-color: #324865;
-  background: #0f1b2e;
+  border-color: #374151;
+  background: #0a0f1a;
 }
 
 :global(.dark) .no-response {
-  color: #adc0dc !important;
+  color: #9ca3af !important;
 }
 
 :global(.dark) .response-error {
@@ -1061,7 +1083,7 @@ onBeforeUnmount(() => {
 }
 
 :global(.dark) .byok {
-  border-top-color: #30455f;
+  border-top-color: #374151;
 }
 
 :global(.dark) .byok-actions button {
@@ -1071,11 +1093,11 @@ onBeforeUnmount(() => {
 
 :global(.dark) .byok-actions button:disabled {
   border-color: #4b5563;
-  background: #334155;
+  background: #374151;
 }
 
 :global(.dark) .byok-status {
-  color: #cbd5e1;
+  color: #d1d5db;
 }
 
 @media (max-width: 1100px) {

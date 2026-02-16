@@ -3,54 +3,39 @@
     <header class="top-nav">
       <a class="brand" :href="links.home">traits.dev</a>
       <nav>
+        <a :href="links.quickstart">Quickstart</a>
         <a :href="links.playground">Playground</a>
-        <a :href="links.schema">Schema</a>
         <a :href="links.guides">Guides</a>
+        <a :href="links.reference">Reference</a>
         <a :href="links.api">API</a>
       </nav>
+      <a class="github-link" href="https://github.com/justinhambleton/traits" target="_blank" rel="noreferrer" aria-label="GitHub">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+      </a>
     </header>
 
     <section class="hero section">
       <div class="hero-copy">
-        <p class="eyebrow">Voice and Behavioral Policy for Agents</p>
-        <h1>Your AI agents sound generic. Fix that.</h1>
+        <p class="eyebrow">Governance SDK for AI Agent Behavior</p>
+        <h1>Govern agent behavior across your fleet. Start in 90 seconds.</h1>
         <p class="subhead">
-          Define voice and behavioral policy as YAML. Validate safety at build time. Compile
-          model-aware system prompts.
+          Define voice and behavioral policy as composable YAML profiles.
+          Validate safety at build time. Compile model-aware system prompts.
+          Evaluate adherence across your agent fleet.
         </p>
-        <div class="hero-cta">
-          <button class="install-command" type="button" @click="copyInstallCommand">
-            <code>npm i @traits-dev/core</code>
-            <span>{{ installCopied ? "Copied" : "Copy" }}</span>
-          </button>
-          <a class="playground-link" :href="links.playground">Try the Playground</a>
-        </div>
-      </div>
-      <div class="hero-visual">
-        <div class="visual-card yaml">
-          <p class="label">YAML policy</p>
-          <pre><code>voice:
-  formality: low
-  warmth: very-high
-  directness: high
-  humor:
-    target: low
-    style: dry</code></pre>
-        </div>
-        <div class="visual-arrow">compile</div>
-        <div class="visual-card prompt">
-          <p class="label">Compiled prompt</p>
-          <pre><code>[VOICE TARGETS]
-formality: low
-warmth: very-high
-directness: high
-humor: low (dry)</code></pre>
+        <button class="install-command" type="button" @click="copyInstallCommand">
+          <code>npm i @traits-dev/core @traits-dev/cli</code>
+          <span>{{ installCopied ? "Copied" : "Copy" }}</span>
+        </button>
+        <div class="hero-buttons">
+          <a class="hero-btn" :href="links.playground">Quickstart</a>
+          <a class="hero-btn" :href="links.overview">Documentation</a>
         </div>
       </div>
     </section>
 
     <section class="workflow section">
-      <h2>Define. Validate. Compile.</h2>
+      <h2>Define. Validate. Compile. Evaluate.</h2>
       <div class="workflow-grid">
         <article v-for="(step, index) in workflowSteps" :key="step.title" class="step-card">
           <p class="step-index">0{{ index + 1 }}</p>
@@ -60,11 +45,21 @@ humor: low (dry)</code></pre>
       </div>
     </section>
 
+    <section class="governance section">
+      <h2>Why governance, not just prompting</h2>
+      <div class="governance-grid">
+        <article v-for="card in governanceCards" :key="card.title" class="governance-card">
+          <h3>{{ card.title }}</h3>
+          <p>{{ card.description }}</p>
+        </article>
+      </div>
+    </section>
+
     <section class="profiles section">
-      <h2>Built-in profile starters</h2>
+      <h2>Starter policy profiles</h2>
       <p class="section-lede">
-        Each profile starts from a different voice target and domain context. Use them as base
-        policies in the playground.
+        Each profile defines voice targets, behavioral rules, and capability boundaries
+        for a specific domain. Use them as base policies or extend them for your fleet.
       </p>
       <div class="profile-grid">
         <article
@@ -135,16 +130,6 @@ humor: low (dry)</code></pre>
       </div>
     </section>
 
-    <section class="footer-cta section">
-      <h2>Ship policy-driven prompts, not ad-hoc prompt strings.</h2>
-      <div class="footer-actions">
-        <button class="install-command" type="button" @click="copyInstallCommand">
-          <code>npm i @traits-dev/core</code>
-          <span>{{ installCopied ? "Copied" : "Copy" }}</span>
-        </button>
-        <a class="playground-link" :href="links.playground">Open Playground</a>
-      </div>
-    </section>
   </div>
 </template>
 
@@ -157,9 +142,11 @@ const snippetCopied = ref(false);
 
 const links = {
   home: withBase("/"),
+  overview: withBase("/overview"),
+  quickstart: withBase("/quickstart"),
   playground: withBase("/playground/"),
-  schema: withBase("/schema-reference"),
   guides: withBase("/guides/first-profile"),
+  reference: withBase("/reference/cli"),
   api: withBase("/api/core")
 };
 
@@ -192,6 +179,33 @@ directness: high
 Tools: (none — advisory only)
 Constraints:
 - Never claim actions without tool confirmation`
+  },
+  {
+    title: "Evaluate",
+    code: `$ traits eval my-profile.yaml --tier 1
+  Tier 1 — 5 samples
+  avg score: 0.72
+  vocabulary: 4/5 preferred, 0 forbidden
+  dimensions: directness 0.86, warmth 0.71
+  PASS — all checks above threshold`
+  }
+];
+
+const governanceCards = [
+  {
+    title: "Composable Policy",
+    description:
+      "Define voice, rules, and capability boundaries as structured YAML. Extend base profiles with array-merge composition. Share constraints across your agent fleet without copy-pasting prompt fragments."
+  },
+  {
+    title: "Build-Time Safety",
+    description:
+      "Validate profiles against 8 safety checks before they reach production. Catch unsafe instructions, missing grounding constraints, and schema violations at CI time — not after deployment."
+  },
+  {
+    title: "Fleet Evaluation",
+    description:
+      "Score agent responses against profile policy with three evaluation tiers. Tier 1 runs locally in milliseconds. Tier 2 uses embeddings. Tier 3 uses LLM judges. Gate releases on adherence scores."
   }
 ];
 
@@ -201,7 +215,7 @@ const profiles = [
     name: "haven",
     title: "Healthcare Companion",
     accent: "#14b8a6",
-    description: "High-empathy care navigation with explicit safety boundaries.",
+    description: "High-empathy care navigation with medical escalation rules and grounding constraints that prevent unsupervised clinical claims.",
     dimensions: [
       { name: "Formality", value: "medium" },
       { name: "Warmth", value: "very-high" },
@@ -221,7 +235,7 @@ const profiles = [
     name: "resolve",
     title: "Customer Resolution Specialist",
     accent: "#3b82f6",
-    description: "Ownership-first support voice with high directness and controlled tone.",
+    description: "Ownership-first support policy with forbidden-term enforcement, escalation rules, and controlled directness constraints.",
     dimensions: [
       { name: "Formality", value: "medium" },
       { name: "Warmth", value: "high" },
@@ -241,7 +255,7 @@ const profiles = [
     name: "architect",
     title: "Developer Assistant",
     accent: "#f97316",
-    description: "Implementation-first engineering voice with terse, decisive guidance.",
+    description: "Implementation-first engineering policy with capability boundaries, terse output constraints, and tool-grounding rules.",
     dimensions: [
       { name: "Formality", value: "low" },
       { name: "Warmth", value: "medium" },
@@ -325,7 +339,7 @@ const trustBadges = [
 
 async function copyInstallCommand() {
   try {
-    await navigator.clipboard.writeText("npm i @traits-dev/core");
+    await navigator.clipboard.writeText("npm i @traits-dev/core @traits-dev/cli");
     installCopied.value = true;
     window.setTimeout(() => {
       installCopied.value = false;
@@ -361,37 +375,45 @@ function levelPercent(level) {
 
 <style scoped>
 .landing-shell {
-  --ink: #e2e8f0;
-  --muted: #94a3b8;
+  --ink: #e5e7eb;
+  --muted: #9ca3af;
   --surface: #0a0f1a;
-  --surface-2: #0f172a;
+  --surface-2: #111827;
   --surface-3: #111827;
-  --border: #22314b;
-  --accent: #3b82f6;
+  --border: #374151;
+  --accent: #60a5fa;
   color: var(--ink);
-  background: radial-gradient(circle at 10% 5%, #12213f 0%, #0a0f1a 34%, #090d16 100%);
+  background: var(--surface);
   min-height: 100vh;
-  padding-bottom: 5rem;
+  padding-bottom: 64px;
 }
 
 .section {
   width: min(1120px, calc(100% - 2rem));
   margin: 0 auto;
-  padding-top: 5.2rem;
+  padding-top: 64px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 64px;
+}
+
+.section:last-child {
+  border-bottom: none;
 }
 
 .top-nav {
   width: min(1120px, calc(100% - 2rem));
   margin: 0 auto;
-  padding-top: 1.5rem;
+  padding-top: 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 16px;
 }
 
 .top-nav nav {
   display: flex;
-  gap: 1rem;
+  gap: 16px;
 }
 
 .top-nav a {
@@ -401,7 +423,7 @@ function levelPercent(level) {
 }
 
 .top-nav a:hover {
-  color: #e2e8f0;
+  color: #e5e7eb;
 }
 
 .brand {
@@ -409,10 +431,21 @@ function levelPercent(level) {
   letter-spacing: 0.03em;
 }
 
-.hero {
-  display: grid;
-  gap: 1.5rem;
-  grid-template-columns: 1.2fr 1fr;
+.github-link {
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+}
+
+.github-link:hover {
+  color: #e5e7eb;
+}
+
+.hero-copy {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .eyebrow {
@@ -420,194 +453,174 @@ function levelPercent(level) {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   font-size: 0.76rem;
-  color: #93c5fd;
+  color: var(--accent);
 }
 
 .hero h1 {
-  margin: 0.8rem 0 0;
+  margin: 8px 0 0;
   font-size: clamp(2.2rem, 6vw, 4.1rem);
   line-height: 1.02;
   color: #f8fafc;
-  max-width: 12ch;
+  max-width: 24ch;
 }
 
 .subhead {
-  margin: 1rem 0 0;
-  color: #cbd5e1;
+  margin: 16px 0 0;
+  color: #d1d5db;
   font-size: 1.06rem;
   max-width: 56ch;
   line-height: 1.5;
 }
 
-.hero-cta {
-  margin-top: 1.4rem;
-  display: flex;
-  gap: 0.85rem;
-  flex-wrap: wrap;
-}
-
 .install-command {
-  border: 1px solid #27406b;
-  background: #07101e;
-  color: #dbeafe;
-  border-radius: 0.75rem;
-  padding: 0.72rem 0.9rem;
+  margin-top: 24px;
+  border: 1px solid var(--border);
+  background: #030712;
+  color: #e5e7eb;
+  border-radius: 0;
+  padding: 12px 16px;
   display: flex;
   align-items: center;
-  gap: 0.85rem;
+  gap: 16px;
   cursor: pointer;
   font-size: 0.88rem;
   font-family: var(--vp-font-family-mono);
 }
 
 .install-command span {
-  color: #93c5fd;
+  color: var(--accent);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-size: 0.68rem;
 }
 
-.playground-link {
-  border-radius: 0.75rem;
-  border: 1px solid #3b82f6;
-  background: #2563eb;
-  color: #f8fafc;
+.hero-buttons {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+.hero-btn {
+  border-radius: 0;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--ink);
   text-decoration: none;
   font-weight: 700;
-  padding: 0.78rem 1rem;
+  padding: 12px 24px;
 }
 
-.playground-link:hover {
-  background: #1d4ed8;
-}
-
-.hero-visual {
-  display: grid;
-  align-content: center;
-  gap: 0.7rem;
-}
-
-.visual-card {
-  border: 1px solid #294066;
-  border-radius: 0.85rem;
-  padding: 0.8rem;
-  background: #0b1323;
-}
-
-.visual-card .label {
-  margin: 0;
-  font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #93c5fd;
-}
-
-.visual-card pre {
-  margin: 0.55rem 0 0;
-  font-size: 0.74rem;
-  line-height: 1.4;
-  color: #e2e8f0;
-  white-space: pre-wrap;
-}
-
-.visual-arrow {
-  color: #60a5fa;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-weight: 700;
-  font-size: 0.75rem;
-  padding-left: 0.4rem;
-  animation: pulse 1.7s ease-in-out infinite;
+.hero-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .workflow h2,
+.governance h2,
 .profiles h2,
 .integrations h2,
-.trust h2,
-.footer-cta h2 {
+.trust h2 {
   margin: 0;
   font-size: clamp(1.6rem, 2.2vw, 2.35rem);
 }
 
 .workflow-grid {
-  margin-top: 1.4rem;
+  margin-top: 24px;
   display: grid;
-  gap: 1rem;
+  gap: 16px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.governance-grid {
+  margin-top: 24px;
+  display: grid;
+  gap: 16px;
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.governance-card {
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  padding: 24px;
+}
+
+.governance-card h3 {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+}
+
+.governance-card p {
+  margin: 0;
+  color: #d1d5db;
+  line-height: 1.5;
+  font-size: 0.9rem;
 }
 
 .step-card {
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 0.95rem;
-  padding: 1rem;
-  animation: fadeInUp 0.6s ease both;
+  border-radius: 0;
+  padding: 16px;
 }
 
 .step-card:nth-child(2) {
-  animation-delay: 0.15s;
 }
 
 .step-card:nth-child(3) {
-  animation-delay: 0.3s;
 }
 
 .step-index {
   margin: 0;
-  color: #60a5fa;
+  color: var(--accent);
   font-size: 0.76rem;
   font-weight: 700;
   letter-spacing: 0.1em;
 }
 
 .step-card h3 {
-  margin: 0.3rem 0 0.7rem;
+  margin: 4px 0 8px;
 }
 
 .step-card pre {
   margin: 0;
-  border-radius: 0.7rem;
-  border: 1px solid #2b4166;
-  background: #030916;
-  padding: 0.75rem;
+  border-radius: 0;
+  border: 1px solid var(--border);
+  background: #030712;
+  padding: 16px;
   min-height: 220px;
   overflow-x: auto;
-  color: #dbeafe;
+  color: #e5e7eb;
   font-size: 0.72rem;
   line-height: 1.45;
 }
 
 .section-lede {
-  margin: 0.8rem 0 0;
-  color: #cbd5e1;
+  margin: 8px 0 0;
+  color: #d1d5db;
   max-width: 72ch;
 }
 
 .profile-grid {
-  margin-top: 1.4rem;
+  margin-top: 24px;
   display: grid;
-  gap: 1rem;
+  gap: 16px;
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .profile-card {
-  border: 1px solid color-mix(in srgb, var(--accent) 35%, #2d3f5d);
-  border-radius: 1rem;
-  background: #0b1424;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--surface-2);
   overflow: hidden;
   display: grid;
   grid-template-rows: auto auto 1fr auto;
 }
 
 .profile-header {
-  padding: 1rem;
-  background: linear-gradient(
-    160deg,
-    color-mix(in srgb, var(--accent) 20%, #0d172a),
-    color-mix(in srgb, var(--accent) 8%, #0b1424)
-  );
-  border-bottom: 1px solid color-mix(in srgb, var(--accent) 26%, #364a67);
+  padding: 16px;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
 }
 
 .profile-name {
@@ -616,157 +629,157 @@ function levelPercent(level) {
   letter-spacing: 0.08em;
   font-size: 0.72rem;
   font-weight: 700;
-  color: color-mix(in srgb, var(--accent) 70%, #dbeafe);
+  color: var(--accent);
 }
 
 .profile-header h3 {
-  margin: 0.35rem 0;
+  margin: 4px 0;
   font-size: 1.1rem;
 }
 
 .profile-header p {
   margin: 0;
-  color: #c7d2e3;
+  color: #d1d5db;
   line-height: 1.45;
 }
 
 .dimension-bars {
-  padding: 0.9rem 1rem;
+  padding: 16px;
   display: grid;
-  gap: 0.5rem;
+  gap: 8px;
 }
 
 .dimension-row {
   display: grid;
   grid-template-columns: 88px 1fr auto;
-  gap: 0.45rem;
+  gap: 8px;
   align-items: center;
 }
 
 .dimension-row span {
-  color: #94a3b8;
+  color: #9ca3af;
   font-size: 0.75rem;
 }
 
 .dimension-row strong {
-  color: #dbeafe;
+  color: #e5e7eb;
   text-transform: capitalize;
   font-size: 0.7rem;
 }
 
 .bar-track {
-  border-radius: 999px;
+  border-radius: 0;
   height: 8px;
-  background: #1f2a3d;
+  background: #1f2937;
 }
 
 .bar-fill {
   height: 100%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 78%, #f8fafc), var(--accent));
+  border-radius: 0;
+  background: var(--accent);
 }
 
 .sample {
-  padding: 0 1rem 1rem;
+  padding: 0 16px 16px;
 }
 
 .sample-label {
-  margin: 0.6rem 0 0.2rem;
+  margin: 8px 0 4px;
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #93a8c6;
+  color: #9ca3af;
 }
 
 .sample-prompt {
   margin: 0;
-  color: #e2e8f0;
+  color: #e5e7eb;
   font-weight: 600;
 }
 
 .sample-response {
   margin: 0;
-  color: #c7d2e2;
+  color: #d1d5db;
 }
 
 .profile-link {
-  border-top: 1px solid #243652;
+  border-top: 1px solid var(--border);
   display: block;
   text-decoration: none;
-  color: #bfdbfe;
+  color: var(--accent);
   font-weight: 600;
-  padding: 0.8rem 1rem;
+  padding: 16px;
 }
 
 .profile-link:hover {
-  color: #eff6ff;
+  color: #93c5fd;
 }
 
 .integration-tabs {
-  margin-top: 1.1rem;
+  margin-top: 16px;
   display: flex;
-  gap: 0.55rem;
+  gap: 8px;
 }
 
 .integration-tabs button {
-  border: 1px solid #29406a;
-  border-radius: 999px;
-  padding: 0.45rem 0.8rem;
-  background: #0b1526;
-  color: #9fb6d7;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  padding: 8px 16px;
+  background: var(--surface-2);
+  color: #9ca3af;
   font-weight: 700;
   cursor: pointer;
 }
 
 .integration-tabs button.active {
-  background: #1d4ed8;
-  border-color: #3b82f6;
+  background: #2563eb;
+  border-color: #2563eb;
   color: #f8fafc;
 }
 
 .integration-code {
   position: relative;
-  margin-top: 0.8rem;
+  margin-top: 8px;
 }
 
 .copy-snippet {
   position: absolute;
-  top: 0.7rem;
-  right: 0.7rem;
-  border: 1px solid #335178;
-  border-radius: 0.5rem;
-  background: #15233c;
-  color: #bfdbfe;
+  top: 8px;
+  right: 8px;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--surface-2);
+  color: var(--accent);
   font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-weight: 700;
-  padding: 0.35rem 0.5rem;
+  padding: 4px 8px;
   cursor: pointer;
 }
 
 .integration-code pre {
   margin: 0;
-  border-radius: 0.9rem;
-  border: 1px solid #2b4168;
-  background: #030b19;
-  color: #dbeafe;
-  padding: 1rem;
+  border-radius: 0;
+  border: 1px solid var(--border);
+  background: #030712;
+  color: #e5e7eb;
+  padding: 16px;
   overflow-x: auto;
   min-height: 210px;
 }
 
 .badge-row {
-  margin-top: 1rem;
+  margin-top: 16px;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.65rem;
+  gap: 8px;
 }
 
 .badge {
   display: inline-flex;
-  border: 1px solid #263a57;
-  border-radius: 999px;
+  border: 1px solid var(--border);
+  border-radius: 0;
   overflow: hidden;
 }
 
@@ -775,45 +788,12 @@ function levelPercent(level) {
   height: 28px;
 }
 
-.footer-cta {
-  margin-top: 1.4rem;
-  padding-bottom: 2rem;
-}
-
-.footer-actions {
-  margin-top: 1rem;
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
-
-@keyframes pulse {
-  0%,
-  100% {
-    opacity: 0.5;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-@keyframes fadeInUp {
-  from {
-    transform: translateY(8px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
 @media (max-width: 1024px) {
-  .hero {
-    grid-template-columns: 1fr;
+  .workflow-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .workflow-grid,
+  .governance-grid,
   .profile-grid {
     grid-template-columns: 1fr;
   }
@@ -821,13 +801,14 @@ function levelPercent(level) {
 
 @media (max-width: 768px) {
   .section {
-    padding-top: 4.1rem;
+    padding-top: 48px;
+    padding-bottom: 48px;
   }
 
   .top-nav {
     flex-direction: column;
     align-items: flex-start;
-    gap: 0.6rem;
+    gap: 8px;
   }
 
   .top-nav nav {
@@ -840,94 +821,147 @@ function levelPercent(level) {
 }
 
 :global(html:not(.dark)) .landing-shell {
-  --ink: #10233e;
-  --muted: #475569;
-  --surface: #eef4fb;
-  --surface-2: #f7fbff;
+  --ink: #0a0a0a;
+  --muted: #6b7280;
+  --surface: #ffffff;
+  --surface-2: #f8f9fa;
   --surface-3: #ffffff;
-  --border: #d1dfef;
-  background: linear-gradient(180deg, #eef5ff 0%, #f8fbff 32%, #ffffff 100%);
+  --border: #d1d5db;
+  background: #ffffff;
 }
 
 :global(html:not(.dark)) .top-nav a {
-  color: #475569;
+  color: #6b7280;
 }
 
 :global(html:not(.dark)) .top-nav a:hover {
-  color: #0f172a;
+  color: #0a0a0a;
 }
 
 :global(html:not(.dark)) .brand {
-  color: #0f172a !important;
+  color: #0a0a0a !important;
 }
 
 :global(html:not(.dark)) .hero h1 {
-  color: #0f172a;
+  color: #0a0a0a;
 }
 
 :global(html:not(.dark)) .subhead {
-  color: #1f334d;
+  color: #374151;
+}
+
+:global(html:not(.dark)) .eyebrow {
+  color: #2563eb;
 }
 
 :global(html:not(.dark)) .install-command {
-  background: #0f172a;
-  border-color: #1e293b;
-  color: #e2e8f0;
+  background: #0a0a0a;
+  border-color: #374151;
+  color: #e5e7eb;
 }
 
-:global(html:not(.dark)) .playground-link {
-  color: #f8fafc;
+:global(html:not(.dark)) .hero-btn {
+  background: #f8f9fa;
+  border-color: #d1d5db;
+  color: #0a0a0a;
 }
 
-:global(html:not(.dark)) .visual-card {
-  background: #0f172a;
-  border-color: #1f2f47;
+:global(html:not(.dark)) .hero-btn:hover {
+  border-color: #2563eb;
+  color: #2563eb;
 }
 
 :global(html:not(.dark)) .workflow h2,
+:global(html:not(.dark)) .governance h2,
 :global(html:not(.dark)) .profiles h2,
 :global(html:not(.dark)) .integrations h2,
-:global(html:not(.dark)) .trust h2,
-:global(html:not(.dark)) .footer-cta h2 {
-  color: #0f172a;
+:global(html:not(.dark)) .trust h2 {
+  color: #0a0a0a;
+}
+
+:global(html:not(.dark)) .governance-card {
+  background: #f8f9fa;
+  border-color: #d1d5db;
+}
+
+:global(html:not(.dark)) .governance-card p {
+  color: #374151;
 }
 
 :global(html:not(.dark)) .section-lede {
-  color: #334155;
+  color: #374151;
 }
 
 :global(html:not(.dark)) .step-card {
-  background: #f8fbff;
-  border-color: #d5e2f3;
+  background: #f8f9fa;
+  border-color: #d1d5db;
 }
 
 :global(html:not(.dark)) .step-card pre {
-  border-color: #294066;
+  border-color: #374151;
 }
 
 :global(html:not(.dark)) .profile-card {
   background: #ffffff;
+  border-color: #d1d5db;
+}
+
+:global(html:not(.dark)) .profile-header {
+  background: #f8f9fa;
 }
 
 :global(html:not(.dark)) .profile-header p,
 :global(html:not(.dark)) .sample-response {
-  color: #334155;
+  color: #374151;
 }
 
 :global(html:not(.dark)) .sample-prompt,
 :global(html:not(.dark)) .profile-header h3 {
-  color: #0f172a;
+  color: #0a0a0a;
 }
 
 :global(html:not(.dark)) .dimension-row strong {
-  color: #1e293b;
+  color: #1f2937;
+}
+
+:global(html:not(.dark)) .bar-track {
+  background: #e5e7eb;
+}
+
+:global(html:not(.dark)) .bar-fill {
+  background: #2563eb;
+}
+
+:global(html:not(.dark)) .profile-name {
+  color: #2563eb;
+}
+
+:global(html:not(.dark)) .profile-link {
+  color: #2563eb;
 }
 
 :global(html:not(.dark)) .integration-tabs button {
   background: #ffffff;
+  border-color: #d1d5db;
+}
+
+:global(html:not(.dark)) .integration-tabs button.active {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #f8fafc;
 }
 
 :global(html:not(.dark)) .integration-code pre {
-  border-color: #2b4168;
+  border-color: #374151;
+}
+
+:global(html:not(.dark)) .copy-snippet {
+  background: #f8f9fa;
+  border-color: #d1d5db;
+  color: #2563eb;
+}
+
+:global(html:not(.dark)) .badge {
+  border-color: #d1d5db;
 }
 </style>

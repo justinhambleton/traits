@@ -1,61 +1,58 @@
-# Voice Profile & Behavioral Policy Schema Reference (`v1.6`)
+# Schema Reference (v1.6)
 
-This page documents the implemented voice profile and behavioral policy schema used by `@traits-dev/core`.
+This page documents the voice and behavioral policy schema used by `@traits-dev/core`. For validation codes, see [Safety & Validation Codes](/reference/safety-codes).
 
 ## Schema version
 
-- Supported: `schema: "v1.4"`, `schema: "v1.5"`, and `schema: "v1.6"`.
-- Any other schema value fails validation (`V001`).
-- `capabilities` is available in `v1.5` and `v1.6`.
+| Version | Status | Key additions |
+|---------|--------|--------------|
+| `v1.4` | Supported | Base schema |
+| `v1.5` | Supported | `capabilities` section |
+| `v1.6` | **Current** | Array `extends`, `locked` rules, object-form behavioral rules |
+
+Any other schema value fails validation ([V001](/reference/safety-codes#v001-structure-errors)). Use `traits migrate` to upgrade older profiles.
 
 ## Top-level structure
 
-Required sections:
+| Section | Required | Since |
+|---------|----------|-------|
+| `schema` | Yes | v1.4 |
+| `meta` | Yes | v1.4 |
+| `identity` | Yes | v1.4 |
+| `voice` | Yes | v1.4 |
+| `vocabulary` | No | v1.4 |
+| `behavioral_rules` | No | v1.4 |
+| `context_adaptations` | No | v1.4 |
+| `capabilities` | No | v1.5 |
+| `extends` | No | v1.4 (array form v1.6) |
+| `localization` | No | v1.4 |
+| `channel_adaptations` | No | v1.4 |
+| `behavioral_rules_remove` | No | v1.4 |
+| `context_adaptations_remove` | No | v1.4 |
 
-- `schema`
-- `meta`
-- `identity`
-- `voice`
-
-Optional sections:
-
-- `vocabulary`
-- `behavioral_rules`
-- `context_adaptations`
-- `capabilities` (`v1.5+`)
-- `localization`
-- `channel_adaptations`
-- `extends`
-- `behavioral_rules_remove`
-- `context_adaptations_remove`
-
-Unknown top-level keys fail validation (`V001`).
+Unknown top-level keys fail validation ([V001](/reference/safety-codes#v001-structure-errors)).
 
 ## `meta`
 
-Required fields:
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `name` | `string` | Yes | Profile identifier |
+| `version` | `string` | Yes | Semver version |
+| `description` | `string` | Yes | Human-readable description |
+| `tags` | `string[]` | No | Categorization tags |
+| `target_audience` | `string` | No | Intended user audience |
 
-- `name: string`
-- `version: string`
-- `description: string`
-
-Optional fields:
-
-- `tags: string[]`
-- `target_audience: string`
-- Additional keys allowed
+Additional keys are allowed.
 
 ## `identity`
 
-Required fields:
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `role` | `string` | Yes | What the agent is (e.g., "Customer support specialist") |
+| `backstory` | `string` | No | Background context for the agent |
+| `expertise_domains` | `string[]` | No | Areas of expertise |
 
-- `role: string`
-
-Optional fields:
-
-- `backstory: string`
-- `expertise_domains: string[]`
-- Additional keys allowed
+Additional keys are allowed.
 
 ## Voice dimensions
 
@@ -230,43 +227,29 @@ Locked rule behavior (`v1.6`):
 
 ## Safety and validation checks
 
-Schema checks:
+| Code | Severity | What it checks |
+|------|----------|---------------|
+| V001 | error | Structure and required fields |
+| V002 | error | Invalid dimension values or properties |
+| V003 | error | Invalid adaptive ranges (floor/ceiling) |
+| S001 | error | Jailbreak/bypass patterns |
+| S002 | warning | Unsafe adaptive dimension extremes |
+| S003 | warning | Protected refusal terms in forbidden vocabulary |
+| S004 | warning/error | Constraint count overspec (>15 warn, >30 error) |
+| S005 | warning | System prompt reference patterns |
+| S006 | warning/error | Inheritance safety regression |
+| S007 | warning | Safety adaptations without priority 100 |
+| S008 | warning | Action-claiming language without matching tools |
 
-- `V001`: structure and required fields
-- `V002`: invalid dimension values or unsupported dimension properties
-- `V003`: invalid adaptive ranges / missing floor-ceiling with `adapt: true`
-
-Safety checks:
-
-- `S001` (error): unsafe instruction patterns (for example, bypass or always-comply behaviors)
-- `S002` (warning): risky adaptive extremes envelope
-- `S003` (warning): protected refusal terms placed in `forbidden_terms`
-- `S004` (warning/error): overspec count thresholds
-- `S005` (warning): prompt-injection-like language in rule text
-- `S006` (warning/error): extends safety regression
-  - warning on removal of safety-relevant arrays
-  - error on attempted removal of locked inherited behavioral rules
-  - error if merged profile has fewer safety constraints than the fully merged parent chain
-- `S007` (warning): safety-named context adaptations should use `priority: 100`
-- `S008` (warning): action-claiming language in `identity.backstory`, `behavioral_rules`, or `context_adaptations[].inject` without matching tools in `capabilities.tools`
-
-`S004` thresholds:
-
-- `> 15` constraints: warning
-- `> 30` constraints: error
-
-Constraint count includes:
-
-- `behavioral_rules`
-- `vocabulary.preferred_terms`
-- `vocabulary.forbidden_terms`
-- `context_adaptations`
+See [Safety & Validation Codes](/reference/safety-codes) for trigger conditions and fix guidance.
 
 ## Validator exit codes
 
-- `0` valid with no warnings
-- `1` valid with warnings
-- `2` validation error (or warnings promoted by `--strict`)
+| Code | Meaning |
+|------|---------|
+| `0` | Valid with no warnings |
+| `1` | Valid with warnings |
+| `2` | Validation error (or warnings promoted by `--strict`) |
 
 ## Minimal valid profile
 
@@ -295,6 +278,13 @@ capabilities:
     trigger: "Action requires unavailable tools"
     action: "Offer to escalate to a human operator"
 ```
+
+## Related pages
+
+- [Safety & Validation Codes](/reference/safety-codes) — every V and S code with fix guidance
+- [Core Concepts](/concepts) — profile anatomy and governance pipeline
+- [Extend Profiles Safely](/guides/extending-profiles) — inheritance patterns
+- [CLI Reference](/reference/cli) — `validate`, `compile`, `migrate` commands
 
 ## Reference implementation
 

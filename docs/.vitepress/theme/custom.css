@@ -3,4 +3,79 @@
 :root {
   --vp-font-family-base: "Inter", "Avenir Next", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   --vp-font-family-mono: "JetBrains Mono", "Geist Mono", "SFMono-Regular", Menlo, monospace;
+
+  /* Zero radius — override all VitePress defaults */
+  --vp-border-radius: 0;
+  --vp-border-radius-small: 0;
+  --vp-border-radius-medium: 0;
+  --vp-border-radius-large: 0;
+
+  /* Design tokens */
+  --traits-surface: #ffffff;
+  --traits-surface-2: #f8f9fa;
+  --traits-ink: #0a0a0a;
+  --traits-muted: #6b7280;
+  --traits-border: #d1d5db;
+  --traits-accent: #2563eb;
+  --traits-accent-bg: #eff6ff;
+}
+
+.dark {
+  --traits-surface: #0a0f1a;
+  --traits-surface-2: #111827;
+  --traits-ink: #e5e7eb;
+  --traits-muted: #9ca3af;
+  --traits-border: #374151;
+  --traits-accent: #60a5fa;
+  --traits-accent-bg: #1e3a5f;
+}
+
+/* VitePress doc content — zero radius code blocks */
+.vp-doc div[class*="language-"] {
+  border-radius: 0;
+}
+
+.vp-doc div[class*="language-"] pre {
+  border-radius: 0;
+}
+
+.vp-doc [class*="language-"] code {
+  border-radius: 0;
+}
+
+.vp-doc :not(pre) > code {
+  border-radius: 0;
+}
+
+/* Tables — full grid lines */
+.vp-doc table {
+  border-collapse: collapse;
+}
+
+.vp-doc table th,
+.vp-doc table td {
+  border: 1px solid var(--vp-c-divider);
+}
+
+/* VitePress buttons and badges */
+.VPButton {
+  border-radius: 0 !important;
+}
+
+.VPBadge {
+  border-radius: 0 !important;
+}
+
+/* VitePress nav and sidebar */
+.VPNavBar .content {
+  border-radius: 0;
+}
+
+.VPSidebar .group {
+  border-radius: 0;
+}
+
+/* Custom containers (tip, warning, danger) */
+.vp-doc .custom-block {
+  border-radius: 0;
 }
