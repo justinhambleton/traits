@@ -8,6 +8,10 @@ coverage/
 *.tsbuildinfo
 docs/.vitepress/dist/
 docs/.vitepress/cache/
+docs/plans/
+docs/planning/
+docs/product/
+docs/reviews/
 packages/mcp/profiles/
 
 .DS_Store
