@@ -1,5 +1,12 @@
 # @traits-dev/cli
 
+## 0.7.4
+
+### Patch Changes
+
+- Updated dependencies [37925e1]
+  - @traits-dev/core@0.7.4
+
 ## 0.7.3
 
 ### Patch Changes
