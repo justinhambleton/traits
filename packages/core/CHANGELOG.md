@@ -1,5 +1,11 @@
 # @traits-dev/core
 
+## 0.7.1
+
+### Patch Changes
+
+- 83eef7a: Fix npm publisher from "GitHub Actions" to "frntr" org account
+
 ## 0.7.0
 
 ### Minor Changes
