@@ -1,5 +1,11 @@
 # @traits-dev/core
 
+## 0.7.4
+
+### Patch Changes
+
+- 37925e1: Remove provenance config from publishConfig to publish under frntr identity
+
 ## 0.7.3
 
 ### Patch Changes
