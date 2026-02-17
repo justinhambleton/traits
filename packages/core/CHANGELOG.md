@@ -1,5 +1,11 @@
 # @traits-dev/core
 
+## 0.7.3
+
+### Patch Changes
+
+- 60cc340: Publish under frntr org identity by dropping OIDC provenance
+
 ## 0.7.2
 
 ### Patch Changes
