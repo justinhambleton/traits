@@ -8,6 +8,7 @@ coverage/
 *.tsbuildinfo
 docs/.vitepress/dist/
 docs/.vitepress/cache/
+packages/mcp/profiles/
 
 .DS_Store
 .vscode/

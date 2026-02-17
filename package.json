@@ -5,9 +5,9 @@
   "description": "Monorepo for traits.dev voice profile and behavioral policy tooling.",
   "packageManager": "pnpm@10.29.1",
   "scripts": {
-    "build": "pnpm --filter @traits-dev/core build && pnpm --filter @traits-dev/cli build",
-    "typecheck": "pnpm --filter @traits-dev/core build && pnpm --filter @traits-dev/core exec tsc --noEmit && pnpm --filter @traits-dev/cli typecheck",
-    "test": "pnpm --filter @traits-dev/core test && pnpm --filter @traits-dev/cli test",
+    "build": "pnpm --filter @traits-dev/core build && pnpm --filter @traits-dev/cli build && pnpm --filter @traits-dev/vercel build && pnpm --filter @traits-dev/mcp build",
+    "typecheck": "pnpm --filter @traits-dev/core build && pnpm --filter @traits-dev/core exec tsc --noEmit && pnpm --filter @traits-dev/cli typecheck && pnpm --filter @traits-dev/vercel typecheck && pnpm --filter @traits-dev/mcp typecheck",
+    "test": "pnpm --filter @traits-dev/core test && pnpm --filter @traits-dev/cli test && pnpm --filter @traits-dev/vercel test && pnpm --filter @traits-dev/mcp test",
     "docs:dev": "pnpm --filter @traits-dev/core build && vitepress dev docs",
     "docs:build": "pnpm --filter @traits-dev/core build && vitepress build docs",
     "docs:preview": "vitepress preview docs",

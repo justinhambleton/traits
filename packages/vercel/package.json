@@ -1,0 +1,67 @@
+{
+  "name": "@traits-dev/vercel",
+  "version": "0.1.0",
+  "description": "Vercel AI SDK middleware for traits.dev voice profile injection.",
+  "keywords": [
+    "traits-dev",
+    "vercel",
+    "ai-sdk",
+    "middleware",
+    "voice-profile",
+    "llm",
+    "prompt-engineering"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/justinhambleton/traits.git",
+    "directory": "packages/vercel"
+  },
+  "homepage": "https://github.com/justinhambleton/traits#readme",
+  "author": {
+    "name": "Justin Hambleton",
+    "url": "https://github.com/justinhambleton"
+  },
+  "contributors": [
+    {
+      "name": "Justin Hambleton",
+      "url": "https://github.com/justinhambleton"
+    }
+  ],
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "pnpm --filter @traits-dev/core build && tsup && node --test"
+  },
+  "peerDependencies": {
+    "ai": ">=5.0.0",
+    "@traits-dev/core": ">=0.7.0"
+  },
+  "devDependencies": {
+    "ai": "^6.0.86",
+    "@ai-sdk/provider": "^3.0.8",
+    "@traits-dev/core": "workspace:^",
+    "@types/json-schema": "^7.0.15",
+    "@types/node": "^25.2.3",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  }
+}

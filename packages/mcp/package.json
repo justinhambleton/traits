@@ -1,0 +1,59 @@
+{
+  "name": "@traits-dev/mcp",
+  "version": "0.1.0",
+  "description": "MCP server exposing traits.dev voice profile validation, compilation, and starter profiles.",
+  "keywords": [
+    "traits-dev",
+    "mcp",
+    "model-context-protocol",
+    "voice-profile",
+    "llm",
+    "prompt-engineering"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/justinhambleton/traits.git",
+    "directory": "packages/mcp"
+  },
+  "homepage": "https://github.com/justinhambleton/traits#readme",
+  "author": {
+    "name": "Justin Hambleton",
+    "url": "https://github.com/justinhambleton"
+  },
+  "contributors": [
+    {
+      "name": "Justin Hambleton",
+      "url": "https://github.com/justinhambleton"
+    }
+  ],
+  "type": "module",
+  "main": "./dist/index.js",
+  "bin": {
+    "traits-mcp": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "profiles"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "scripts": {
+    "build": "mkdir -p profiles && cp ../../profiles/*.yaml profiles/ && tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "pnpm --filter @traits-dev/core build && pnpm build && node --test"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.26.0",
+    "@traits-dev/core": "workspace:^",
+    "yaml": "^2.8.1",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "@types/node": "^25.2.3",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3"
+  }
+}
