@@ -4,10 +4,17 @@ traits.dev is a governance SDK for AI agent behavior. Define voice and behaviora
 
 ## Get started
 
-Install the SDK and CLI:
+Install core SDK + CLI:
 
 ```bash
 npm i @traits-dev/core @traits-dev/cli
+```
+
+Install integration packages as needed:
+
+```bash
+npm i @traits-dev/vercel ai
+npx -y @traits-dev/mcp
 ```
 
 If you are new to traits.dev, start with the [Quickstart](/quickstart) to go from zero to a policy-driven LLM response in 90 seconds. Install, scaffold a profile from a starter template, validate, compile, and call an LLM — all in one pass.
@@ -27,7 +34,12 @@ To understand the conceptual model behind profiles, validation, compilation, and
 
 - **[CLI Reference](/reference/cli)** — All six commands with flags, options, and exit codes
 - **[Safety & Validation Codes](/reference/safety-codes)** — Every code reported by `traits validate`
-- **[Integration Recipes](/guides/integrations)** — OpenAI, Anthropic, Vercel AI SDK, and LangChain patterns
+- **[Integration Recipes](/guides/integrations)** — OpenAI, Anthropic, Vercel AI SDK, MCP, and LangChain patterns
+
+### Integration packages
+
+- **[`@traits-dev/vercel` API](/api/vercel)** — `withPersonality()` middleware wrapper for Vercel AI SDK `LanguageModelV3`
+- **[`@traits-dev/mcp` API](/api/mcp)** — MCP tools/resources surface and client configuration guidance
 
 ### Evaluate
 
@@ -38,5 +50,7 @@ To understand the conceptual model behind profiles, validation, compilation, and
 ### Reference
 
 - **[API (`@traits-dev/core`)](/api/core)** — Public TypeScript API surface with all function signatures
+- **[API (`@traits-dev/vercel`)](/api/vercel)** — Vercel adapter API and options
+- **[API (`@traits-dev/mcp`)](/api/mcp)** — MCP server contract and usage
 - **[Playground](/playground/)** — Interactive voice dimension playground with compiled prompt preview
 - **[Showcase](/showcase/)** — Side-by-side profile comparison with precomputed responses

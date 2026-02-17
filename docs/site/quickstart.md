@@ -81,9 +81,54 @@ npx traits eval my-agent.yaml --model gpt-4o \
 
 Tier 1 runs locally in milliseconds. It checks vocabulary coverage, forbidden-term violations, dimension alignment, and helpfulness.
 
-## 6. Next steps
+## 6. Optional: Vercel AI SDK wrapper
+
+Use `@traits-dev/vercel` if you want one-line model wrapping instead of manual `compileProfile` + `system` wiring.
+
+```bash
+npm i @traits-dev/vercel ai
+```
+
+```ts
+import { generateText } from "ai";
+import { openai } from "@ai-sdk/openai";
+import { withPersonality } from "@traits-dev/vercel";
+
+const model = withPersonality(openai("gpt-4o"), "my-agent.yaml", { strict: true });
+const result = await generateText({ model, prompt: "Help with my billing issue." });
+console.log(result.text);
+```
+
+## 7. Optional: expose traits via MCP
+
+Run the MCP server:
+
+```bash
+npx -y @traits-dev/mcp
+```
+
+Claude Desktop config:
+
+```json
+{
+  "mcpServers": {
+    "traits": {
+      "command": "npx",
+      "args": ["-y", "@traits-dev/mcp"]
+    }
+  }
+}
+```
+
+MCP resources and tools:
+
+- Resources: `traits://profiles`, `traits://profiles/{name}`, `traits://profiles/{name}/compiled/{model}`
+- Tools: `traits_validate`, `traits_compile`, `traits_list_profiles`
+
+## 8. Next steps
 
 - [Extend Profiles Safely](/guides/extending-profiles) — compose base profiles with overrides
 - [Composition Patterns](/guides/composition-patterns) — three-layer fleet governance
 - [Run Evaluations](/guides/running-evaluations) — tier scoring semantics and CI gating
+- [Integration Recipes](/guides/integrations) — full OpenAI/Anthropic/Vercel/MCP/LangChain patterns
 - [CLI Reference](/reference/cli) — all 6 commands with flags and exit codes

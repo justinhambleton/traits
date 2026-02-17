@@ -42,6 +42,9 @@ jobs:
       - name: Test
         run: pnpm test
 
+      - name: Docs Build
+        run: pnpm docs:build
+
       - name: Version or Publish
         uses: changesets/action@v1
         with:

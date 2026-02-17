@@ -32,7 +32,14 @@ export default defineConfig({
       { text: "Playground", link: "/playground/" },
       { text: "Guides", link: "/guides/first-profile" },
       { text: "Reference", link: "/reference/cli" },
-      { text: "API", link: "/api/core" }
+      {
+        text: "API",
+        items: [
+          { text: "@traits-dev/core", link: "/api/core" },
+          { text: "@traits-dev/vercel", link: "/api/vercel" },
+          { text: "@traits-dev/mcp", link: "/api/mcp" }
+        ]
+      }
     ],
     sidebar: {
       "/": [
@@ -64,7 +71,9 @@ export default defineConfig({
             { text: "Eval Scoring", link: "/reference/eval-scoring" },
             { text: "Safety & Validation Codes", link: "/reference/safety-codes" },
             { text: "Schema", link: "/schema-reference" },
-            { text: "API (@traits-dev/core)", link: "/api/core" }
+            { text: "API (@traits-dev/core)", link: "/api/core" },
+            { text: "API (@traits-dev/vercel)", link: "/api/vercel" },
+            { text: "API (@traits-dev/mcp)", link: "/api/mcp" }
           ]
         }
       ]

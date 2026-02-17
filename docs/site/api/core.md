@@ -10,6 +10,11 @@ Public, semver-tracked surface exported from `@traits-dev/core`.
 npm i @traits-dev/core
 ```
 
+Related package APIs:
+
+- [`@traits-dev/vercel`](/api/vercel) for Vercel AI SDK middleware wrapping
+- [`@traits-dev/mcp`](/api/mcp) for MCP tools/resources integration
+
 ## Profile operations
 
 ### `loadProfileFile`

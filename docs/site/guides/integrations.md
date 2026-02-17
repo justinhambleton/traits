@@ -2,6 +2,73 @@
 
 Compiled policy text goes into the system prompt of your LLM call. These recipes show how.
 
+## Recommended integration packages
+
+Use these first if they fit your stack:
+
+- `@traits-dev/vercel` for Vercel AI SDK middleware (`withPersonality`)
+- `@traits-dev/mcp` for MCP-native tools/resources access
+
+### `@traits-dev/vercel` (Vercel AI SDK middleware)
+
+Install:
+
+```bash
+npm i @traits-dev/vercel ai
+```
+
+Wrap any `LanguageModelV3` once and use it with `generateText` or `streamText`:
+
+```ts
+import { generateText } from "ai";
+import { openai } from "@ai-sdk/openai";
+import { withPersonality } from "@traits-dev/vercel";
+
+const model = withPersonality(
+  openai("gpt-4o"),
+  "profiles/resolve.yaml",
+  { strict: true, bundledProfilesDir: "profiles" }
+);
+
+const result = await generateText({
+  model,
+  prompt: "You charged me twice. Help me resolve this."
+});
+```
+
+`withPersonality()` compiles once at creation time, then injects or merges personality text into system messages on each request.
+
+### `@traits-dev/mcp` (MCP server)
+
+Run directly:
+
+```bash
+npx -y @traits-dev/mcp
+```
+
+Claude Desktop config:
+
+```json
+{
+  "mcpServers": {
+    "traits": {
+      "command": "npx",
+      "args": ["-y", "@traits-dev/mcp"]
+    }
+  }
+}
+```
+
+MCP surface:
+
+- Tools: `traits_validate`, `traits_compile`, `traits_list_profiles`
+- Resources:
+  - `traits://profiles`
+  - `traits://profiles/{name}`
+  - `traits://profiles/{name}/compiled/{model}`
+
+Use tool calls for custom YAML content (`yaml` input), and resources for bundled starter profiles.
+
 ## OpenAI Chat Completions
 
 ```ts
@@ -30,6 +97,7 @@ import OpenAI from "openai";
 import { compileProfile } from "@traits-dev/core";
 
 const compiled = compileProfile("profiles/resolve.yaml", { model: "gpt-4o" });
+const client = new OpenAI();
 const tools = [
   {
     type: "function" as const,
@@ -103,7 +171,7 @@ const result = await client.messages.create({
 });
 ```
 
-## Vercel AI SDK
+## Vercel AI SDK (manual compile flow)
 
 Works with `generateText` and `streamText`:
 

@@ -40,18 +40,35 @@ pnpm typecheck
 pnpm test
 ```
 
-If your change touches docs content or showcase artifacts:
+If your change touches public package/API/CLI/integration behavior:
 
 ```bash
 pnpm docs:build
+```
+
+If your change touches showcase artifacts:
+
+```bash
 pnpm showcase:build
 ```
+
+## Release-blocking documentation gate
+
+For user-facing package changes, documentation updates are required before publish.
+
+Use the checklist in `docs/documentation-release-checklist.md` and complete all required sections for:
+
+- root README/discovery surfaces
+- integration guides
+- package READMEs
+- API reference pages and navigation links
+- docs build verification
 
 ## Engineering expectations
 
 - Keep runtime behavior deterministic where possible.
 - Preserve safety semantics (`S001`-`S008`) when touching schema, merge, validator, compiler, or eval logic.
-- Update docs when schema, CLI flags, or public API behavior changes.
+- Treat docs updates as release-blocking when schema, CLI flags, public API behavior, or integration surfaces change.
 - For significant implementation decisions, append an entry to `docs/planning/development-memory.md`.
 
 ## Tests

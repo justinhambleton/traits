@@ -12,7 +12,7 @@ Voice profile and behavioral policy infrastructure for production AI systems.
 - Model-aware compilation for Claude and GPT prompt placement
 - Multi-tier evaluation tooling for local and CI workflows
 
-This repository is a monorepo containing both the SDK and CLI.
+This repository is a monorepo containing core tooling and integration packages.
 
 ## Packages
 
@@ -21,6 +21,12 @@ This repository is a monorepo containing both the SDK and CLI.
   - Public API plus internal monorepo entrypoint (`@traits-dev/core/internal`)
 - `@traits-dev/cli`
   - Commands: `init`, `validate`, `compile`, `eval`, `import`
+- `@traits-dev/vercel`
+  - Vercel AI SDK middleware via `withPersonality()`
+  - One-line model wrapping with eager compile and automatic system injection
+- `@traits-dev/mcp`
+  - MCP server exposing traits tools/resources for Claude Desktop, Cursor, and other MCP clients
+  - Run with `npx @traits-dev/mcp` or `traits-mcp`
 
 ## Install
 
@@ -30,10 +36,24 @@ This repository is a monorepo containing both the SDK and CLI.
 pnpm add @traits-dev/core
 ```
 
+### Vercel AI SDK integration
+
+```bash
+pnpm add @traits-dev/vercel ai
+```
+
 ### CLI
 
 ```bash
 pnpm add -D @traits-dev/cli
+```
+
+### MCP server
+
+Run without install:
+
+```bash
+npx -y @traits-dev/mcp
 ```
 
 Or run directly without install:
@@ -84,6 +104,52 @@ const finalSystem = injectPersonality({
   system: "You are a helpful assistant."
 });
 ```
+
+## Quick start (Vercel AI SDK)
+
+```ts
+import { generateText } from "ai";
+import { openai } from "@ai-sdk/openai";
+import { withPersonality } from "@traits-dev/vercel";
+
+const model = withPersonality(
+  openai("gpt-4o"),
+  "profiles/resolve.yaml",
+  { strict: true, bundledProfilesDir: "profiles" }
+);
+
+const result = await generateText({
+  model,
+  prompt: "I was charged twice. Please fix this."
+});
+
+console.log(result.text);
+```
+
+## Quick start (MCP)
+
+`@traits-dev/mcp` exposes starter profiles as MCP resources and traits operations as tools.
+
+Claude Desktop config:
+
+```json
+{
+  "mcpServers": {
+    "traits": {
+      "command": "npx",
+      "args": ["-y", "@traits-dev/mcp"]
+    }
+  }
+}
+```
+
+MCP surface:
+
+- Tools: `traits_validate`, `traits_compile`, `traits_list_profiles`
+- Resources:
+  - `traits://profiles`
+  - `traits://profiles/{name}`
+  - `traits://profiles/{name}/compiled/{model}`
 
 ## Schema versions
 
@@ -151,12 +217,16 @@ Built-in suites:
 - `support`
 - `healthcare`
 - `developer`
+- `educator`
+- `advisor`
 
 ## Repo layout
 
 ```text
 packages/core/      SDK runtime + validators + compiler + evaluators
 packages/cli/       CLI command surface
+packages/vercel/    Vercel AI SDK middleware adapter
+packages/mcp/       MCP server package
 profiles/           Canonical profile artifacts + test fixtures
 knowledge-base/     Pattern libraries + calibration metadata
 experiment/         Calibration and evaluation scripts/artifacts
@@ -194,7 +264,10 @@ Trusted publishing is configured via npm OIDC in CI.
 
 - Schema reference: `docs/site/schema-reference.md`
 - Guides: `docs/site/guides/`
-- API reference: `docs/site/api/core.md`
+- API references:
+  - `docs/site/api/core.md`
+  - `docs/site/api/vercel.md`
+  - `docs/site/api/mcp.md`
 - Contributing guide: `CONTRIBUTING.md`
 - Security policy: `SECURITY.md`
 

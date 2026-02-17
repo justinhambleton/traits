@@ -155,6 +155,25 @@ Validate and evaluate all profiles in a directory:
           report_paths: eval-*.xml
 ```
 
+## Documentation gate before publish
+
+Package releases should block on docs updates for any user-facing API/CLI/integration changes.
+
+Recommended pre-publish checks:
+
+```bash
+pnpm build
+pnpm typecheck
+pnpm test
+pnpm docs:build
+```
+
+Repository workflow:
+
+- Use `docs/documentation-release-checklist.md` as the release documentation sign-off
+- Ensure package README updates and docs site updates are in the same PR as behavior changes
+- Keep release automation gated by `Docs Build` before publish
+
 ## Decision tree
 
 ```
