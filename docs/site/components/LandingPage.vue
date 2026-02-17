@@ -133,7 +133,9 @@
 
     <footer class="site-footer">
       <p>
-        &copy; {{ new Date().getFullYear() }} FRNTR, LLC. All rights reserved.
+        &copy; {{ new Date().getFullYear() }}
+        <a href="https://frntr.ai" target="_blank" rel="noreferrer">FRNTR, LLC</a>.
+        All rights reserved.
         <span aria-hidden="true"> · </span>
         <a :href="links.llms">llms.txt</a>
       </p>
