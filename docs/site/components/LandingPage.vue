@@ -132,7 +132,11 @@
     </section>
 
     <footer class="site-footer">
-      <p>&copy; {{ new Date().getFullYear() }} FRNTR, LLC. All rights reserved.</p>
+      <p>
+        &copy; {{ new Date().getFullYear() }} FRNTR, LLC. All rights reserved.
+        <span aria-hidden="true"> · </span>
+        <a :href="links.llms">llms.txt</a>
+      </p>
       <p class="built-in">Built in California</p>
     </footer>
   </div>
@@ -148,7 +152,8 @@ const activeProfile = ref("haven");
 
 const links = {
   overview: withBase("/overview"),
-  playground: withBase("/playground/")
+  playground: withBase("/playground/"),
+  llms: withBase("/llms.txt")
 };
 
 const workflowSteps = [
@@ -833,6 +838,12 @@ function levelPercent(level) {
   margin: 0;
   color: var(--muted);
   font-size: 0.82rem;
+}
+
+.site-footer a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
 }
 
 .site-footer .built-in {

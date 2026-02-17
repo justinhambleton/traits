@@ -1,0 +1,57 @@
+# traits.dev
+
+> Schema-driven voice profile and behavioral policy tooling for production AI systems.
+
+This file is the machine-oriented index for traits.dev documentation. Prefer the links below over inferring behavior from examples or marketing pages.
+
+## Docs
+
+- [Overview](overview): Product scope, governance pipeline, and documentation map.
+- [Quickstart](quickstart): End-to-end install, profile creation, validation, compilation, and evaluation.
+- [Core Concepts](concepts): Profile anatomy, model-aware compilation, composition, and safety model.
+- [Write Your First Profile](guides/first-profile): Build and run a first policy profile from starter templates.
+- [Schema Reference (v1.6)](schema-reference): Full profile schema, merge semantics, and version support.
+- [Extend Profiles Safely](guides/extending-profiles): `extends`, removal controls, and locked rule behavior.
+- [Composition Patterns](guides/composition-patterns): Multi-agent layering patterns for organizations.
+- [CLI Reference](reference/cli): `init`, `validate`, `compile`, `eval`, `import`, and `migrate` commands.
+- [Safety and Validation Codes](reference/safety-codes): Complete V001-V003 and S001-S008 diagnostics and fixes.
+- [Running Evaluations](guides/running-evaluations): Tier strategy, thresholds, suites, and CI usage.
+- [Eval Scoring Reference](reference/eval-scoring): Tier formulas, weights, and signal-scoring details.
+- [CI/CD Pipeline Setup](guides/ci-cd): Practical validation/eval gates and release checks.
+- [Integration Recipes](guides/integrations): OpenAI, Anthropic, Vercel AI SDK, MCP, and LangChain patterns.
+
+## Package APIs
+
+- [@traits-dev/core API](api/core): Runtime TypeScript APIs for load/resolve/validate/compile/inject/eval.
+- [@traits-dev/vercel API](api/vercel): `withPersonality()` wrapper for Vercel AI SDK `LanguageModelV3`.
+- [@traits-dev/mcp API](api/mcp): MCP server tools/resources and client configuration.
+
+## MCP Contract
+
+- Tools: `traits_validate`, `traits_compile`, `traits_list_profiles`
+- Resources: `traits://profiles`, `traits://profiles/{name}`, `traits://profiles/{name}/compiled/{model}`
+- Bundled starter profiles: `resolve`, `haven`, `architect`, `educator`, `advisor`, `pipeline`, `steward`
+
+## Packages
+
+- [@traits-dev/core](https://www.npmjs.com/package/@traits-dev/core): Core SDK.
+- [@traits-dev/cli](https://www.npmjs.com/package/@traits-dev/cli): Command-line interface.
+- [@traits-dev/vercel](https://www.npmjs.com/package/@traits-dev/vercel): Vercel AI SDK middleware.
+- [@traits-dev/mcp](https://www.npmjs.com/package/@traits-dev/mcp): MCP server package.
+
+## Source
+
+- [GitHub repository](https://github.com/justinhambleton/traits): Monorepo source, issues, and releases.
+- [Root README](https://github.com/justinhambleton/traits#readme): Installation and quick usage across packages.
+- [Starter profile YAMLs](https://github.com/justinhambleton/traits/tree/main/profiles): Canonical profile artifacts used by templates and MCP resources.
+
+## Agent Notes
+
+- Treat schema and safety references as authoritative for validation semantics.
+- Prefer API reference signatures over inferred patterns from snippets.
+- For model-family differences, follow compiler output metadata and model-aware placement guidance.
+- When generating integration code, keep imports and option names aligned to the package API pages above.
+
+## Optional
+
+- [Playground](playground/): Interactive voice-dimension tuning and compiled prompt preview.
