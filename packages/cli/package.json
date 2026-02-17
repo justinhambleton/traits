@@ -37,8 +37,7 @@
     "traits": "./dist/traits.js"
   },
   "publishConfig": {
-    "access": "public",
-    "provenance": true
+    "access": "public"
   },
   "scripts": {
     "build": "tsup",
