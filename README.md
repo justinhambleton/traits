@@ -1,5 +1,12 @@
 # traits.dev
 
+[![npm @traits-dev/core](https://img.shields.io/npm/v/@traits-dev/core?label=%40traits-dev%2Fcore)](https://www.npmjs.com/package/@traits-dev/core)
+[![npm @traits-dev/cli](https://img.shields.io/npm/v/@traits-dev/cli?label=%40traits-dev%2Fcli)](https://www.npmjs.com/package/@traits-dev/cli)
+[![npm @traits-dev/vercel](https://img.shields.io/npm/v/@traits-dev/vercel?label=%40traits-dev%2Fvercel)](https://www.npmjs.com/package/@traits-dev/vercel)
+[![npm @traits-dev/mcp](https://img.shields.io/npm/v/@traits-dev/mcp?label=%40traits-dev%2Fmcp)](https://www.npmjs.com/package/@traits-dev/mcp)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![CI](https://github.com/justinhambleton/traits/actions/workflows/release.yml/badge.svg)](https://github.com/justinhambleton/traits/actions/workflows/release.yml)
+
 Voice profile and behavioral policy infrastructure for production AI systems.
 
 `traits.dev` helps teams define how assistants should communicate, validate policy safety before shipping, compile model-aware system prompt blocks, and evaluate adherence over time.
@@ -54,12 +61,6 @@ Run without install:
 
 ```bash
 npx -y @traits-dev/mcp
-```
-
-Or run directly without install:
-
-```bash
-npx @traits-dev/cli validate profiles/resolve.yaml
 ```
 
 ## Quick start (CLI)
@@ -258,7 +259,7 @@ pnpm version-packages
 git push origin main
 ```
 
-Trusted publishing is configured via npm OIDC in CI.
+Publishing uses token-based auth via Changesets GitHub Action.
 
 ## Documentation
 
