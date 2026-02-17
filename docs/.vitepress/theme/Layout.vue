@@ -10,14 +10,19 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 import { useData } from "vitepress";
 import DefaultTheme from "vitepress/theme";
+import { inject } from "@vercel/analytics";
 import LandingPage from "../../site/components/LandingPage.vue";
 import CopyMarkdownButton from "../../site/components/CopyMarkdownButton.vue";
 
 const { page } = useData();
 const isLanding = computed(() => page.value.relativePath === "index.md");
+
+onMounted(() => {
+  inject();
+});
 </script>
 
 <style>
