@@ -1,5 +1,11 @@
 # @traits-dev/core
 
+## 0.7.2
+
+### Patch Changes
+
+- e6f658f: Fix npm publish auth to use frntr org token instead of OIDC
+
 ## 0.7.1
 
 ### Patch Changes
