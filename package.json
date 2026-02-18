@@ -17,7 +17,8 @@
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "changeset publish",
-    "release:ci": "pnpm build && pnpm docs:build && pnpm release"
+    "release:ci": "pnpm build && pnpm docs:build && pnpm release",
+    "verify:post-publish": "./scripts/post-publish-verify.sh"
   },
   "devDependencies": {
     "@changesets/cli": "^2.29.8",
