@@ -4,6 +4,8 @@ Thanks for contributing. This repository is a pnpm monorepo for:
 
 - `@traits-dev/core` (SDK runtime)
 - `@traits-dev/cli` (CLI)
+- `@traits-dev/vercel` (Vercel AI SDK middleware)
+- `@traits-dev/mcp` (MCP server)
 - `docs/` (VitePress docs)
 - `profiles/`, `knowledge-base/`, and `experiment/` (artifacts and evaluation tooling)
 
