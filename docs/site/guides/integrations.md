@@ -90,7 +90,7 @@ console.log(response.choices[0]?.message?.content ?? "");
 
 ## OpenAI with tool calling
 
-When using tools, place the compiled policy before or after tool definitions depending on the model. The compiler sets `compiled.metadata.recommended_position` — for GPT models this is `"after_tools"`.
+When using tools, place the compiled policy before or after tool definitions depending on the model. The compiler sets `compiled.placement.recommended_position` — for GPT models this is `"after_tools"`.
 
 ```ts
 import OpenAI from "openai";
@@ -248,8 +248,8 @@ import { compileProfile } from "@traits-dev/core";
 
 const compiled = compileProfile("my-agent.yaml", { model: "gpt-4o" });
 
-if (compiled.metadata.estimated_tokens > 2000) {
-  console.warn(`System prompt is ${compiled.metadata.estimated_tokens} tokens`);
+if (compiled.metadata.token_count > 2000) {
+  console.warn(`System prompt is ${compiled.metadata.token_count} tokens`);
 }
 ```
 

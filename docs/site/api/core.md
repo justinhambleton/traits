@@ -158,9 +158,9 @@ compileProfile(
 import { compileProfile } from "@traits-dev/core";
 
 const compiled = compileProfile("profiles/resolve.yaml", { model: "gpt-4o" });
-console.log(compiled.text);                          // System prompt string
-console.log(compiled.metadata.recommended_position); // "after_tools"
-console.log(compiled.metadata.estimated_tokens);     // Token estimate
+console.log(compiled.text);                              // System prompt string
+console.log(compiled.placement.recommended_position);    // "after_tools"
+console.log(compiled.metadata.token_count);              // Token estimate
 ```
 
 ### `compileResolvedProfile`
