@@ -52,3 +52,6 @@ export type { Tier3Options } from "./eval/tier3.js";
 
 export { runImportAnalysis } from "./import/engine.js";
 export type { ImportOptions } from "./import/engine.js";
+
+export { diffProfiles } from "./diff.js";
+export type { ProfileDiff, DiffEntry } from "./diff.js";

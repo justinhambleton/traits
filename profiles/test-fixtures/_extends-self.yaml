@@ -1,0 +1,21 @@
+# Test fixture: Self-referencing extends (A extends A)
+schema: "v1.6"
+extends: "_extends-self"
+
+meta:
+  name: "_extends-self"
+  version: "1.0.0"
+  description: "Self-reference cycle test"
+
+identity:
+  role: "Self-reference"
+
+voice:
+  formality: "medium"
+  warmth: "medium"
+  verbosity: "medium"
+  directness: "medium"
+  empathy: "medium"
+  humor:
+    target: "very-low"
+    style: "none"

@@ -62,6 +62,47 @@ context_adaptations:
       - "Provide emergency and crisis resources immediately"
 ```
 
+## Recursive extends chains
+
+Parent profiles can themselves declare `extends`, enabling layered hierarchies:
+
+```
+grandparent.yaml → parent.yaml → child.yaml
+```
+
+```yaml
+# parent.yaml
+schema: "v1.6"
+extends: "brand-base"
+meta:
+  name: "domain-health"
+  description: "Healthcare variant"
+voice:
+  directness:
+    target: medium
+    adapt: true
+    floor: low
+    ceiling: medium
+
+# child.yaml
+schema: "v1.6"
+extends: "domain-health"
+meta:
+  name: "clinic-assistant"
+  description: "Clinic-specific override"
+behavioral_rules:
+  - "Include clinic hours in responses when relevant"
+```
+
+The resolver walks the full chain. Each level merges using the same rules.
+
+**Safety limits:**
+
+- Circular references produce `E_EXTENDS_CYCLE` error.
+- Chains deeper than 5 levels produce `E_EXTENDS_DEPTH` error (configurable via `maxExtendsDepth` option).
+
+Use `traits diff <profile> --resolved` to see the full effect of a chain.
+
 ## Merge behavior to remember
 
 1. `meta`, `identity`: field-level merge.
@@ -94,5 +135,6 @@ Locked inherited rules cannot be removed by `behavioral_rules_remove`; validator
 pnpm exec traits validate brand-base.yaml
 pnpm exec traits validate domain-health.yaml
 pnpm exec traits validate domain-health.yaml --strict
+pnpm exec traits diff domain-health.yaml --resolved    # See what extends adds
 pnpm exec traits compile domain-health.yaml --model gpt-4o
 ```

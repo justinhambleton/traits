@@ -115,6 +115,38 @@ traits compile my-agent.yaml --model gpt-4o --json --explain
 
 ---
 
+## diff
+
+Compare two profiles structurally, or compare a profile before and after extends resolution.
+
+```bash
+traits diff <profile-a> <profile-b> [options]
+traits diff <profile> --resolved [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--resolved` | Compare raw profile vs extends-resolved version |
+| `--json` | Output structured JSON |
+| `--bundled-profiles-dir <dir>` | Directory for bundled starter profiles |
+
+```bash
+# Compare two profiles
+traits diff profiles/resolve.yaml profiles/haven.yaml
+
+# Compare raw vs resolved (see what extends adds)
+traits diff profiles/domain-health.yaml --resolved
+
+# JSON output
+traits diff profiles/resolve.yaml profiles/haven.yaml --json
+```
+
+The diff compares voice dimensions, behavioral rules, vocabulary terms, context adaptations, identity, and capabilities. Changes are categorized as `added`, `removed`, or `modified`.
+
+**Exit codes:** `0` no differences, `1` differences found, `2` error.
+
+---
+
 ## eval
 
 Score agent responses against profile policy across three evaluation tiers.

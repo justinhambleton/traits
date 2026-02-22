@@ -1,0 +1,33 @@
+# Test fixture: Parent profile that extends grandparent (chain level 2)
+schema: "v1.6"
+extends: "_extends-chain-grandparent"
+
+meta:
+  name: "_extends-chain-parent"
+  version: "1.0.0"
+  description: "Mid-level parent in chain resolution"
+  tags:
+    - "chain-parent"
+
+identity:
+  backstory: "Parent backstory overrides grandparent"
+
+voice:
+  warmth: "high"
+
+vocabulary:
+  preferred_terms:
+    - "parent-term"
+  forbidden_terms:
+    - "parent-forbidden"
+
+behavioral_rules:
+  - "Parent rule added"
+
+context_adaptations:
+  - when: "shared_context"
+    inject:
+      - "Parent inject replaces grandparent for shared"
+  - when: "parent_only"
+    inject:
+      - "Parent-only inject"

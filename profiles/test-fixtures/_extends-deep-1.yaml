@@ -1,0 +1,18 @@
+schema: "v1.6"
+meta:
+  name: "_extends-deep-1"
+  version: "1.0.0"
+  description: "Depth chain level 1"
+identity:
+  role: "Deep 1"
+voice:
+  formality: "medium"
+  warmth: "medium"
+  verbosity: "medium"
+  directness: "medium"
+  empathy: "medium"
+  humor:
+    target: "very-low"
+    style: "none"
+behavioral_rules:
+  - "Rule from depth 1"

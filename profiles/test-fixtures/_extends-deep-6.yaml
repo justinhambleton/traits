@@ -1,0 +1,8 @@
+schema: "v1.6"
+extends: "_extends-deep-5"
+meta:
+  name: "_extends-deep-6"
+  version: "1.0.0"
+  description: "Depth chain level 6 — exceeds default max depth of 5"
+behavioral_rules:
+  - "Rule from depth 6"

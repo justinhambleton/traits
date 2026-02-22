@@ -38,12 +38,15 @@ const profile = loadProfileFile("profiles/resolve.yaml");
 
 ### `resolveExtends`
 
-Resolve parent profiles and return the merged result with diagnostics.
+Resolve parent profiles recursively and return the merged result with diagnostics. Supports multi-level inheritance chains with cycle detection and configurable depth limits.
 
 ```ts
 resolveExtends(
   profilePath: string,
-  options?: { bundledProfilesDir?: string }
+  options?: {
+    bundledProfilesDir?: string;
+    maxExtendsDepth?: number;
+  }
 ): ExtendsResult
 ```
 
@@ -51,8 +54,14 @@ resolveExtends(
 |-----------|------|-------------|
 | `profilePath` | `string` | Path to the child profile |
 | `options.bundledProfilesDir` | `string?` | Directory for bundled starter profiles |
+| `options.maxExtendsDepth` | `number?` | Maximum chain depth (default: 5) |
 
-**Returns:** `ExtendsResult` with `profile` (merged) and `diagnostics`.
+**Returns:** `ExtendsResult` with `profile` (merged), `parentPaths`, and `diagnostics`.
+
+Diagnostics may include:
+
+- `E_EXTENDS_CYCLE` — circular reference in extends chain
+- `E_EXTENDS_DEPTH` — chain exceeds max depth
 
 ### `resolveActiveContext`
 
@@ -353,6 +362,45 @@ const result = await runImportAnalysis(existingPrompt, {
 console.log(result.yaml); // Generated YAML profile
 ```
 
+## Diff
+
+### `diffProfiles`
+
+Compare two profile objects structurally and return a list of changes.
+
+```ts
+diffProfiles(
+  profileA: PersonalityProfile,
+  profileB: PersonalityProfile
+): ProfileDiff
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `profileA` | `PersonalityProfile` | Base profile |
+| `profileB` | `PersonalityProfile` | Comparison profile |
+
+**Returns:** `ProfileDiff` with `changes` array and `summary`.
+
+```ts
+import { diffProfiles, loadProfileFile, resolveExtends } from "@traits-dev/core";
+
+const a = resolveExtends("profiles/resolve.yaml", { bundledProfilesDir: "profiles" }).profile;
+const b = resolveExtends("profiles/haven.yaml", { bundledProfilesDir: "profiles" }).profile;
+const diff = diffProfiles(a, b);
+
+console.log(diff.summary); // { added: 3, removed: 1, modified: 5 }
+for (const change of diff.changes) {
+  console.log(`${change.type}: ${change.path}`);
+}
+```
+
+Each `DiffEntry` has:
+
+- `path` — dotted path (e.g., `voice.formality`, `behavioral_rules[]`, `context_adaptations[vip_user]`)
+- `type` — `"added"`, `"removed"`, or `"modified"`
+- `oldValue` / `newValue` — the values that changed
+
 ## Option types
 
 ### `CompileOptions`
@@ -453,7 +501,7 @@ type ImportOptions = {
 
 Exported types for TypeScript consumers:
 
-`Level`, `DimensionName`, `HumorStyle`, `DimensionShorthand`, `DimensionObject`, `HumorDimensionObject`, `DimensionValue`, `HumorDimensionValue`, `VocabularyConstraints`, `ContextAdaptation`, `LockedRule`, `RuleConstraint`, `CapabilityHandoff`, `ProfileCapabilities`, `PersonalityProfile`, `ValidationDiagnostic`, `ValidationResult`, `CompiledPersonality`, `ExtendsDiagnostics`, `ExtendsResult`, `ContextResolution`.
+`Level`, `DimensionName`, `HumorStyle`, `DimensionShorthand`, `DimensionObject`, `HumorDimensionObject`, `DimensionValue`, `HumorDimensionValue`, `VocabularyConstraints`, `ContextAdaptation`, `LockedRule`, `RuleConstraint`, `CapabilityHandoff`, `ProfileCapabilities`, `PersonalityProfile`, `ValidationDiagnostic`, `ValidationResult`, `CompiledPersonality`, `ExtendsDiagnostics`, `ExtendsResult`, `ContextResolution`, `ProfileDiff`, `DiffEntry`.
 
 ## Internal boundary
 

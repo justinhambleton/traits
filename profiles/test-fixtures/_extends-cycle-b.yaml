@@ -1,0 +1,21 @@
+# Test fixture: Circular extends B → A → B
+schema: "v1.6"
+extends: "_extends-cycle-a"
+
+meta:
+  name: "_extends-cycle-b"
+  version: "1.0.0"
+  description: "Cycle test B"
+
+identity:
+  role: "Cycle B"
+
+voice:
+  formality: "medium"
+  warmth: "medium"
+  verbosity: "medium"
+  directness: "medium"
+  empathy: "medium"
+  humor:
+    target: "very-low"
+    style: "none"

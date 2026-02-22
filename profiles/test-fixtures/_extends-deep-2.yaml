@@ -1,0 +1,8 @@
+schema: "v1.6"
+extends: "_extends-deep-1"
+meta:
+  name: "_extends-deep-2"
+  version: "1.0.0"
+  description: "Depth chain level 2"
+behavioral_rules:
+  - "Rule from depth 2"

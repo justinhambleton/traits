@@ -1,4 +1,4 @@
-# Schema Reference (v1.6)
+# Schema Reference (v1.7)
 
 This page documents the voice and behavioral policy schema used by `@traits-dev/core`. For validation codes, see [Safety & Validation Codes](/reference/safety-codes).
 
@@ -8,7 +8,8 @@ This page documents the voice and behavioral policy schema used by `@traits-dev/
 |---------|--------|--------------|
 | `v1.4` | Supported | Base schema |
 | `v1.5` | Supported | `capabilities` section |
-| `v1.6` | **Current** | Array `extends`, `locked` rules, object-form behavioral rules |
+| `v1.6` | Supported | Array `extends`, `locked` rules, object-form behavioral rules |
+| `v1.7` | **Current** | Recursive extends chains, adaptive compilation output, `traits diff` |
 
 Any other schema value fails validation ([V001](/reference/safety-codes#v001-structure-errors)). Use `traits migrate` to upgrade older profiles.
 
@@ -97,6 +98,22 @@ Object-form rules:
 - `adapt` is optional boolean.
 - If `adapt: true`, both `floor` and `ceiling` are required.
 - Adaptive ranges must satisfy `floor <= target <= ceiling`.
+
+**Adaptive compilation behavior (`v1.7`):**
+
+When `adapt: true` with `floor`/`ceiling`, the compiler renders:
+
+1. An inline annotation in `[VOICE TARGETS]`: `warmth: high (adaptive: high → very-high)`
+2. An `[ADAPTIVE RANGES]` section instructing the model to adjust within bounds:
+
+```
+[ADAPTIVE RANGES]
+You may adjust the following dimensions within the specified bounds based on conversational context:
+- warmth: Shift between high and very-high based on conversational cues.
+Dimensions not listed above are locked at their target values. Do not adjust them.
+```
+
+Dimensions without `adapt: true` are locked and excluded from the adaptive ranges section.
 
 Humor-specific rule:
 
@@ -189,17 +206,48 @@ Net effect: higher priority overrides lower priority deterministically.
 `extends` accepts either:
 
 - `extends: "parent-name"` (single parent)
-- `extends: ["parent-a", "parent-b", "parent-c"]` (multi-parent chain; `v1.6` only)
+- `extends: ["parent-a", "parent-b", "parent-c"]` (multi-parent chain; `v1.6+`)
 
 Resolution search order for each parent name:
 
 1. Sibling directory of the child profile.
 2. Bundled starter profiles (`profiles/` in the SDK package).
 
+### Recursive extends chains (`v1.7`)
+
+Parent profiles may themselves declare `extends`, enabling multi-level hierarchies:
+
+```yaml
+# grandparent.yaml
+schema: "v1.6"
+extends: ~
+voice:
+  formality: medium
+
+# parent.yaml
+schema: "v1.6"
+extends: "grandparent"
+voice:
+  warmth: high
+
+# child.yaml
+schema: "v1.6"
+extends: "parent"
+voice:
+  directness: high
+```
+
+The resolver walks the full chain recursively: grandparent → parent → child. Each level is merged using the same binary merge rules.
+
+**Safety limits:**
+
+- **Cycle detection:** If a profile appears twice in the same chain, the resolver returns `E_EXTENDS_CYCLE`.
+- **Depth limit:** Chains deeper than 5 levels (configurable via `maxExtendsDepth`) return `E_EXTENDS_DEPTH`.
+
 For array form, parent profiles are merged left to right before the child is applied:
 
-1. Start with the first parent as base.
-2. Merge the second parent on top.
+1. Start with the first parent as base (resolving its own chain recursively).
+2. Merge the second parent on top (resolving its chain recursively).
 3. Merge each next parent in sequence.
 4. Merge the child last.
 

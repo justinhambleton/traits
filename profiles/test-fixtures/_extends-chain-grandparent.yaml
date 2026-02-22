@@ -1,0 +1,44 @@
+# Test fixture: Grandparent profile for chain resolution testing
+schema: "v1.6"
+
+meta:
+  name: "_extends-chain-grandparent"
+  version: "1.0.0"
+  description: "Base grandparent for chain resolution tests"
+  tags:
+    - "test-fixture"
+    - "chain"
+
+identity:
+  role: "Base agent"
+  backstory: "Grandparent backstory"
+  expertise_domains:
+    - "general"
+
+voice:
+  formality: "medium"
+  warmth: "medium"
+  verbosity: "medium"
+  directness: "medium"
+  empathy: "medium"
+  humor:
+    target: "very-low"
+    style: "none"
+
+vocabulary:
+  preferred_terms:
+    - "grandparent-term"
+  forbidden_terms:
+    - "grandparent-forbidden"
+
+behavioral_rules:
+  - "Grandparent rule one"
+  - "Grandparent rule two"
+
+context_adaptations:
+  - when: "shared_context"
+    inject:
+      - "Grandparent inject for shared"
+  - when: "grandparent_only"
+    inject:
+      - "Grandparent-only inject"

@@ -55,9 +55,45 @@ function selectPlacement(model: string): CompiledPersonality["placement"] {
 function stringifyDimensionTarget(value: unknown): string {
   if (typeof value === "string") return value;
   if (value && typeof value === "object") {
-    return String((value as { target?: unknown }).target ?? "medium");
+    const obj = value as { target?: string; adapt?: boolean; floor?: string; ceiling?: string };
+    const target = String(obj.target ?? "medium");
+    if (obj.adapt === true && (obj.floor || obj.ceiling)) {
+      const floor = obj.floor ?? target;
+      const ceiling = obj.ceiling ?? target;
+      return `${target} (adaptive: ${floor} → ${ceiling})`;
+    }
+    return target;
   }
   return "medium";
+}
+
+function renderAdaptiveRanges(voice: Record<string, unknown>): string[] {
+  const adaptiveDims: Array<{ dim: string; floor: string; ceiling: string }> = [];
+
+  for (const [dim, value] of Object.entries(voice)) {
+    if (value && typeof value === "object") {
+      const obj = value as { adapt?: boolean; floor?: string; ceiling?: string; target?: string };
+      if (obj.adapt === true && (obj.floor || obj.ceiling)) {
+        adaptiveDims.push({
+          dim,
+          floor: obj.floor ?? obj.target ?? "medium",
+          ceiling: obj.ceiling ?? obj.target ?? "medium"
+        });
+      }
+    }
+  }
+
+  if (adaptiveDims.length === 0) return [];
+
+  const lines: string[] = [];
+  lines.push("");
+  lines.push("[ADAPTIVE RANGES]");
+  lines.push("You may adjust the following dimensions within the specified bounds based on conversational context:");
+  for (const { dim, floor, ceiling } of adaptiveDims) {
+    lines.push(`- ${dim}: Shift between ${floor} and ${ceiling} based on conversational cues.`);
+  }
+  lines.push("Dimensions not listed above are locked at their target values. Do not adjust them.");
+  return lines;
 }
 
 function applyContextAdjustments(
@@ -167,6 +203,7 @@ function renderPersonalityText(
   if (voice.humor && typeof voice.humor === "object" && voice.humor.style) {
     lines.push(`humor_style: ${voice.humor.style}`);
   }
+  lines.push(...renderAdaptiveRanges(voice));
   lines.push("");
   lines.push("[PATTERN GUIDANCE]");
   for (const selection of patternSelections) {

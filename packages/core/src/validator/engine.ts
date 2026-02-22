@@ -80,7 +80,9 @@ function buildCompositionCheck(
   );
   const compositionErrors = resolvedErrors.filter(
     (diagnostic) =>
-      diagnostic.code === "E_RESOLVE_EXTENDS" || diagnostic.code === "E_EXTENDS_CHAIN"
+      diagnostic.code === "E_RESOLVE_EXTENDS" ||
+      diagnostic.code === "E_EXTENDS_CYCLE" ||
+      diagnostic.code === "E_EXTENDS_DEPTH"
   );
   return summarizeCheck([...compositionWarnings, ...compositionErrors]);
 }
