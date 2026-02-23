@@ -1,5 +1,12 @@
 # @traits-dev/vercel
 
+## 1.0.0
+
+### Patch Changes
+
+- Updated dependencies [472b213]
+  - @traits-dev/core@0.8.0
+
 ## 0.2.0
 
 ### Minor Changes
